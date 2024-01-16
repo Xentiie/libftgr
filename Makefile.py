@@ -84,12 +84,12 @@ if (platform == "win32"):
 	CC="x86_64-w64-mingw32-gcc"
 	CFLAGS += ["-D FT_WIN32"]
 	INCLUDES += ["-I./libftwin32"]
-	DEP_SRCS_DIR="./libftwin32/srcs"
+	DEP_SRCS_DIR="./srcs/win32"
 elif (platform == "linux"):
 	CC="gcc"
 	CFLAGS += ["-D FT_LINUX"]
 	INCLUDES += ["-I./libftx11"]
-	DEP_SRCS_DIR="./libftx11/srcs"
+	DEP_SRCS_DIR="./srcs/x11"
 elif (platform == "osx"):
 	CFLAGS += ["-D FT_OSX"]
 	print("Platform not supported")
