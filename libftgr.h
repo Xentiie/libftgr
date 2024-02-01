@@ -14,6 +14,7 @@
 # define LIBFTGR_H
 
 # include "libft.h"
+# include "srcs/libftgr_constants.h"
 
 typedef void*	t_ftgr_ctx;
 typedef void*	t_ftgr_win;
@@ -27,12 +28,15 @@ void		ftgr_free_window(t_ftgr_ctx *win);
 void		ftgr_quit(t_ftgr_ctx *ctx);
 void		ftgr_set_quit_handler(t_ftgr_ctx *ctx, void (*handler)());
 
+void		ftgr_bring_top(t_ftgr_win *win);
+
+void		ftgr_mouse_move(t_ftgr_ctx *ctx, t_ftgr_win *win, t_iv2 pos);
+void		ftgr_mouse_hide(t_ftgr_ctx *ctx, t_ftgr_win *win);
+void		ftgr_mouse_show(t_ftgr_ctx *ctx, t_ftgr_win *win);
+
 /*
 void		ftx11_clear_window(t_ftgr_ctx *xvar, t_ftgr_win *win);
 
-void		ftx11_mouse_move(t_ftgr_ctx *ctx, t_ftgr_win *win, t_iv2 pos);
-void		ftx11_mouse_hide(t_ftgr_ctx *ctx, t_ftgr_win *win);
-void		ftx11_mouse_show(t_ftgr_ctx *ctx, t_ftgr_win *win);
 t_iv2		ftx11_mouse_get_pos(t_ftgr_ctx *ctx, t_ftgr_win *win);
 
 bool		ftx11_is_key_down(t_ftgr_ctx *ctx);

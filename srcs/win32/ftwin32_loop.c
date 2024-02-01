@@ -26,7 +26,6 @@ void ftwin32_loop(t_ftwin32_ctx *ctx)
 	while (ctx->run)
 	{
 		MSG msg;
-		//while (GetMessage(&msg, NULL, 0, 0))
 		while (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE))
 		{
 			// Task manager can send WM_QUIT

@@ -20,18 +20,24 @@ LRESULT CALLBACK windowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 	switch (msg)
 	{
+
 	case WM_CLOSE:
 		ftwin32_quit(win->ctx);
 		return 0;
 
 	case WM_DESTROY:
-		// Handle the destroy event
 		PostQuitMessage(0);
-		return 0;
-	}
+		return FALSE;
 
-	// Pass unhandled messages to the default window procedure
-	return DefWindowProc(hwnd, msg, wParam, lParam);
+	case WM_SETCURSOR:
+		printf("%d\n", win->cursor_mode & FTGR_CURSOR_HIDDEN);
+		if (win->cursor_mode & FTGR_CURSOR_HIDDEN && LOWORD(lParam) == HTCLIENT)
+			SetCursor(NULL);
+		return TRUE;
+
+	default:
+		return DefWindowProc(hwnd, msg, wParam, lParam);
+	}
 }
 
 t_ftwin32_win *ftwin32_new_window(t_ftwin32_ctx *ctx, t_iv2 size, const_string title)
@@ -75,6 +81,8 @@ t_ftwin32_win *ftwin32_new_window(t_ftwin32_ctx *ctx, t_iv2 size, const_string t
 
     ShowWindow(win->window_handle, SW_SHOWNORMAL);
     UpdateWindow(win->window_handle);
+
+	win->cursor_mode = FTGR_CURSOR_NORMAL;
 
 	t_list	*lst = ft_lstnew(win);
 	ft_lstadd_front(&ctx->windows, lst);

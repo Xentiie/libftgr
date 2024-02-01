@@ -15,6 +15,7 @@
 
 # include <windows.h>
 # include "libft.h"
+# include "../libftgr_constants.h"
 
 
 # ifndef FT_LISTS
@@ -47,7 +48,7 @@ typedef struct s_ftwin32_win {
     
 	t_ftwin32_ctx	*ctx;
     HWND			window_handle;
-
+	S32				cursor_mode;
 }   t_ftwin32_win;
 
 #define	FTWIN32_WINDOW(lst) ((t_ftwin32_win*)(lst->content))

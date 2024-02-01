@@ -27,4 +27,9 @@ void			ftwin32_free_window(t_ftwin32_win *win);
 void			ftwin32_quit(t_ftwin32_ctx *ctx);
 void			ftwin32_set_quit_handler(t_ftwin32_ctx *ctx, void (*handler)());
 
+void			ftwin32_bring_top(t_ftwin32_win *win);
+
+void			ftwin32_mouse_move(t_ftwin32_ctx *ctx, t_ftwin32_win *win, t_iv2 pos);
+void			ftwin32_mouse_hide(t_ftwin32_ctx *ctx, t_ftwin32_win *win);
+void			ftwin32_mouse_show(t_ftwin32_ctx *ctx, t_ftwin32_win *win);
 #endif

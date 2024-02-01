@@ -36,3 +36,9 @@ inline void		ftgr_quit(t_ftgr_ctx *ctx)
 
 inline void		ftgr_set_quit_handler(t_ftgr_ctx *ctx, void (*handler)())
 { FTGR_FUNC(set_quit_handler)(ctx, handler); }
+
+inline void		ftgr_bring_top(t_ftgr_win *win)
+{ FTGR_FUNC(bring_top)(win); }
+
+inline void		ftgr_mouse_move(t_ftgr_ctx *ctx, t_ftgr_win *win, t_iv2 pos)
+{ FTGR_FUNC(mouse_move)(ctx, win, pos); }
