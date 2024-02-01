@@ -1,33 +1,18 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ftwin32_ctx.c                                      :+:      :+:    :+:   */
+/*   ftwin32_bring_top.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/01/12 18:06:29 by reclaire          #+#    #+#             */
-/*   Updated: 2024/01/12 18:06:29 by reclaire         ###   ########.fr       */
+/*   Created: 2024/01/31 21:08:54 by reclaire          #+#    #+#             */
+/*   Updated: 2024/01/31 21:08:54 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libftwin32_int.h"
 
-t_ftwin32_ctx   *ftwin32_create_ctx()
+void	ftwin32_bring_top(t_ftwin32_win *win)
 {
-    t_ftwin32_ctx   *ctx = malloc(sizeof(t_ftwin32_ctx));
-
-    ctx->instance_handle = GetModuleHandle(NULL);
-	if (!ctx->instance_handle)
-	{
-		return NULL;
-	}
-
-	ctx->main_window_class = 0;
-
-	ctx->windows = NULL;
-	ctx->loop_hooks = NULL;
-
-	ctx->run = FALSE;
-	
-	return ctx;
+	SetWindowPos(win->window_handle, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 }

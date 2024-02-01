@@ -1,33 +1,24 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ftwin32_ctx.c                                      :+:      :+:    :+:   */
+/*   test.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/01/12 18:06:29 by reclaire          #+#    #+#             */
-/*   Updated: 2024/01/12 18:06:29 by reclaire         ###   ########.fr       */
+/*   Created: 2024/01/31 21:05:21 by reclaire          #+#    #+#             */
+/*   Updated: 2024/01/31 21:05:21 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libftwin32_int.h"
+#include <stdlib.h>
+#include <stdio.h>
+#include "libftgr.h"
 
-t_ftwin32_ctx   *ftwin32_create_ctx()
+
+int main()
 {
-    t_ftwin32_ctx   *ctx = malloc(sizeof(t_ftwin32_ctx));
+	t_ftgr_ctx *ctx = ftgr_create_ctx();
+	t_ftgr_win *win = ftgr_new_window(ctx, ivec2(512, 512), "test");
 
-    ctx->instance_handle = GetModuleHandle(NULL);
-	if (!ctx->instance_handle)
-	{
-		return NULL;
-	}
-
-	ctx->main_window_class = 0;
-
-	ctx->windows = NULL;
-	ctx->loop_hooks = NULL;
-
-	ctx->run = FALSE;
-	
-	return ctx;
+	ftgr_loop(ctx);
 }

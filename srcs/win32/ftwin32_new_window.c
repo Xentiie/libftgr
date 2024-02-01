@@ -18,16 +18,10 @@ LRESULT CALLBACK windowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	t_ftwin32_win	*win = GetPropW(hwnd, FTWIN32_PROP_NAME);
 
-	printf("WINDOW: %p\n", win);
-
 	switch (msg)
 	{
 	case WM_CLOSE:
-		// Handle the close event
-		if (MessageBox(win->window_handle, "Do you really want to quit?", "Quit", MB_YESNO | MB_ICONQUESTION) == IDYES)
-		{
-			DestroyWindow(win->window_handle);
-		}
+		ftwin32_quit(win->ctx);
 		return 0;
 
 	case WM_DESTROY:

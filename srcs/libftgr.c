@@ -22,11 +22,17 @@
 
 #include "libftgr.h"
 
-t_ftgr_ctx	*ftgr_create_ctx()
+inline t_ftgr_ctx	*ftgr_create_ctx()
 { return FTGR_FUNC(create_ctx)(); }
 
-t_ftgr_win	*ftgr_new_window(t_ftgr_ctx *ctx, t_iv2 size, const_string title)
+inline t_ftgr_win	*ftgr_new_window(t_ftgr_ctx *ctx, t_iv2 size, const_string title)
 { return FTGR_FUNC(new_window)(ctx, size, title); }
 
-void		ftgr_loop(t_ftgr_ctx *ctx)
+inline void		ftgr_loop(t_ftgr_ctx *ctx)
 { FTGR_FUNC(loop)(ctx); }
+
+inline void		ftgr_quit(t_ftgr_ctx *ctx)
+{ FTGR_FUNC(quit)(ctx); }
+
+inline void		ftgr_set_quit_handler(t_ftgr_ctx *ctx, void (*handler)())
+{ FTGR_FUNC(set_quit_handler)(ctx, handler); }

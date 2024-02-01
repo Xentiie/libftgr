@@ -14,7 +14,7 @@
 
 #include <stdio.h>
 
-void call_loop_hook(void *func)
+static void call_loop_hook(void *func)
 {
 	((void (*)())(func))();
 }
@@ -26,8 +26,8 @@ void ftwin32_loop(t_ftwin32_ctx *ctx)
 	while (ctx->run)
 	{
 		MSG msg;
-		while (GetMessage(&msg, NULL, 0, 0))
-		//while (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE))
+		//while (GetMessage(&msg, NULL, 0, 0))
+		while (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE))
 		{
 			// Task manager can send WM_QUIT
 			if (msg.message == WM_QUIT)

@@ -21,9 +21,6 @@
 # ifndef FT_MATHS
 #  error Ftx11 requires FT_MATHS to be defined
 # endif
-# ifndef FT_HASHMAPS
-#  error Ftx11 requires FT_HASHMAPS to be defined
-# endif
 
 # include <stdlib.h>
 # include <stdio.h>

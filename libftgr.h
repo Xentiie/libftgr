@@ -19,10 +19,14 @@ typedef void*	t_ftgr_ctx;
 typedef void*	t_ftgr_win;
 
 t_ftgr_ctx	*ftgr_create_ctx();
+void		ftgr_loop(t_ftgr_ctx *ctx);
 
 t_ftgr_win	*ftgr_new_window(t_ftgr_ctx *ctx, t_iv2 size, const_string title);
+void		ftgr_free_window(t_ftgr_ctx *win);
 
-void		ftgr_loop(t_ftgr_ctx *ctx);
+void		ftgr_quit(t_ftgr_ctx *ctx);
+void		ftgr_set_quit_handler(t_ftgr_ctx *ctx, void (*handler)());
+
 /*
 void		ftx11_clear_window(t_ftgr_ctx *xvar, t_ftgr_win *win);
 

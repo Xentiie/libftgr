@@ -1,33 +1,35 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ftwin32_ctx.c                                      :+:      :+:    :+:   */
+/*   ftwin32_free_window.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/01/12 18:06:29 by reclaire          #+#    #+#             */
-/*   Updated: 2024/01/12 18:06:29 by reclaire         ###   ########.fr       */
+/*   Created: 2024/01/16 23:33:07 by reclaire          #+#    #+#             */
+/*   Updated: 2024/01/16 23:33:07 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libftwin32_int.h"
 
-t_ftwin32_ctx   *ftwin32_create_ctx()
+static bool _find_win(void *w1, void *w2)
 {
-    t_ftwin32_ctx   *ctx = malloc(sizeof(t_ftwin32_ctx));
+	return w1 == w2;
+}
 
-    ctx->instance_handle = GetModuleHandle(NULL);
-	if (!ctx->instance_handle)
+void ftwin32_free_window(t_ftwin32_win *win)
+{
+	if (win->window_handle)
 	{
-		return NULL;
+		DestroyWindow(win->window_handle);
+		win->window_handle = NULL;
+	}
+	
+	t_list *lst = ft_lstfind(win->ctx->windows, _find_win, win);
+	if (lst)
+	{
+		ft_lstremove(&win->ctx->windows, lst, NULL);
 	}
 
-	ctx->main_window_class = 0;
-
-	ctx->windows = NULL;
-	ctx->loop_hooks = NULL;
-
-	ctx->run = FALSE;
-	
-	return ctx;
+	free(win);
 }

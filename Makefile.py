@@ -75,8 +75,8 @@ LIBTOOL=["ar", "-rcs"]
 RM=["rm", "-rf"]
 
 INCLUDES=["-I../libft", "-I./"]
-LIBRARIES_PATH=[]
-LIBRARIES=[]
+LIBRARIES_PATH=["-L../libft"]
+LIBRARIES=["-lft"]
 CFLAGS=["-O3"]
 
 platform = _get_platform()
@@ -143,6 +143,9 @@ def re():
 	fclean()
 	all()
 
+def test():
+	all()
+	_execute(CC, *CFLAGS, *INCLUDES, *LIBRARIES_PATH, '-L./', 'test.c', '-o', 'test', '-lftgr', *LIBRARIES)
 
 target = None
 if (len(sys.argv) == 1):

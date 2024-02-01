@@ -23,9 +23,6 @@
 # ifndef FT_MATHS
 #  error Ftwin32 requires FT_MATHS to be defined
 # endif
-# ifndef FT_HASHMAPS
-#  error Ftwin32 requires FT_HASHMAPS to be defined
-# endif
 
 
 # define FTWIN32_WINDOW_CLASS "FtMainWindowClass"
@@ -38,11 +35,12 @@ typedef struct s_ftwin32_ctx {
     HINSTANCE	instance_handle;
     ATOM		main_window_class;
 
-	t_list			*windows;
-	t_list			*loop_hooks;
+	t_list		*windows;
+	t_list		*loop_hooks;
 
-	bool			run;
+	bool		run;
 
+	void		(*on_quit)();
 }	t_ftwin32_ctx;
 
 typedef struct s_ftwin32_win {
@@ -53,5 +51,15 @@ typedef struct s_ftwin32_win {
 }   t_ftwin32_win;
 
 #define	FTWIN32_WINDOW(lst) ((t_ftwin32_win*)(lst->content))
+
+t_ftwin32_ctx   *ftwin32_create_ctx();
+
+void ftwin32_loop(t_ftwin32_ctx *ctx);
+
+t_ftwin32_win *ftwin32_new_window(t_ftwin32_ctx *ctx, t_iv2 size, const_string title);
+void ftwin32_free_window(t_ftwin32_win *win);
+
+void ftwin32_set_quit_handler(t_ftwin32_ctx *ctx, void (*handler)());
+void ftwin32_quit(t_ftwin32_ctx *ctx);
 
 #endif
