@@ -21,8 +21,12 @@ void ftwin32_free_window(t_ftwin32_win *win)
 {
 	if (win->window_handle)
 	{
-		DestroyWindow(win->window_handle);
-		win->window_handle = NULL;
+		BOOL ret = DestroyWindow(win->window_handle);
+		//Ne pas changer, documentation dis que on doit check explicitement pour TRUE/FALSE
+		if (ret == FALSE)
+			_ftwin32_error(win->ctx);
+		if (ret == TRUE)
+			win->window_handle = NULL;
 	}
 	
 	t_list *lst = ft_lstfind(win->ctx->windows, _find_win, win);

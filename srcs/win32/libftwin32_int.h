@@ -29,7 +29,7 @@
 # define FTWIN32_WINDOW_CLASS "FtMainWindowClass"
 # define FTWIN32_PROP_NAME L"FTWIN32"
 
-typedef t_error_code (*t_loop_hook)();
+typedef S32 (*t_loop_hook)();
 
 typedef struct s_ftwin32_ctx {
 	
@@ -41,6 +41,7 @@ typedef struct s_ftwin32_ctx {
 
 	bool		run;
 
+	void		(*error_callback)();
 	void		(*on_quit)();
 }	t_ftwin32_ctx;
 
@@ -62,5 +63,7 @@ void ftwin32_free_window(t_ftwin32_win *win);
 
 void ftwin32_set_quit_handler(t_ftwin32_ctx *ctx, void (*handler)());
 void ftwin32_quit(t_ftwin32_ctx *ctx);
+
+void _ftwin32_error(t_ftwin32_ctx *ctx);
 
 #endif

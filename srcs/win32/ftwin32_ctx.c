@@ -15,10 +15,14 @@
 t_ftwin32_ctx   *ftwin32_create_ctx()
 {
     t_ftwin32_ctx   *ctx = malloc(sizeof(t_ftwin32_ctx));
+	if (!ctx)
+		return NULL;
 
-    ctx->instance_handle = GetModuleHandle(NULL);
+
+    ctx->instance_handle = GetModuleHandleW(NULL);
 	if (!ctx->instance_handle)
 	{
+		free(ctx);
 		return NULL;
 	}
 
@@ -28,6 +32,9 @@ t_ftwin32_ctx   *ftwin32_create_ctx()
 	ctx->loop_hooks = NULL;
 
 	ctx->run = FALSE;
-	
+
+	ctx->on_quit = NULL;
+	ctx->error_callback = NULL;
+
 	return ctx;
 }

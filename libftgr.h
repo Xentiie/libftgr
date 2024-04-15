@@ -33,11 +33,13 @@ void		ftgr_bring_top(t_ftgr_win *win);
 void		ftgr_mouse_move(t_ftgr_ctx *ctx, t_ftgr_win *win, t_iv2 pos);
 void		ftgr_mouse_hide(t_ftgr_ctx *ctx, t_ftgr_win *win);
 void		ftgr_mouse_show(t_ftgr_ctx *ctx, t_ftgr_win *win);
+t_iv2		ftgr_mouse_get_pos(t_ftgr_ctx *ctx, t_ftgr_win *win);
+
+void		ftgr_set_error_callback(t_ftgr_ctx *ctx, void (*callback)());
 
 /*
 void		ftx11_clear_window(t_ftgr_ctx *xvar, t_ftgr_win *win);
 
-t_iv2		ftx11_mouse_get_pos(t_ftgr_ctx *ctx, t_ftgr_win *win);
 
 bool		ftx11_is_key_down(t_ftgr_ctx *ctx);
 bool		ftx11_is_key_up(t_ftgr_ctx *ctx);

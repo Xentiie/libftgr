@@ -14,6 +14,7 @@
 
 void	ftwin32_bring_top(t_ftwin32_win *win)
 {
-	BringWindowToTop(win->window_handle);
+	if (BringWindowToTop(win->window_handle) == FALSE)
+		_ftwin32_error(win->ctx);
 	//SetWindowPos(win->window_handle, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 }

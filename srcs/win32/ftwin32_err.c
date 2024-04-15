@@ -1,26 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   test.c                                             :+:      :+:    :+:   */
+/*   ftwin32_err.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/01/31 21:05:21 by reclaire          #+#    #+#             */
-/*   Updated: 2024/01/31 21:05:21 by reclaire         ###   ########.fr       */
+/*   Created: 2024/02/02 23:15:32 by reclaire          #+#    #+#             */
+/*   Updated: 2024/02/02 23:15:32 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include "libftgr.h"
+#include "libftwin32_int.h"
 
-int main()
+void ftwin32_set_error_callback(t_ftwin32_ctx *ctx, void (*callback)())
 {
-	t_ftgr_ctx *ctx = ftgr_create_ctx();
-	t_ftgr_win *win = ftgr_new_window(ctx, ivec2(512, 512), "test");
-
-	ftgr_bring_top(win);
-	ftgr_mouse_move(ctx, win, ivec2(10, 10));
-
-	ftgr_loop(ctx);
+	ctx->error_callback = callback;
 }
+
+void _ftwin32_error(t_ftwin32_ctx *ctx)
+{
+	if (ctx->error_callback)
+		ctx->error_callback();
+}
+
