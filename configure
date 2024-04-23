@@ -1,0 +1,110 @@
+#!/bin/bash
+set -e
+
+POSITIONAL_ARGS=()
+
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -t|--target)
+            if [ "$2" != "windows" ] && [ "$2" != "linux" ] && [ "$2" != "glfw" ]; then
+                echo "Invalid option for -t: $2"
+            fi
+            TARGET="$2"
+            shift # past argument
+            shift # past value
+            ;;
+        --glfw)
+            GLFW="true"
+            shift
+            ;;
+        -*|--*)
+            echo "Unknown option $1"
+            exit 1
+            ;;
+        *)
+            POSITIONAL_ARGS+=("$1") # save positional arg
+            shift # past argument
+            ;;
+    esac
+done
+
+OBJS_PATH="./objs"
+
+CC_WINDOWS=x86_64-w64-mingw32-gcc
+CC_LINUX=gcc
+
+RM="rm -r"
+CFLAGS=
+INCLUDES=
+LIBS_PATHS=
+LIBS=
+
+if [ -z "$TARGET" ]; then
+    if [ -z "$WSLENV" ]; then
+        TARGET="linux"
+    else
+        TARGET="windows"
+    fi
+fi
+
+if [ "$TARGET" = "windows" ]; then
+    CC=$CC_WINDOWS
+    CFLAGS="-DFT_OS_WIN $CFLAGS"
+    SRCS_PATH="./srcs/windows"
+
+elif [ "$TARGET" = "linux" ]; then
+    CC=$CC_LINUX
+    CFLAGS="-DFT_OS_LINUX $CFLAGS"
+    SRCS_PATH="./srcs/x11"
+
+else
+    echo Not supported, defaulting to linux/glfw
+    TARGET="linux"
+    CC=$CC_LINUX
+    CFLAGS="-DFT_OS_UNKNOWN $CFLAGS"
+    GLFW="true"
+fi
+
+if [ -n "$GLFW" ]; then
+    SRCS_PATH="./srcs/glfw"
+fi
+
+echo "$TARGET -> `basename "$SRCS_PATH"`"
+
+SRCS=()
+OBJS=()
+readarray -d '' SRCS < <(find $SRCS_PATH -type f -name '*.c' -print0)
+readarray -d '' OBJS < <(for i in "${!SRCS[@]}"; do printf "$OBJS_PATH/`basename ${SRCS[i]%.c}.o`\0"; done)
+
+echo -n > config.mk
+
+echo ".DEFAULT_GOAL := all" >> config.mk
+echo "all: objs "'$(NAME)' >> config.mk
+echo "" >> config.mk
+
+echo "RM=$RM" >> config.mk
+echo "CC=$CC" >> config.mk
+echo "CFLAGS=$CFLAGS" >> config.mk
+echo "INCLUDES=$INCLUDES" >> config.mk
+echo "LIBS_PATHS=$LIBS_PATHS" >> config.mk
+echo "LIBS=$LIBS" >> config.mk
+echo "OBJS_PATH=$OBJS_PATH" >> config.mk
+echo -e "SRCS=${SRCS[@]}" >> config.mk
+echo -e "OBJS=${OBJS[@]}" >> config.mk
+echo "" >> config.mk
+
+printf "objs:\n\tmkdir -p %s" "$OBJS_PATH" >> config.mk
+echo "" >> config.mk
+
+for i in "${!SRCS[@]}"; do
+    printf "%s: %s\n" "${OBJS[i]}" "${SRCS[i]}" >> config.mk
+    printf "\t%s %s %s -c %s -o %s\n\n" '$(CC)' '$(CFLAGS)' '$(INCLUDES)' "${SRCS[i]}" "${OBJS[i]}" >> config.mk
+done
+echo "" >> config.mk
+
+printf "clean:\n\t\t\t%s %s\n\n" '$(RM)' '$(OBJS)' >> config.mk
+printf "fclean:\tclean\n\t\t\t%s %s\n\n" '$(RM)' '$(NAME)' >> config.mk
+printf "re:\t\t\tfclean all\n\n" >> config.mk
+
+printf ".PHONY:\t\t all clean fclean re\n" >> config.mk
+

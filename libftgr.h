@@ -6,47 +6,85 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/13 01:58:46 by reclaire          #+#    #+#             */
-/*   Updated: 2024/01/13 01:58:46 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/04/23 03:54:56 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef LIBFTGR_H
-# define LIBFTGR_H
+#define LIBFTGR_H
 
-# include "libft.h"
-# include "srcs/libftgr_constants.h"
+#include "libft/std.h"
+#include "libft/strings.h"
+#include "libft/maths.h"
+#include "srcs/libftgr_constants.h"
 
-typedef void*	t_ftgr_ctx;
-typedef void*	t_ftgr_win;
+typedef void *t_ftgr_ctx;
+typedef void *t_ftgr_win;
 
-t_ftgr_ctx	*ftgr_create_ctx();
-void		ftgr_loop(t_ftgr_ctx *ctx);
+typedef struct
+{
+	U64 line_size;
+	U64 pixel_size;
+	char *data;
+	t_iv2 size;
 
-t_ftgr_win	*ftgr_new_window(t_ftgr_ctx *ctx, t_iv2 size, const_string title);
-void		ftgr_free_window(t_ftgr_ctx *win);
+	t_ftgr_ctx *ctx;
+	void *internal;
+} t_ftgr_img;
 
-void		ftgr_quit(t_ftgr_ctx *ctx);
-void		ftgr_set_quit_handler(t_ftgr_ctx *ctx, void (*handler)());
+typedef struct {
+	U8 r;
+	U8 g;
+	U8 b;
+	U8 a;
+}	t_color;
 
-void		ftgr_bring_top(t_ftgr_win *win);
 
-void		ftgr_mouse_move(t_ftgr_ctx *ctx, t_ftgr_win *win, t_iv2 pos);
-void		ftgr_mouse_hide(t_ftgr_ctx *ctx, t_ftgr_win *win);
-void		ftgr_mouse_show(t_ftgr_ctx *ctx, t_ftgr_win *win);
-t_iv2		ftgr_mouse_get_pos(t_ftgr_ctx *ctx, t_ftgr_win *win);
+t_ftgr_ctx *ftgr_create_ctx();
+bool ftgr_wait(t_ftgr_ctx *ctx);
+bool ftgr_poll(t_ftgr_ctx *ctx);
 
-void		ftgr_set_error_callback(t_ftgr_ctx *ctx, void (*callback)());
+t_ftgr_win *ftgr_new_window(t_ftgr_ctx *ctx, t_iv2 size, const_string title);
+void ftgr_free_window(t_ftgr_ctx *win);
+void ftgr_set_win_name(t_ftgr_win *win, string name);
+void ftgr_set_win_name_infos(t_ftgr_win *win, string infos);
+
+void ftgr_free(t_ftgr_ctx *ctx);
+
+void ftgr_bring_top(t_ftgr_win *win);
+
+void ftgr_mouse_move(t_ftgr_ctx *ctx, t_ftgr_win *win, t_iv2 pos);
+void ftgr_mouse_hide(t_ftgr_ctx *ctx, t_ftgr_win *win);
+void ftgr_mouse_show(t_ftgr_ctx *ctx, t_ftgr_win *win);
+t_iv2 ftgr_mouse_get_pos(t_ftgr_ctx *ctx, t_ftgr_win *win);
+
+bool ftgr_is_key_pressed(t_ftgr_ctx *ctx, U32 key);
+bool ftgr_is_key_down(t_ftgr_ctx *ctx, U32 key);
+bool ftgr_is_key_up(t_ftgr_ctx *ctx, U32 key);
+void ftgr_key_autorepeat(t_ftgr_ctx *ctx, bool active);
+
+void ftgr_set_error_callback(t_ftgr_ctx *ctx, void (*callback)());
+
+float ftgr_time(t_ftgr_ctx *ctx);
+float ftgr_delta_time(t_ftgr_ctx *ctx);
+
+t_ftgr_img *ftgr_new_img(t_ftgr_ctx *ctx, t_iv2 size);
+void ftgr_free_img(t_ftgr_img *img);
+void ftgr_display_image(t_ftgr_img *img, t_ftgr_win *win, t_iv2 pos);
+void ftgr_set_pixel(t_ftgr_img *img, t_iv2 p, t_color col);
+
+void ftgr_display_fps(t_ftgr_win *win);
+S32 ftgr_color_to_int(t_color col);
 
 /*
-void		ftx11_clear_window(t_ftgr_ctx *xvar, t_ftgr_win *win);
+void		ftgr_clear_window(t_ftgr_ctx *xvar, t_ftgr_win *win);
 
 
-bool		ftx11_is_key_down(t_ftgr_ctx *ctx);
-bool		ftx11_is_key_up(t_ftgr_ctx *ctx);
-void		ftx11_key_autorepeat(t_ftgr_ctx *ctx, bool active);
+bool		ftgr_is_key_down(t_ftgr_ctx *ctx);
+bool		ftgr_is_key_up(t_ftgr_ctx *ctx);
+void		ftgr_key_autorepeat(t_ftgr_ctx *ctx, bool active);
 
-t_iv2		ftx11_get_screen_size(t_ftgr_ctx *ctx);
+t_iv2		ftgr_get_screen_size(t_ftgr_ctx *ctx);
 */
-
 
 #endif

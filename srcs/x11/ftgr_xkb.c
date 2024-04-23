@@ -1,18 +1,18 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ftx11_xkb.c                                        :+:      :+:    :+:   */
+/*   ftgr_xkb.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 08:47:06 by reclaire          #+#    #+#             */
-/*   Updated: 2024/01/10 08:55:54 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/04/16 22:36:58 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-//Stolen from glfw: https://github.com/glfw/glfw/blob/master/src/xkb_unicode.c
+//Shamelessly stolen from glfw: https://github.com/glfw/glfw/blob/master/src/xkb_unicode.c
 
-#include "ftx11_int.h"
+#include "libftgr_int.h"
 
 static const struct codepair {
   unsigned short keysym;
@@ -849,7 +849,7 @@ static const struct codepair {
 };
 
 
-U32	_ftx11_keysym2uni(U32 keysym)
+U32	_ftgr_keysym2uni(U32 keysym)
 {
     int min = 0;
     int max = sizeof(keysymtab) / sizeof(struct codepair) - 1;

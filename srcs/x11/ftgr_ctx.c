@@ -1,36 +1,42 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ftx11_ctx.c                                        :+:      :+:    :+:   */
+/*   ftgr_ctx.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/09 16:46:04 by reclaire          #+#    #+#             */
-/*   Updated: 2024/01/10 10:55:00 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/04/23 03:32:52 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ftx11_int.h"
+#include "libftgr_int.h"
+#include "libft/time.h"
 #include <unistd.h>
 
-static void	ftx11_init_shm(t_ftx11_ctx *ctx);
-
+static void	ftgr_init_shm(t_ftgr_ctx *ctx);
 //TODO: check return codes
 
-t_ftx11_ctx	*ftx11_create_ctx()
-{
-	t_ftx11_ctx *ctx;
 
-	ctx = malloc(sizeof(t_ftx11_ctx));
+t_ftgr_ctx	*ftgr_create_ctx()
+{
+	t_ftgr_ctx *ctx;
+
+	ctx = malloc(sizeof(t_ftgr_ctx));
 	if (!ctx)
 		return NULL;
 
 	ctx->display = XOpenDisplay("");
 	if (ctx->display == 0)
 	{
-		// TODO: CLEANUP
+		free(ctx);
 		return NULL;
 	}
+
+	ctx->screen = DefaultScreen(ctx->display);
+	ctx->root = DefaultRootWindow(ctx->display);
+	ctx->cmap = DefaultColormap(ctx->display, ctx->screen);
+	ctx->depth = DefaultDepth(ctx->display, ctx->screen);
 
 	ctx->visual = DefaultVisual(ctx->display, ctx->screen);
 	if (ctx->visual->class != TrueColor)
@@ -50,27 +56,24 @@ t_ftx11_ctx	*ftx11_create_ctx()
 		ctx->cmap = XCreateColormap(ctx->display, ctx->root, ctx->visual, AllocNone);
 	}
 
-	ctx->screen = DefaultScreen(ctx->display);
-	ctx->root = DefaultRootWindow(ctx->display);
-	ctx->cmap = DefaultColormap(ctx->display, ctx->screen);
-	ctx->depth = DefaultDepth(ctx->display, ctx->screen);
 
 	ctx->flush = TRUE;
-	ctx->run = FALSE;
-
-	ctx->loop_hooks = NULL;
 	ctx->windows = NULL;
 
 	ctx->del_win_atom = XInternAtom(ctx->display, "WM_DELETE_WINDOW", False);
 	ctx->protocols_atom = XInternAtom(ctx->display, "WM_PROTOCOLS", False);
 
-	ftx11_init_shm(ctx);
-	//ftx11_int_rgb_conversion(ctx);
+	ftgr_init_shm(ctx);
+	//ftgr_int_rgb_conversion(ctx);
 
+	clk_get(&ctx->global_time);
+	clk_get(&ctx->delta_time_clk);
+
+	ctx->keys = NULL;
 	return (ctx);
 }
 
-static void	ftx11_init_shm(t_ftx11_ctx *ctx)
+static void	ftgr_init_shm(t_ftgr_ctx *ctx)
 {
 	S32 dummy;
 
@@ -96,43 +99,7 @@ static void	ftx11_init_shm(t_ftx11_ctx *ctx)
 	}
 
 	ctx->windows = NULL;
+	if (!ctx->use_xshm)
+		fprintf(stderr, "Warning: not using shared memory\n");
 }
 
-/*
-
-int ftx11_int_rgb_conversion(t_ftx11_ctx *ctx)
-{
-	bzero(ctx->decrgb, sizeof(int) * 6);
-	while (!(ctx->visual->red_mask & 1))
-	{
-		ctx->visual->red_mask >>= 1;
-		ctx->decrgb[0]++;
-	}
-	while (ctx->visual->red_mask & 1)
-	{
-		ctx->visual->red_mask >>= 1;
-		ctx->decrgb[1]++;
-	}
-	while (!(ctx->visual->green_mask & 1))
-	{
-		ctx->visual->green_mask >>= 1;
-		ctx->decrgb[2]++;
-	}
-	while (ctx->visual->green_mask & 1)
-	{
-		ctx->visual->green_mask >>= 1;
-		ctx->decrgb[3]++;
-	}
-	while (!(ctx->visual->blue_mask & 1))
-	{
-		ctx->visual->blue_mask >>= 1;
-		ctx->decrgb[4]++;
-	}
-	while (ctx->visual->blue_mask & 1)
-	{
-		ctx->visual->blue_mask >>= 1;
-		ctx->decrgb[5]++;
-	}
-}
-
-*/

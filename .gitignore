@@ -6,7 +6,7 @@ objs/
 
 #deps
 libftwin32/
-libftx11/
+libftgr/
 
 #env
 .editorconfig

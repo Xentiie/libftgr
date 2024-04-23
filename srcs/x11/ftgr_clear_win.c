@@ -1,21 +1,20 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ftx11_screen_size.c                                :+:      :+:    :+:   */
+/*   ftgr_clear_win.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/01/10 08:10:06 by reclaire          #+#    #+#             */
-/*   Updated: 2024/01/10 08:11:32 by reclaire         ###   ########.fr       */
+/*   Created: 2024/04/16 22:36:39 by reclaire          #+#    #+#             */
+/*   Updated: 2024/04/16 22:36:40 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ftx11_int.h"
+#include "libftgr_int.h"
 
-t_iv2 ftx11_get_screen_size(t_ftx11_ctx *ctx)
+void	ftgr_clear_window(t_ftgr_ctx *xvar, t_ftgr_win *win)
 {
-	XWindowAttributes	attr;
-	XGetWindowAttributes(ctx->display, ctx->root, &attr);
-
-	return ivec2(attr.width, attr.height);
+  XClearWindow(xvar->display, win->window);
+  if (xvar->flush)
+    XFlush(xvar->display);
 }

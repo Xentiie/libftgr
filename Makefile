@@ -5,21 +5,23 @@
 #                                                     +:+ +:+         +:+      #
 #    By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2024/01/15 18:18:04 by reclaire          #+#    #+#              #
-#    Updated: 2024/01/15 18:18:04 by reclaire         ###   ########.fr        #
+#    Created: 2024/04/15 17:26:47 by reclaire          #+#    #+#              #
+#    Updated: 2024/04/23 03:00:42 by reclaire         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-.DEFAULT_GOAL := all
+NAME		=	libftgr.a
+include config.mk
 
-all:
-	python3 ./Makefile.py all
+INCLUDES	+=	-I../libft -I./ -I./srcs
+#CFLAGS		+=	-Wall -Wextra -Werror -O3 -g
+CFLAGS		+=	-O3 -g
 
-clean:
-	python3 ./Makefile.py clean
+$(NAME):	objs $(OBJS)
+			ar -rcs $(NAME) $(OBJS)
 
-fclean:
-	python3 ./Makefile.py fclean
+_libft:
+			make -C ../libft
 
-re:
-	python3 ./Makefile.py re
+test:	$(NAME) _libft
+			$(CC) $(CFLAGS) $(INCLUDES) -L./ -L../libft test.c -lftgr -lft -lX11 -lXext -lm
