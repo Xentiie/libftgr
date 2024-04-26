@@ -79,8 +79,6 @@ void ftgr_display_image(t_ftgr_img *img, t_ftgr_win *win, t_iv2 pos)
 void ftgr_set_pixel(t_ftgr_img *img, t_iv2 p, t_color col)
 {
 	int c = ftgr_color_to_int(col);
-	(void)c;
-
 	*(unsigned int *)(img->data + (p.y * img->line_size + p.x * (img->pixel_size / 8))) = c;
 }
 

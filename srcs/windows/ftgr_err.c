@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ftwin32_err.c                                      :+:      :+:    :+:   */
+/*   ftgr_err.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -10,16 +10,40 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libftwin32_int.h"
+#include "libftgr_int.h"
 
-void ftwin32_set_error_callback(t_ftwin32_ctx *ctx, void (*callback)())
+#define PRINT_ERROR(name, error_code, msg) printf("(%s:%d) ["name":%d] %s\n", file, line, error_code, msg)
+#define PRINT_ERROR_WIN(error_code, msg) PRINT_ERROR("WIN", error_code, msg)
+#define PRINT_ERROR_FT(error_code, msg) PRINT_ERROR("FT", error_code, msg)
+
+void (_ftgr_error)(char *file, int line)
 {
-	ctx->error_callback = callback;
-}
+    DWORD err = GetLastError();
+	if (err != 0)
+	{
+    	string buffer = NULL;
+    	size_t size = FormatMessageA(
+			FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+			NULL,
+			err,
+			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+			(LPSTR)&buffer,
+			0,
+			NULL);
 
-void _ftwin32_error(t_ftwin32_ctx *ctx)
-{
-	if (ctx->error_callback)
-		ctx->error_callback();
+		for (size_t i = size - 1; i >= 0; i++)
+		{
+			if (buffer[i] == '\n')
+			{
+				buffer[i] = '\0';
+				break;
+			}
+		}
+		PRINT_ERROR_WIN(err, buffer);
+	    LocalFree(buffer);
+	}
+	else if (ft_errno != FT_OK)
+		PRINT_ERROR_FT(ft_errno, ft_strerror(ft_errno));
+	else
+		PRINT_ERROR("UNKNOWN", -1, "Unknown error");
 }
-

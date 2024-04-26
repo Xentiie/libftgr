@@ -59,9 +59,6 @@ typedef struct
 
 	t_list *windows;
 
-	float t_last_frame;
-	float t_startup;
-
 	t_time global_time;
 	t_time delta_time_clk;
 	float delta_time;

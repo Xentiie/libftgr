@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ftwin32_loop.c                                     :+:      :+:    :+:   */
+/*   ftgr_loop.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -10,36 +10,34 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libftwin32_int.h"
+#include "libftgr_int.h"
 
 #include <stdio.h>
 
-static void call_loop_hook(void *func)
+static void update_time(t_ftgr_ctx *ctx)
 {
-	((void (*)())(func))();
+	t_time tmp;
+	clk_get(&tmp);
+	ctx->delta_time = clk_diff_float(&ctx->delta_time_clk, &tmp);
+	ctx->delta_time_clk = tmp;
 }
 
-void ftwin32_loop(t_ftwin32_ctx *ctx)
+bool ftgr_poll(t_ftgr_ctx *ctx)
 {
-	ctx->run = TRUE;
+	update_time(ctx);
+	_ftwin32_keys_cleanup(ctx);
 
-	while (ctx->run)
+	MSG msg;
+	while (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE))
 	{
-		MSG msg;
-		while (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE))
+		switch (msg.message)
 		{
-			// Task manager can send WM_QUIT
-			if (msg.message == WM_QUIT)
-			{
-				// Close all windows
-			}
-			else
-			{
-				TranslateMessage(&msg);
-				DispatchMessageW(&msg);
-			}
+		case WM_QUIT:
+			return FALSE;
+		default:
+			TranslateMessage(&msg);
+			DispatchMessageW(&msg);
 		}
-
-		ft_lstiter(ctx->loop_hooks, call_loop_hook);
 	}
+	return TRUE;
 }

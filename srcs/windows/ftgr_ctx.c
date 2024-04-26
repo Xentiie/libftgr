@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ftwin32_ctx.c                                      :+:      :+:    :+:   */
+/*   ftgr_ctx.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -10,11 +10,11 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libftwin32_int.h"
+#include "libftgr_int.h"
 
-t_ftwin32_ctx   *ftwin32_create_ctx()
+t_ftgr_ctx   *ftgr_create_ctx()
 {
-    t_ftwin32_ctx   *ctx = malloc(sizeof(t_ftwin32_ctx));
+    t_ftgr_ctx   *ctx = malloc(sizeof(t_ftgr_ctx));
 	if (!ctx)
 		return NULL;
 
@@ -22,6 +22,7 @@ t_ftwin32_ctx   *ftwin32_create_ctx()
     ctx->instance_handle = GetModuleHandleW(NULL);
 	if (!ctx->instance_handle)
 	{
+		_ftgr_error();
 		free(ctx);
 		return NULL;
 	}
@@ -29,12 +30,11 @@ t_ftwin32_ctx   *ftwin32_create_ctx()
 	ctx->main_window_class = 0;
 
 	ctx->windows = NULL;
-	ctx->loop_hooks = NULL;
 
-	ctx->run = FALSE;
+	clk_get(&ctx->global_time);
+	clk_get(&ctx->delta_time_clk);
 
-	ctx->on_quit = NULL;
-	ctx->error_callback = NULL;
+	ctx->keys = NULL;
 
 	return ctx;
 }

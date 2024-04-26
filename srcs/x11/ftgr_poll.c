@@ -11,7 +11,6 @@
 /* ************************************************************************** */
 
 #include "libftgr_int.h"
-#include <wchar.h>
 
 static bool find_event_win(void *w1, void *w2)
 {

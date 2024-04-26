@@ -1,20 +1,28 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ftwin32_bring_top.c                                :+:      :+:    :+:   */
+/*   ftgr_time.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/01/31 21:08:54 by reclaire          #+#    #+#             */
-/*   Updated: 2024/01/31 21:08:54 by reclaire         ###   ########.fr       */
+/*   Created: 2024/04/23 16:25:39 by reclaire          #+#    #+#             */
+/*   Updated: 2024/04/23 16:25:39 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libftwin32_int.h"
+#include "libftgr_int.h"
+#include "libft/time.h"
 
-void	ftwin32_bring_top(t_ftwin32_win *win)
+float ftgr_time(t_ftgr_ctx *ctx)
 {
-	if (BringWindowToTop(win->window_handle) == FALSE)
-		_ftwin32_error(win->ctx);
-	//SetWindowPos(win->window_handle, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+    t_time t;
+    clk_get(&t);
+    return clk_diff_float(&ctx->global_time, &t);
 }
+
+float ftgr_delta_time(t_ftgr_ctx *ctx)
+{
+    return ctx->delta_time;
+}
+
+
