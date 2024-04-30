@@ -83,6 +83,7 @@ echo ".DEFAULT_GOAL := all" >> config.mk
 echo "all: objs "'$(NAME)' >> config.mk
 echo "" >> config.mk
 
+echo "TARGET=$TARGET" >> config.mk
 echo "RM=$RM" >> config.mk
 echo "CC=$CC" >> config.mk
 echo "CFLAGS=$CFLAGS" >> config.mk

@@ -1,6 +1,7 @@
 .DEFAULT_GOAL := all
 all: objs $(NAME)
 
+TARGET=windows
 RM=rm -r
 CC=x86_64-w64-mingw32-gcc
 CFLAGS=-DFT_OS_WIN 

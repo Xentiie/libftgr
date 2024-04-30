@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/13 01:58:46 by reclaire          #+#    #+#             */
-/*   Updated: 2024/04/24 15:15:24 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/04/28 22:01:20 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 
 typedef void *t_ftgr_ctx;
 typedef void *t_ftgr_win;
+typedef void *t_opencl_ctx;
 
 typedef struct
 {
@@ -76,8 +77,8 @@ void ftgr_set_pixel(t_ftgr_img *img, t_iv2 p, t_color col);
 void ftgr_display_fps(t_ftgr_win *win);
 S32 ftgr_color_to_int(t_color col);
 
-void *CreateBitmapFromData(int width, int height);
-void DisplayBitmap(t_ftgr_win *win, void *bitmap, int width, int height);
+t_opencl_ctx *ftgr_create_opencl_ctx();
+void ftgr_opencl_render(t_opencl_ctx *ctx);
 
 /*
 void		ftgr_clear_window(t_ftgr_ctx *xvar, t_ftgr_win *win);
