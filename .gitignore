@@ -5,7 +5,7 @@ objs/
 *.exe
 
 #deps
-libftwin32/
+libftgr/
 libftgr/
 
 #env
