@@ -34,7 +34,7 @@ CC_WINDOWS=x86_64-w64-mingw32-gcc
 #CC_WINDOWS=gcc.exe
 CC_LINUX=gcc
 
-RM="rm -r"
+RM="rm -rf"
 CFLAGS=
 INCLUDES=
 LIBS_PATHS=
