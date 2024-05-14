@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 08:26:57 by reclaire          #+#    #+#             */
-/*   Updated: 2024/04/23 04:05:42 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/05/01 19:35:10 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,4 +96,5 @@ void ftgr_key_autorepeat(t_ftgr_ctx *ctx, bool active)
 		XAutoRepeatOn(ctx->display);
 	else
 		XAutoRepeatOff(ctx->display);
+	XFlush(ctx->display);
 }
