@@ -3,10 +3,12 @@ objs/
 *.a
 *.o
 *.exe
+config.mk
 
 #deps
 libftgr/
 libftgr/
+
 
 #env
 .editorconfig
