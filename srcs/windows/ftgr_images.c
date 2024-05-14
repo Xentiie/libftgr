@@ -6,11 +6,12 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/24 14:51:47 by reclaire          #+#    #+#             */
-/*   Updated: 2024/04/24 14:51:47 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/05/07 02:31:43 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libftgr_int.h"
+#include "libft/time.h"
 
 t_ftgr_img *ftgr_new_img(t_ftgr_ctx *ctx, t_iv2 size)
 {
@@ -36,6 +37,7 @@ t_ftgr_img *ftgr_new_img(t_ftgr_ctx *ctx, t_iv2 size)
 	img->size = size;
 	img->pixel_size = 32;
 	img->line_size = 32 / 8 * size.x;
+	img->data_size = img->line_size * size.y;
 
 	return img;
 }
@@ -63,4 +65,12 @@ void ftgr_set_pixel(t_ftgr_img *img, t_iv2 p, t_color col)
 	addr[1] = col.g;
 	addr[2] = col.r;
 	addr[3] = col.a;
+}
+
+t_color ftgr_rand_color()
+{
+	t_time t;
+	clk_get(&t);
+
+	return (t_color){.r = ft_frand(t.nanoseconds), .g = ft_frand(t.nanoseconds + 1), .b = ft_frand(t.nanoseconds + 2), .a = 255};
 }

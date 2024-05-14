@@ -1,32 +1,29 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ftgr_on_quit.c                                  :+:      :+:    :+:   */
+/*   ftgr_ui.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/01/16 23:22:11 by reclaire          #+#    #+#             */
-/*   Updated: 2024/01/16 23:22:11 by reclaire         ###   ########.fr       */
+/*   Created: 2024/05/06 23:53:06 by reclaire          #+#    #+#             */
+/*   Updated: 2024/05/15 00:11:02 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libftgr_int.h"
 
-void ftgr_free(t_ftgr_ctx *ctx)
+t_ui_element *ftgr_new_ui()
 {
-	if (ctx->main_window_class)
-	{
-		UnregisterClass(FTGR_WINDOW_CLASS, ctx->instance_handle);
-		ctx->main_window_class = 0;
-	}
-	t_list *curr = ctx->windows;
-	ft_lstclear(&ctx->windows, ftgr_free_window);
+	t_ui_element *elem = malloc(sizeof(t_ui_element));
 
-	if (ctx->instance_handle)
-	{
-		FreeLibrary(ctx->instance_handle);
-		ctx->instance_handle = NULL;
-	}
+	ft_memset(elem->callbacks, 0, sizeof(elem->callbacks));
+	elem->primitives = NULL;
+	return elem;
+}
 
-	free(ctx);
+t_ui_callback *ftgr_ui_bind(t_ui_element *ui, S32 event, t_ui_callback callback)
+{
+	t_ui_callback prev = ui->callbacks[event];
+	ui->callbacks[event] = callback;
+	return prev;
 }

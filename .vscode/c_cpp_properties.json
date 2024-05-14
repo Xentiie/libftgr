@@ -4,9 +4,10 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**",
-                "../libft"
+                "../libft",
+				"./3rdparty/OpenCL/include"
             ],
-            "defines": [],
+            "defines": ["FT_OS_WIN"],
             "compilerPath": "/usr/bin/clang",
             "cStandard": "c17",
             "cppStandard": "c++14",

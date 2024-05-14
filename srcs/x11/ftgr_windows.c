@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/16 22:36:34 by reclaire          #+#    #+#             */
-/*   Updated: 2024/04/22 23:31:50 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/05/07 02:22:01 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,11 +69,15 @@ t_ftgr_win *ftgr_new_window(t_ftgr_ctx *ctx, t_iv2 size, const_string title)
 	return new_win;
 }
 
+
+static bool cmp_window(void *a1, void *a2)
+{return a1 == a2;}
 void ftgr_free_window(t_ftgr_win *win)
 {
 	free(win->name);
 	XFreeGC(win->ctx->display, win->gc);
 	XDestroyWindow(win->ctx->display, win->window);
+	ft_lstremoveif(&win->ctx->windows, NULL, cmp_window, win);
 	free(win);
 }
 

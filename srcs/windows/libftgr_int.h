@@ -22,6 +22,41 @@
 #include "libft/time.h"
 #include "../libftgr_constants.h"
 
+typedef struct s_ftgr_ctx
+{
+	HINSTANCE instance_handle;
+	ATOM main_window_class;
+
+	bool key_autorepeat;
+
+	t_list *windows;
+
+	t_time global_time;
+	t_time delta_time_clk;
+	float delta_time;
+
+	t_list *keys;
+
+	bool left_mouse_pressed, left_mouse_clicked;
+	bool right_mouse_pressed, right_mouse_clicked;
+	bool middle_mouse_pressed, middle_mouse_clicked;
+
+	bool ui_focus;
+
+} t_ftgr_ctx;
+
+typedef struct s_ftgr_win
+{
+	t_ftgr_ctx *ctx;
+	HWND window_handle;
+	S32 cursor_mode;
+	string name;
+	HDC dc;
+} t_ftgr_win;
+#define T_FTGR_CTX
+#define T_FTGR_WIN
+#include "libftgr.h"
+
 #define FTGR_WINDOW_CLASS "FtMainWindowClass"
 #define FTGR_PROP_NAME L"ftgr"
 
@@ -36,51 +71,6 @@ typedef struct
 	bool down;
 	U32 k;
 } t_key;
-
-typedef struct s_ftgr_ctx
-{
-
-	HINSTANCE instance_handle;
-	ATOM main_window_class;
-
-	bool key_autorepeat;
-
-	t_list *windows;
-
-	t_time global_time;
-	t_time delta_time_clk;
-	float delta_time;
-
-	t_list *keys;
-} t_ftgr_ctx;
-
-typedef struct s_ftgr_win
-{
-	t_ftgr_ctx *ctx;
-	HWND window_handle;
-	S32 cursor_mode;
-	string name;
-	HDC dc;
-} t_ftgr_win;
-
-typedef struct
-{
-	char r;
-	char g;
-	char b;
-	char a;
-} t_color;
-
-typedef struct
-{
-	U64 line_size;
-	U64 pixel_size;
-	char *data;
-	t_iv2 size;
-
-	t_ftgr_ctx *ctx;
-	void *internal;
-} t_ftgr_img;
 
 typedef struct
 {
@@ -102,25 +92,26 @@ typedef struct
 		clk_get(&__freq_t1);                               \
 	} while (0)
 
-t_ftgr_ctx *ftgr_create_ctx();
-
-void ftgr_loop(t_ftgr_ctx *ctx);
-
-t_ftgr_win *ftgr_new_window(t_ftgr_ctx *ctx, t_iv2 size, const_string title);
-void ftgr_free_window(t_ftgr_win *win);
-void ftgr_set_win_name(t_ftgr_win *win, string name);
-void ftgr_set_win_name_infos(t_ftgr_win *win, string infos);
-void ftgr_bring_top(t_ftgr_win *win);
-
-void ftgr_free(t_ftgr_ctx *ctx);
-
-float ftgr_time(t_ftgr_ctx *ctx);
-float ftgr_delta_time(t_ftgr_ctx *ctx);
-void ftgr_display_fps(t_ftgr_win *win);
-
 void(_ftgr_error)();
 void _ftwin32_keys_cleanup(t_ftgr_ctx *ctx);
 void _ftwin32_register_key_up(t_ftgr_ctx *ctx, U32 key);
 void _ftwin32_register_key_down(t_ftgr_ctx *ctx, U32 key);
+
+
+typedef struct s_ui_element t_ui_element;
+typedef void (*t_ui_callback)(t_ui_element *ui, void *param1, void *param2);
+
+#define T_UI_ELEMENT
+#define T_UI_CALLBACK
+#include "libftgr_ui.h"
+
+typedef struct s_ui_element
+{
+	t_list *callbacks[UI_EVENT_MAX];
+	t_v2 pos;
+	t_v2 size;
+	t_ftgr_img *img;
+	U32 flags;
+}	t_ui_element;
 
 #endif

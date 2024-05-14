@@ -66,9 +66,24 @@ LRESULT CALLBACK windowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			SetCursor(NULL);
 		return TRUE;
 
+	case WM_LBUTTONDOWN:
+	case WM_MBUTTONDOWN:
+	case WM_RBUTTONDOWN:
+		ctx->left_mouse_clicked |= !!(wParam & 0x0001);
+		ctx->middle_mouse_clicked |= !!(wParam & 0x0010);
+		ctx->right_mouse_clicked |= !!(wParam & 0x0002);
+	case WM_LBUTTONUP:
+	case WM_MBUTTONUP:
+	case WM_RBUTTONUP:
+		ctx->left_mouse_pressed = !!(wParam & 0x0001);
+		ctx->middle_mouse_pressed = !!(wParam & 0x0010);
+		ctx->right_mouse_pressed = !!(wParam & 0x0002);
+		return FALSE;
+
 	default:
 		return DefWindowProc(hwnd, msg, wParam, lParam);
 	}
+
 }
 
 t_ftgr_win *ftgr_new_window(t_ftgr_ctx *ctx, t_iv2 size, const_string title)
@@ -154,13 +169,12 @@ void ftgr_free_window(t_ftgr_win *win)
 	if (win->window_handle)
 	{
 		if (win->dc)
-			CHECKRET(ReleaseDC(win->window_handle, win->dc));
+			CHECKRET(ReleaseDC(win->window_handle, win->dc) == FALSE);
 		int ret = DestroyWindow(win->window_handle);
 		// Ne pas changer, documentation dis que on doit check explicitement pour TRUE/FALSE
 		if (ret == FALSE)
 			_ftgr_error();
-		if (ret == TRUE)
-			win->window_handle = NULL;
+		win->window_handle = NULL;
 	}
 
 	t_list *lst = ft_lstfind(win->ctx->windows, _find_win, win);
