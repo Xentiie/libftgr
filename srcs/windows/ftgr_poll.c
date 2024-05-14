@@ -27,6 +27,10 @@ bool ftgr_poll(t_ftgr_ctx *ctx)
 	update_time(ctx);
 	_ftwin32_keys_cleanup(ctx);
 
+	ctx->left_mouse_clicked = FALSE;
+	ctx->middle_mouse_clicked = FALSE;
+	ctx->right_mouse_clicked = FALSE;
+
 	MSG msg;
 	while (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE))
 	{

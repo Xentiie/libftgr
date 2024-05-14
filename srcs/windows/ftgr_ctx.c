@@ -35,6 +35,14 @@ t_ftgr_ctx   *ftgr_create_ctx()
 	clk_get(&ctx->delta_time_clk);
 
 	ctx->keys = NULL;
+	ctx->left_mouse_pressed = FALSE;
+	ctx->left_mouse_clicked = FALSE;
+	ctx->middle_mouse_pressed = FALSE;
+	ctx->middle_mouse_clicked = FALSE;
+	ctx->right_mouse_pressed = FALSE;
+	ctx->right_mouse_clicked = FALSE;
+
+	ctx->ui_focus = FALSE;
 
 	return ctx;
 }
