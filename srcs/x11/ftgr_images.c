@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/22 13:02:37 by reclaire          #+#    #+#             */
-/*   Updated: 2024/04/23 01:39:57 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/05/15 01:38:40 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,7 @@ t_ftgr_img *ftgr_new_img(t_ftgr_ctx *ctx, t_iv2 size)
 	img->pixel_size = img_int->img->bits_per_pixel;
 	img->size = size;
 	img->ctx = ctx;
+	img->data_size = img->size.x * img->size.y;
 	if (ctx->flush)
 		XFlush(ctx->display);
 	return (img);
@@ -93,3 +94,4 @@ void ftgr_free_img(t_ftgr_img *img)
 	// free(img->data);
 	free(img);
 }
+

@@ -6,11 +6,12 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/07 17:32:16 by reclaire          #+#    #+#             */
-/*   Updated: 2024/05/14 02:19:43 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/05/15 01:30:35 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libftgr.h"
+#include <stdlib.h>
 
 void ftgr_draw_line(t_ftgr_img *img, t_iv2 p1, t_iv2 p2, t_color col)
 {

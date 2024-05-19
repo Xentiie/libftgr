@@ -3,6 +3,7 @@ objs/
 *.a
 *.o
 *.exe
+*.out
 config.mk
 
 #deps

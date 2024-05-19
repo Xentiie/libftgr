@@ -88,17 +88,9 @@ typedef struct
 	GC gc;
 	string name;
 } t_ftgr_win;
-
-typedef struct
-{
-	U64 line_size;
-	U64 pixel_size;
-	char *data;
-	t_iv2 size;
-
-	t_ftgr_ctx *ctx;
-	void *internal;
-} t_ftgr_img;
+#define T_FTGR_CTX
+#define T_FTGR_WIN
+#include "libftgr.h"
 
 typedef struct 
 {
@@ -108,43 +100,6 @@ typedef struct
 	S32 format;
 	bool shm;
 } t_ftgr_img_int;
-
-typedef struct {
-	char r;
-	char g;
-	char b;
-	char a;
-}	t_color;
-
-
-t_ftgr_ctx *ftgr_create_ctx();
-bool ftgr_poll(t_ftgr_ctx *ctx);
-
-t_ftgr_win *ftgr_new_window(t_ftgr_ctx *ctx, t_iv2 size, const_string title);
-void ftgr_free_window(t_ftgr_win *win);
-void ftgr_set_win_name(t_ftgr_win *win, string name);
-void ftgr_set_win_name_infos(t_ftgr_win *win, string infos);
-
-void ftgr_free(t_ftgr_ctx *ctx);
-
-void ftgr_bring_top(t_ftgr_win *win);
-
-void ftgr_mouse_move(t_ftgr_ctx *ctx, t_ftgr_win *win, t_iv2 pos);
-void ftgr_mouse_hide(t_ftgr_ctx *ctx, t_ftgr_win *win);
-void ftgr_mouse_show(t_ftgr_ctx *ctx, t_ftgr_win *win);
-t_iv2 ftgr_mouse_get_pos(t_ftgr_ctx *ctx, t_ftgr_win *win);
-
-void ftgr_set_error_callback(t_ftgr_ctx *ctx, void (*callback)());
-
-float ftgr_time(t_ftgr_ctx *ctx);
-float ftgr_delta_time(t_ftgr_ctx *ctx);
-
-t_ftgr_img *ftgr_new_img(t_ftgr_ctx *ctx, t_iv2 size);
-void ftgr_display_image(t_ftgr_img *img, t_ftgr_win *win, t_iv2 pos);
-void ftgr_set_pixel(t_ftgr_img *img, t_iv2 p, t_color col);
-
-void ftgr_display_fps(t_ftgr_win *win);
-S32 ftgr_color_to_int(t_color col);
 
 U32 _ftgr_keysym2uni(U32 keysym);
 void _ftx11_keys_cleanup(t_ftgr_ctx *ctx);

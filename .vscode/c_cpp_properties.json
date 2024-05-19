@@ -7,7 +7,7 @@
                 "../libft",
 				"./3rdparty/OpenCL/include"
             ],
-            "defines": ["FT_OS_WIN"],
+            "defines": ["FT_OS_LINUX"],
             "compilerPath": "/usr/bin/clang",
             "cStandard": "c17",
             "cppStandard": "c++14",

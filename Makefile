@@ -6,7 +6,7 @@
 #    By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/04/15 17:26:47 by reclaire          #+#    #+#              #
-#    Updated: 2024/05/01 19:33:38 by reclaire         ###   ########.fr        #
+#    Updated: 2024/05/17 18:13:30 by reclaire         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -15,7 +15,7 @@ include config.mk
 
 INCLUDES	+=	-I../libft -I./ -I./srcs -I./3rdparty/OpenCL/include
 #CFLAGS		+=	-Wall -Wextra -Werror -O3 -g
-CFLAGS		+=	-O3 -g
+CFLAGS		+=	-g
 
 $(NAME):	objs $(OBJS)
 			ar -rcs $(NAME) $(OBJS)
