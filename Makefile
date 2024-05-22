@@ -6,7 +6,7 @@
 #    By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/04/15 17:26:47 by reclaire          #+#    #+#              #
-#    Updated: 2024/05/17 18:13:30 by reclaire         ###   ########.fr        #
+#    Updated: 2024/05/21 22:36:02 by reclaire         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -15,6 +15,7 @@ include config.mk
 
 INCLUDES	+=	-I../libft -I./ -I./srcs -I./3rdparty/OpenCL/include
 #CFLAGS		+=	-Wall -Wextra -Werror -O3 -g
+#CFLAGS		+=	-g -fsanitize=address
 CFLAGS		+=	-g
 
 $(NAME):	objs $(OBJS)
@@ -26,5 +27,5 @@ _libft:
 #			mingw32-make.exe -C ../libft
 
 test:	$(NAME) _libft
-			$(CC) $(CFLAGS) $(INCLUDES) -L./ -L../libft test.c -lftgr -lft -lX11 -lXext -lm -lOpenCL
+			$(CC) $(CFLAGS) $(INCLUDES) -L./ -L../libft test.c -lftgr -lft -lX11 -lXext -lm -lOpenCL -lz
 #			$(CC) $(CFLAGS) $(INCLUDES) -L./ -L./3rdparty/OpenCL/lib -L../libft test.c -lftgr -lft -lm -lgdi32 -lopengl32 -lOpenCL

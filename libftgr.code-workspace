@@ -1,0 +1,25 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../libft"
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"*.h": "c",
+			"array": "c",
+			"string": "c",
+			"string_view": "c",
+			"cstdlib": "c",
+			"xutility": "c",
+			"cstdint": "c",
+			"format": "c",
+			"system_error": "c",
+			"span": "c",
+			"random": "c"
+		}
+	}
+}
