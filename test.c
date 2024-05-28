@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/07 01:33:38 by reclaire          #+#    #+#             */
-/*   Updated: 2024/05/22 02:41:20 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/05/27 19:45:28 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,9 +19,11 @@
 #include "libft/compression.h"
 #include "libft/bitstreams.h"
 #include "libft/limits.h"
-#include "libft/ht.h"
+#include "nn.h"
 
+#ifndef __USE_MISC
 #define __USE_MISC
+#endif
 #include <dirent.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -40,7 +42,7 @@ void test_gzip()
 		s += ft_fread(fd, buffer + s, sizeof(buffer) - s);
 	ft_fclose(fd);
 
-	
+	//char data[] = "aaaabbccddenudqbvdzbiqbdziuqndbzuaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaqondzqu";
 	ft_make_gzip(buffer, s, "/home/reclaire/Desktop/libftgr/test_gzip.gz");
 
 }
@@ -80,7 +82,7 @@ void test_compression_lzss()
 	t_bitstream stream_in = FT_BITSTREAM_INIT(compressed, buffer_init_size);
 	ft_lzss_compress(buffer, s, &stream_in, 32768, 1024);
 
-	printf("Compression: %ld/%lu: %d%%\n", stream_in.bits_read, s * 8, 100 - (stream_in.bits_read * 100 / (s * 8)));
+	//printf("Compression: %ld/%lu: %d%%\n", stream_in.bits_read, s * 8, 100 - (stream_in.bits_read * 100 / (s * 8)));
 
 	U8 *decompressed = malloc(sizeof(U8) * buffer_init_size);
 	U64 n = ft_lzss_decompress(&stream_in, decompressed, buffer_init_size);
@@ -120,31 +122,11 @@ U64 hash_int(void *elem)
 	return (U64)*(int*)elem;
 }
 
-void test_ht()
-{
-	t_ht *ht = ft_new_hash_table(sizeof(int), 10, hash_int);
-	if (!ht)
-	{
-		printf("error: %s\n", ft_strerror(ft_errno));
-		return;
-	}
-	
-	ft_hash_insert(ht, &(int){10});
-	if (ft_errno != FT_OK)
-	{
-		printf("error: %s\n", ft_strerror(ft_errno));
-		return;
-	}
-
-	ft_hash_get()
-
-	ft_hash_free(ht);
-}
-
 int main()
 {
 	//test_huffman_coding();
 	//test_compression_lzss();
-	test_ht();
+
+	test_gzip();
 }
 

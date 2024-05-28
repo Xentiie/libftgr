@@ -19,7 +19,13 @@
 			"format": "c",
 			"system_error": "c",
 			"span": "c",
-			"random": "c"
+			"random": "c",
+			"vector": "c",
+			"memory": "c",
+			"optional": "c",
+			"variant": "c",
+			"initializer_list": "c",
+			"utility": "c"
 		}
 	}
 }

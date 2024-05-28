@@ -186,6 +186,57 @@ class HuffmanTreeNode:
         self.left = left
         self.right = right
 
+    def display(self):
+        lines, *_ = self._display_aux()
+        for line in lines:
+            print(line)
+
+    def _display_aux(self):
+        """Returns list of strings, width, height, and horizontal coordinate of the root."""
+        # No child.
+        if self.right is None and self.left is None:
+            line = '%s' % self.symbol
+            width = len(line)
+            height = 1
+            middle = width // 2
+            return [line], width, height, middle
+
+        # Only left child.
+        if self.right is None:
+            lines, n, p, x = self.left._display_aux()
+            s = '%s' % self.symbol
+            u = len(s)
+            first_line = (x + 1) * ' ' + (n - x - 1) * '_' + s
+            second_line = x * ' ' + '/' + (n - x - 1 + u) * ' '
+            shifted_lines = [line + u * ' ' for line in lines]
+            return [first_line, second_line] + shifted_lines, n + u, p + 2, n + u // 2
+
+        # Only right child.
+        if self.left is None:
+            lines, n, p, x = self.right._display_aux()
+            s = '%s' % self.symbol
+            u = len(s)
+            first_line = s + x * '_' + (n - x) * ' '
+            second_line = (u + x) * ' ' + '\\' + (n - x - 1) * ' '
+            shifted_lines = [u * ' ' + line for line in lines]
+            return [first_line, second_line] + shifted_lines, n + u, p + 2, u // 2
+
+        # Two children.
+        left, n, p, x = self.left._display_aux()
+        right, m, q, y = self.right._display_aux()
+        s = '%s' % self.symbol
+        u = len(s)
+        first_line = (x + 1) * ' ' + (n - x - 1) * '_' + s + y * '_' + (m - y) * ' '
+        second_line = x * ' ' + '/' + (n - x - 1 + u + y) * ' ' + '\\' + (m - y - 1) * ' '
+        if p < q:
+            left += [n * ' '] * (q - p)
+        elif q < p:
+            right += [m * ' '] * (p - q)
+        zipped_lines = zip(left, right)
+        lines = [first_line, second_line] + [a + u * ' ' + b for a, b in zipped_lines]
+        return lines, n + m + u, max(p, q) + 2, n + u // 2
+
+
 
 # Add a node with the provided code and symbol to the Huffman tree rooted at 
 # the provided node, then return the new root
@@ -248,12 +299,13 @@ def decode_huffman(stream, output_buffer, ll_tree, dist_tree):
 
         # Terminal literal/length node
         symbol = node.symbol
+        print("%12sSymbol:"%'', symbol, end=" | ")
         if decode_blocks:
             if symbol >= 33 and symbol <= 127:
                 # If this symbol is a printable character, print both the hex and character representation
-                print("%12s%s: 0x%02x (%s)"%('',''.join(str(b) for b in ll_path), symbol, chr(symbol)))
+                print("%s: 0x%02x (%s)"%(''.join(str(b) for b in ll_path), symbol, chr(symbol)))
             else:
-                print("%12s%s: 0x%02x"%('',''.join(str(b) for b in ll_path), symbol))
+                print("%s: 0x%02x"%(''.join(str(b) for b in ll_path), symbol))
         if symbol == 256:
             break #End of stream marker
         if symbol > 256:
@@ -352,6 +404,17 @@ def decode_uncompressed(stream, output_buffer):
     for i in range(block_len):
         b = stream.read_byte()
         output_buffer.write_byte(b)
+
+def print_huffman_tree(tree: HuffmanTreeNode):
+    print("{", end="")
+    if (tree.symbol == -1):
+        print_huffman_tree(tree.right)
+        print(",", end="")
+        print_huffman_tree(tree.left)
+        print(",-1", end="")
+    else:
+        print(f"NULL, NULL, {tree.symbol}", end="")
+    print("}", end="")
 
 def decode_fixed(stream, output_buffer):
     # Type 01: Block uses the built-in Huffman code to encode data
