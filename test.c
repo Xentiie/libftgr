@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/05/07 01:33:38 by reclaire          #+#    #+#             */
-/*   Updated: 2024/05/27 19:45:28 by reclaire         ###   ########.fr       */
+/*   Created: 2024/05/31 02:10:39 by reclaire          #+#    #+#             */
+/*   Updated: 2024/06/02 18:54:55 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,114 +19,56 @@
 #include "libft/compression.h"
 #include "libft/bitstreams.h"
 #include "libft/limits.h"
-#include "nn.h"
 
 #ifndef __USE_MISC
 #define __USE_MISC
 #endif
 #include <dirent.h>
+#include <sys/stat.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <errno.h>
 
-void test_gzip()
+int main(int argc, char **argv)
 {
-	U8 buffer[4096 * 4] = {0};
-	file fd = ft_fopen("./test.c", "r");
-	S64 s = ft_fread(fd, buffer, sizeof(buffer));
-	if (s < 0)
-		exit(1);
-	ft_fclose(fd);
+	U64 size = 0;
+	U8 *data;
 
-	fd = ft_fopen("./gzstat.py", "r");
-	if (s < sizeof(buffer))
-		s += ft_fread(fd, buffer + s, sizeof(buffer) - s);
-	ft_fclose(fd);
-
-	//char data[] = "aaaabbccddenudqbvdzbiqbdziuqndbzuaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaqondzqu";
-	ft_make_gzip(buffer, s, "/home/reclaire/Desktop/libftgr/test_gzip.gz");
-
-}
-
-void test_compression_lzss()
-{
-	U64 buffer_init_size = 32768 * 8;
-	U8 *buffer = malloc(sizeof(U8) * buffer_init_size);
-
-	DIR *d = opendir("./");
-	U64 s = 0;
-	struct dirent *ent = readdir(d);
-	while (s < buffer_init_size)
 	{
-		if (!ent)
-		{
-			printf("Loaded whole dir :)\n");
-			break;
-		}
-		if (ent->d_type != DT_REG)
-		{
-			ent = readdir(d);
-			continue;
-		}
-		printf("Reading file: %s\n", ent->d_name);
+		string path = argc > 1 ? argv[1] : "./tests_gzip/gzip.gz";
 
-		file fd = ft_fopen(ent->d_name, "r");
-		U64 bytes_read;
-		while ((bytes_read = ft_fread(fd, buffer + s, buffer_init_size - s)) > 0)
-			s += bytes_read;
+		struct stat st;
+		stat(path, &st);
+		data = malloc(sizeof(U8) * st.st_size);
+
+		file fd = ft_fopen(path, "r");
+		U64 rd;
+		while ((rd = ft_fread(fd, data + size, 4096)) > 0)
+		{
+			if (rd == -1)
+			{
+				printf("%s\n", strerror(errno));
+				return 1;
+			}
+			size += rd;
+		}
 		ft_fclose(fd);
-		ent = readdir(d);
-		printf("Filled %lu/%lu bytes of data\n", s, buffer_init_size);
 	}
+	data += 10;
+	size -= 10;
 
-	U8 *compressed = malloc(sizeof(U8) * buffer_init_size);
-	t_bitstream stream_in = FT_BITSTREAM_INIT(compressed, buffer_init_size);
-	ft_lzss_compress(buffer, s, &stream_in, 32768, 1024);
+	U8 buffer[10000];
+	t_deflate_stream stream = ft_deflate_init_stream(data, size, buffer, sizeof(buffer));
+	S32 err = 0;
+	while (ft_inflate_next_block(&stream, &err))
+	{	
+	}
+	if (err)
+		printf("Error: %d:%s\n", err, ft_inflate_strerror(err));
 
-	//printf("Compression: %ld/%lu: %d%%\n", stream_in.bits_read, s * 8, 100 - (stream_in.bits_read * 100 / (s * 8)));
+	printf("Total size: %lu\n", stream.out_used);
+	printf("CRC32: %#x\n", stream.crc32);
 
-	U8 *decompressed = malloc(sizeof(U8) * buffer_init_size);
-	U64 n = ft_lzss_decompress(&stream_in, decompressed, buffer_init_size);
-	free(compressed);
-
-	if (!n)
-		printf("ERROR\n");
-
-	printf(ft_memcmp(buffer, decompressed, s) == 0 ? "YES\n" : "NO\n");
-	free(decompressed);
-	free(buffer);
+	free(data - 10);
 }
-
-void test_huffman_coding()
-{
-	// Huffman coding
-	// string data = "It must be easy to commit crimes as a snake because you don't have to worry about leaving fingerprints.";
-	string data = "aaaaabbbbbbbbbccccccccccccdddddddddddddeeeeeeeeeeeeeeeefffffffffffffffffffffffffffffffffffffffffffff";
-	U64 len = ft_strlen(data);
-
-	t_huffman_node **nodes;
-	U64 nodes_count;
-	t_huffman_node *tree = ft_create_huffman_tree(data, len, &nodes, &nodes_count);
-
-	t_huffman_node *node = ft_get_huffman_node('f', nodes, nodes_count);
-	if (node)
-		ft_print_huffman_node(node, TRUE);
-	else
-		ft_printf("nul\n");
-
-	ft_print_huffman_tree(tree);
-	ft_free_huffman_tree(tree);
-}
-
-U64 hash_int(void *elem)
-{
-	return (U64)*(int*)elem;
-}
-
-int main()
-{
-	//test_huffman_coding();
-	//test_compression_lzss();
-
-	test_gzip();
-}
-

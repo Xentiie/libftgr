@@ -25,7 +25,10 @@
 			"optional": "c",
 			"variant": "c",
 			"initializer_list": "c",
-			"utility": "c"
+			"utility": "c",
+			"chrono": "c",
+			"limits": "c",
+			"iterator": "c"
 		}
 	}
 }

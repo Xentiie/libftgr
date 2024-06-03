@@ -26,7 +26,6 @@ print_block_stats = True
 print_block_codes = True
 decode_blocks = True
 
-
 # Dictionary of possible 8 bit "compression type values" in the gzip header
 compression_methods = collections.defaultdict(lambda: "(invalid)")
 compression_methods[0] = 'store'
@@ -599,9 +598,11 @@ def read_member(stream, member_number):
     # Read the gzip header
     # See http://www.onicos.com/staff/iz/formats/gzip.html for a concise description
 
-    def header_print(s):
+    def header_print(*args, _pre=True, **kwargs):
         if print_gzip_headers:
-            print('    %s'%s)
+            if (_pre):
+                print('    ', end="")
+            print(*args, **kwargs)
 
     # Magic number
     try:
@@ -626,6 +627,38 @@ def read_member(stream, member_number):
     header_print("Extra flags: 0x%02x"%(exflags))
     ostype = stream.read_byte()
     header_print("OS Type: %d"%ostype)
+
+    if (flags & (1 << 1)):
+        header_print("Text mode")
+
+    if (flags & (1 << 2)):
+        extra_data_size = stream.read_uint16_little_endian()
+        header_print("Extra data size: " + extra_data_size)
+        header_print("Extra data: ")
+        for i in range(extra_data_size):
+            header_print(chr(stream.read_byte()), _pre=False, end="")
+        header_print(_pre=False)
+
+    if (flags & (1 << 3)):
+        header_print("Filename: ", end="")
+        char = stream.read_byte()
+        while (char != 0):
+            header_print(chr(char), _pre=False, end="")
+            char = stream.read_byte()
+        header_print(_pre=False)
+
+    if (flags & (1 << 4)):
+        header_print("Comment: ", end="")
+        char = stream.read_byte()
+        while (char != 0):
+            header_print(chr(char), _pre=False, end="")
+            char = stream.read_byte()
+        header_print(_pre=False)
+
+    if (flags & (1 << 1)):
+        crc = stream.read_uint16_little_endian()
+        header_print("Header CRC16: %#x"%crc)
+        
 
     if not (print_block_stats or print_block_codes or decode_blocks):
         return True
@@ -659,12 +692,26 @@ if __name__ == '__main__':
     argument_parser.add_argument('--no-block-stats',action="store_true",help='Don\'t print block stats.')
     argument_parser.add_argument('--print-block-codes',action="store_true",help='Print code information for blocks of type 2.')
     argument_parser.add_argument('--decode-blocks',action="store_true",help='Print full decoding information for each block.')
+    argument_parser.add_argument('--get-code',nargs='?',help='Get a code for a character')
 
     args = argument_parser.parse_args()
     print_gzip_headers = not args.no_headers
     print_block_stats = not args.no_block_stats
     print_block_codes = args.print_block_codes
     decode_blocks = args.decode_blocks
+    if (args.get_code):
+        ll_code = [0]*288
+        for i in range(0, 144):
+            ll_code[i] = (8, 0b00110000 + i)
+        for i in range(144, 256):
+            ll_code[i] = (9, 0b110010000 + (i-144))
+        for i in range(256, 280):
+            ll_code[i] = (7, i - 256)
+        for i in range(280,288):
+            ll_code[i] = (8, 0b11000000 + (i-280))
+        
+        print(ll_code[int(args.get_code)])
+        exit(0)
 
     try:
         stream = BitStream(sys.stdin.buffer) # sys.stdin.buffer is a version of sys.stdin open in binary mode
