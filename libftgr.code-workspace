@@ -28,7 +28,14 @@
 			"utility": "c",
 			"chrono": "c",
 			"limits": "c",
-			"iterator": "c"
+			"iterator": "c",
+			"ratio": "c",
+			"charconv": "c",
+			"compare": "c",
+			"functional": "c",
+			"tuple": "c",
+			"type_traits": "c",
+			"typeinfo": "c"
 		}
 	}
 }

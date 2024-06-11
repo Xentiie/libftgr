@@ -6,7 +6,7 @@
 #    By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/04/15 17:26:47 by reclaire          #+#    #+#              #
-#    Updated: 2024/06/01 00:33:39 by reclaire         ###   ########.fr        #
+#    Updated: 2024/06/08 22:51:39 by reclaire         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -32,3 +32,6 @@ test:	$(NAME) _libft
 
 test_deflate:	$(NAME) _libft
 			$(CC) $(CFLAGS) -O3 $(INCLUDES) -L./ -L../libft test_deflate.c -lftgr -lft -lm
+
+test_text:	$(NAME) _libft
+			$(CC) $(CFLAGS) -O3 $(INCLUDES) -L./ -L../libft test_text.c -lftgr -lft -lm -lX11 -lXext

@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/13 01:58:46 by reclaire          #+#    #+#             */
-/*   Updated: 2024/05/15 23:38:03 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/06/09 23:40:38 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,8 @@
 #define MOUSE_LEFT 0
 #define MOUSE_MIDDLE 1
 #define MOUSE_RIGHT 2
+
+#define FTGR_EX11 1000
 
 #ifndef T_FTGR_CTX
 typedef void *t_ftgr_ctx;
@@ -80,6 +82,7 @@ t_ftgr_win *ftgr_new_window(t_ftgr_ctx *ctx, t_iv2 size, const_string title);
 void ftgr_free_window(t_ftgr_win *win);
 void ftgr_set_win_name(t_ftgr_win *win, string name);
 void ftgr_set_win_name_infos(t_ftgr_win *win, string infos);
+void ftgr_move_window(t_ftgr_win *win, t_iv2 pos);
 
 void ftgr_free(t_ftgr_ctx *ctx);
 
@@ -115,13 +118,16 @@ S32 ftgr_color_to_int(t_color col);
 
 void ftgr_draw_line(t_ftgr_img *img, t_iv2 p1, t_iv2 p2, t_color col);
 void ftgr_draw_line_e(t_ftgr_img *img, t_iv2 p1, t_iv2 p2, t_color (*eval)(t_iv2 p1, t_iv2 p2, t_iv2 p));
-
+void ftgr_draw_line_horizontal(t_ftgr_img *img, t_iv2 p1, S32 x2, t_color col);
+void ftgr_draw_bezier(t_ftgr_img *img, t_color col, t_v2 p1, t_v2 p2, t_v2 p3, S32 res);
 void ftgr_draw_rect(t_ftgr_img *img, t_iv2 c1, t_iv2 c2, t_color col);
 void ftgr_draw_rect_e(t_ftgr_img *img, t_iv2 c1, t_iv2 c2, t_color (*eval)(t_iv2 p1, t_iv2 p2, t_iv2 p));
-
 void ftgr_fill_rect(t_ftgr_img *img, t_iv2 c1, t_iv2 c2, t_color col);
 void ftgr_fill_rect_e(t_ftgr_img *img, t_iv2 c1, t_iv2 c2, t_color (*eval)(t_iv2 p1, t_iv2 p2, t_iv2 p));
+void ftgr_draw_circle(t_ftgr_img *img, t_iv2 pos, S32 radius, t_color col);
+void ftgr_draw_disc(t_ftgr_img *img, t_iv2 pos, S32 radius, t_color col);
 
+void *ftgr_load_font(file fd, t_ftgr_img *img);
 
 /*
 void		ftgr_clear_window(t_ftgr_ctx *xvar, t_ftgr_win *win);

@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 08:07:44 by reclaire          #+#    #+#             */
-/*   Updated: 2024/04/16 23:40:11 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/06/09 17:12:57 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,4 +49,34 @@ t_iv2 ftgr_mouse_get_pos(t_ftgr_ctx *ctx, t_ftgr_win *win)
 		&root_return, &child_return, &root_x_return, &root_y_return,
 		&out.x, &out.y, &mask_return);
 	return out;
+}
+
+bool	ftgr_mouse_pressed(t_ftgr_ctx *ctx, S32 button)
+{
+	switch (button)
+	{
+	case MOUSE_LEFT:
+		return ctx->left_mouse_pressed;
+	case MOUSE_MIDDLE:
+		return ctx->middle_mouse_pressed;
+	case MOUSE_RIGHT:
+		return ctx->right_mouse_pressed;
+	default:
+		return FALSE;
+	}
+}
+
+bool	ftgr_mouse_click(t_ftgr_ctx *ctx, S32 button)
+{
+	switch (button)
+	{
+	case MOUSE_LEFT:
+		return ctx->left_mouse_clicked;
+	case MOUSE_MIDDLE:
+		return ctx->middle_mouse_clicked;
+	case MOUSE_RIGHT:
+		return ctx->right_mouse_clicked;
+	default:
+		return FALSE;
+	}
 }

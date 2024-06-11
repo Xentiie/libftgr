@@ -39,6 +39,11 @@ bool ftgr_poll(t_ftgr_ctx *ctx)
 {
 	update_time(ctx);
 	_ftx11_keys_cleanup(ctx);
+
+	ctx->left_mouse_clicked = FALSE;
+	ctx->middle_mouse_clicked = FALSE;
+	ctx->right_mouse_clicked = FALSE;
+
 	while (XPending(ctx->display))
 	{
 		XEvent ev;
@@ -67,6 +72,41 @@ bool ftgr_poll(t_ftgr_ctx *ctx)
 			key_uni = _ftgr_keysym2uni(keysym);
 			_ftx11_register_key_up(ctx, key_uni);
 			//printf("Released key: %lc\n", key_uni);
+			break;
+
+		case ButtonPress:;
+			switch ((ev.xbutton.button - 1) % 3)
+			{
+			case MOUSE_LEFT:
+				ctx->left_mouse_pressed = TRUE;
+				ctx->left_mouse_clicked = TRUE;
+				break;
+			case MOUSE_MIDDLE:
+				ctx->middle_mouse_pressed = TRUE;
+				ctx->middle_mouse_clicked = TRUE;
+				break;
+			case MOUSE_RIGHT:
+				ctx->right_mouse_pressed = TRUE;
+				ctx->right_mouse_clicked = TRUE;
+				break;
+			}
+			break;
+		case ButtonRelease:
+			switch ((ev.xbutton.button - 1) % 3)
+			{
+			case MOUSE_LEFT:
+				ctx->left_mouse_pressed = FALSE;
+				ctx->left_mouse_clicked = FALSE;
+				break;
+			case MOUSE_MIDDLE:
+				ctx->middle_mouse_pressed = FALSE;
+				ctx->middle_mouse_clicked = FALSE;
+				break;
+			case MOUSE_RIGHT:
+				ctx->right_mouse_pressed = FALSE;
+				ctx->right_mouse_clicked = FALSE;
+				break;
+			}
 			break;
 
 		default:

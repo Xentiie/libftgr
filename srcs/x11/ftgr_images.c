@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/22 13:02:37 by reclaire          #+#    #+#             */
-/*   Updated: 2024/05/15 01:38:40 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/06/09 02:47:40 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,3 +95,10 @@ void ftgr_free_img(t_ftgr_img *img)
 	free(img);
 }
 
+t_color ftgr_rand_color()
+{
+	t_time t;
+	clk_get(&t);
+
+	return (t_color){.r = ft_frand(t.nanoseconds)*255, .g = ft_frand(t.nanoseconds + 1)*255, .b = ft_frand(t.nanoseconds + 2)*255, .a = 255};
+}

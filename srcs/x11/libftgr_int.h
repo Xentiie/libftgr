@@ -32,6 +32,14 @@
 #include <X11/extensions/XShm.h>
 #include <X11/XKBlib.h>
 
+# define __FTRETURN_OK(ret) do { ft_errno=FT_OK; return ret; } while (0)
+
+# ifdef DEBUG
+#  define __FTRETURN_ERR(ret, err) do { ft_errno = err ; ft_debug_break(); return ret; } while (0)
+# else
+#  define __FTRETURN_ERR(ret, err) do { ft_errno = err ; return ret; } while (0)
+# endif
+
 typedef struct
 {
 	bool up;
@@ -62,6 +70,10 @@ typedef struct
 	t_time global_time;
 	t_time delta_time_clk;
 	float delta_time;
+
+	bool left_mouse_pressed, left_mouse_clicked;
+	bool right_mouse_pressed, right_mouse_clicked;
+	bool middle_mouse_pressed, middle_mouse_clicked;
 
 	t_list *keys;
 } t_ftgr_ctx;

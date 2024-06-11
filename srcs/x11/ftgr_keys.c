@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 08:26:57 by reclaire          #+#    #+#             */
-/*   Updated: 2024/05/01 19:35:10 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/06/11 00:28:36 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ void _ftx11_register_key_up(t_ftgr_ctx *ctx, U32 key)
 }
 
 
-static bool _ftx11_keys_cleanup_chk(void *d, void *dummy)
+static bool _ftx11_keys_cleanup_chk(void *d)
 {
 	t_key *key = (t_key *)d;
 	if (key->down)
@@ -59,7 +59,9 @@ static bool _ftx11_keys_cleanup_chk(void *d, void *dummy)
 
 void _ftx11_keys_cleanup(t_ftgr_ctx *ctx)
 {
-	ft_lstremoveif(&ctx->keys, free, _ftx11_keys_cleanup_chk, NULL);
+	if (ctx->keys)
+		ft_lstiter(ctx->keys, _ftx11_keys_cleanup_chk);
+	//ft_lstremoveif(&ctx->keys, free, _ftx11_keys_cleanup_chk, NULL);
 }
 /*
 ==================================================

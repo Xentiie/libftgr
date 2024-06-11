@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/16 22:36:34 by reclaire          #+#    #+#             */
-/*   Updated: 2024/05/07 02:22:01 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/06/08 22:55:26 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,4 +100,9 @@ void ftgr_set_win_name_infos(t_ftgr_win *win, string infos)
 	char buffer[256];
 	snprintf(buffer, sizeof(buffer), "%s - %s", win->name, infos);
 	XStoreName(win->ctx->display, win->window, buffer);
+}
+
+void ftgr_move_window(t_ftgr_win *win, t_iv2 pos)
+{
+	XMoveWindow(win->ctx->display, win->window, pos.x, pos.y);
 }

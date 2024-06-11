@@ -470,8 +470,11 @@ def decode_dynamic(stream,output_buffer):
     #The lengths are stored in a weird order:
     CL_code_length_encoding_order = [16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15]
     CL_code_lengths = [0]*19
+    print("CL_code_lengths")
     for idx in CL_code_length_encoding_order[0:num_cl_codes]:
         CL_code_lengths[idx] = stream.read_bits(3)
+        print(CL_code_lengths[idx], end=" ")
+    print()
     
 
     decode_print("CL code lengths (0 - 18): " + ' '.join(str(i) for i in CL_code_lengths))
