@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/22 13:02:37 by reclaire          #+#    #+#             */
-/*   Updated: 2024/06/09 02:47:40 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/07/02 03:07:16 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,10 +45,15 @@ t_ftgr_img *ftgr_new_img(t_ftgr_ctx *ctx, t_iv2 size)
 	img->pixel_size = img_int->img->bits_per_pixel;
 	img->size = size;
 	img->ctx = ctx;
-	img->data_size = img->size.x * img->size.y;
+	img->data_size = img->size.x * img->size.y * img->pixel_size/8;
 	if (ctx->flush)
 		XFlush(ctx->display);
 	return (img);
+}
+
+U8 *ftgr_get_img_data(t_ftgr_img *img)
+{
+	
 }
 
 void ftgr_display_image(t_ftgr_img *img, t_ftgr_win *win, t_iv2 pos)
@@ -79,8 +84,8 @@ void ftgr_display_image(t_ftgr_img *img, t_ftgr_win *win, t_iv2 pos)
 
 void ftgr_set_pixel(t_ftgr_img *img, t_iv2 p, t_color col)
 {
-	int c = ftgr_color_to_int(col);
-	*(unsigned int *)(img->data + (p.y * img->line_size + p.x * (img->pixel_size / 8))) = c;
+	U32 c = ftgr_color_to_int(col);
+	*(U32 *)(img->data + (p.y * img->line_size + p.x * (img->pixel_size / 8))) = c;
 }
 
 void ftgr_free_img(t_ftgr_img *img)

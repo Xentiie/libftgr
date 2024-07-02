@@ -1,0 +1,126 @@
+        -:    0:Source:test2.c
+        -:    0:Graph:a-test2.gcno
+        -:    0:Data:a-test2.gcda
+        -:    0:Runs:1
+        -:    1:/* ************************************************************************** */
+        -:    2:/*                                                                            */
+        -:    3:/*                                                        :::      ::::::::   */
+        -:    4:/*   test2.c                                            :+:      :+:    :+:   */
+        -:    5:/*                                                    +:+ +:+         +:+     */
+        -:    6:/*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
+        -:    7:/*                                                +#+#+#+#+#+   +#+           */
+        -:    8:/*   Created: 2024/05/07 01:33:38 by reclaire          #+#    #+#             */
+        -:    9:/*   Updated: 2024/07/02 21:52:41 by reclaire         ###   ########.fr       */
+        -:   10:/*                                                                            */
+        -:   11:/* ************************************************************************** */
+        -:   12:
+        -:   13:#include "libftgr.h"
+        -:   14:#include "libft/crypt.h"
+        -:   15:#include "libft/images.h"
+        -:   16:#include "libft/time.h"
+        -:   17:#include "libft/io.h"
+        -:   18:
+        -:   19:#include <stdio.h>
+        -:   20:#include <stdlib.h>
+        -:   21:
+        -:   22:#define MIN(a, b) (a < b ? a : b)
+        -:   23:
+        -:   24:
+        1:   25:int main(int argc, char **argv)
+        -:   26:{
+        -:   27:	/*
+        -:   28:	struct {
+        -:   29:		U64 a;
+        -:   30:		U64 b;
+        -:   31:	} t;
+        -:   32:	t.a = 0x807060504030201;
+        -:   33:	t.b = 0x100f0e0d0c0b0a09;
+        -:   34:	for (int i = 0; i < 16; i++)
+        -:   35:		printf("%#x\n", ((U8*)&t)[i]);
+        -:   36:	return 0;
+        -:   37:	*/
+        -:   38:
+        1:   39:	if (argc != 2)
+       1*:   40:		return 1;
+        -:   41:
+        1:   42:	t_ftgr_ctx *ctx = ftgr_create_ctx();
+        1:   43:	t_ftgr_win *win = ftgr_new_window(ctx, ivec2(800, 800), "PNG");
+        -:   44:
+        1:   45:	file fd = ft_fopen(argv[1], "r");
+        -:   46:	t_clock clk;
+        1:   47:	clk_init(&clk);
+        1:   48:	clk_start(&clk);
+        1:   49:	t_png_img *img = ft_load_png(fd, TRUE);
+        1:   50:	clk_stop(&clk);
+        1:   51:	ft_fclose(fd);
+        -:   52:
+        1:   53:	if (img == NULL || ft_errno != FT_OK)
+    #####:   54:		return 1;
+        -:   55:
+        1:   56:	printf("	%u %u %u\n", img->bpp, img->bit_depth, img->color_type);
+        -:   57:
+        1:   58:	t_ftgr_img *display_img = ftgr_new_img(ctx, ivec2(800, 800));
+        1:   59:	ft_memset(display_img->data, 255, display_img->data_size);
+        1:   60:	printf("%lu\n", display_img->data_size);
+        1:   61:	printf("%lu\n", display_img->line_size);
+        1:   62:	printf("%lu\n", display_img->pixel_size);
+        -:   63:	
+      801:   64:	for (U64 y = 0; y < display_img->size.y; y++)
+        -:   65:	{
+   640800:   66:		for (U64 x = 0; x < display_img->size.x; x++)
+        -:   67:		{
+        -:   68:
+   640000:   69:			t_v2 t = ft_invlerp2(vec2(0, 0), ivec2_flt(display_img->size), vec2(x, y));
+   640000:   70:			S64 x2 = ft_lerp(0, img->width, t.x);
+   640000:   71:			S64 y2 = ft_lerp(0, img->height, t.y);
+        -:   72:
+   640000:   73:			S64 ind = (S64)((y2 * img->width + x2) * img->bpp);
+        -:   74:
+   640000:   75:			U8 *addr = &img->data[ind];
+   640000:   76:			ftgr_set_pixel(
+        -:   77:				display_img,
+        -:   78:				ivec2(x, y),
+   640000:   79:				(t_color){ *addr, *(addr + 1), *(addr + 2), 255 });
+        -:   80:		}
+        -:   81:	}
+        -:   82:
+        -:   83:
+        1:   84:	ftgr_set_pixel(display_img, ivec2(800, 800), COL_WHITE);
+        -:   85:
+        -:   86:	//ft_memcpy(display_img->data, img->data, sizeof(U8) * img->width * img->height * img->bpp);
+        1:   87:	ftgr_display_image(display_img, win, ivec2(0, 0));
+        1:   88:	return 0;
+        -:   89:
+        -:   90:	printf("\nText data:\n");
+        -:   91:	for (t_list *curr = img->text_data; curr; curr = curr->next)
+        -:   92:	{
+        -:   93:		string str1 = (string)curr->content;
+        -:   94:		string str2 = str1 + ft_strlen(str1) + 1;
+        -:   95:		printf("%s:%s\n", str1, str2);
+        -:   96:	}
+        -:   97:
+        -:   98:	printf("Clk time: %s\n", clk_fmt_elapsed_str(&clk));
+        -:   99:	//return 0;
+        -:  100:
+        -:  101:	t_iv2 prev_pos = ivec2(-1, -1);
+        -:  102:	t_iv2 img_pos = ivec2(0, 0);
+        -:  103:	while (ftgr_poll(ctx))
+        -:  104:	{
+        -:  105:		if (ftgr_mouse_down(ctx, MOUSE_LEFT))
+        -:  106:			prev_pos = ftgr_mouse_get_pos(ctx, win);
+        -:  107:		if (ftgr_mouse_released(ctx, MOUSE_LEFT))
+        -:  108:			prev_pos = ivec2(-1, -1);
+        -:  109:
+        -:  110:		if (prev_pos.x != -1)
+        -:  111:		{
+        -:  112:			img_pos = ivec2_add(img_pos, ivec2_sub(ftgr_mouse_get_pos(ctx, win), prev_pos));
+        -:  113:			prev_pos = ftgr_mouse_get_pos(ctx, win);
+        -:  114:			ftgr_display_image(display_img, win, img_pos);
+        -:  115:		}
+        -:  116:
+        -:  117:	}
+        -:  118:
+        -:  119:	ftgr_free(ctx);
+        -:  120:
+        -:  121:	ft_free_png_img(img);
+        -:  122:}

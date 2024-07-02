@@ -97,14 +97,17 @@ bool ftgr_poll(t_ftgr_ctx *ctx)
 			case MOUSE_LEFT:
 				ctx->left_mouse_pressed = FALSE;
 				ctx->left_mouse_clicked = FALSE;
+				ctx->left_mouse_released = TRUE;
 				break;
 			case MOUSE_MIDDLE:
 				ctx->middle_mouse_pressed = FALSE;
 				ctx->middle_mouse_clicked = FALSE;
+				ctx->middle_mouse_released = TRUE;
 				break;
 			case MOUSE_RIGHT:
 				ctx->right_mouse_pressed = FALSE;
 				ctx->right_mouse_clicked = FALSE;
+				ctx->right_mouse_released = TRUE;
 				break;
 			}
 			break;

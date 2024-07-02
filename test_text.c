@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/08 22:48:14 by reclaire          #+#    #+#             */
-/*   Updated: 2024/06/11 03:38:44 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/07/02 18:43:32 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ void draw_bezier(t_ftgr_ctx *ctx, t_ftgr_win *win, t_ftgr_img *img)
 		dirty = TRUE;
 	}
 
-	if (ftgr_mouse_click(ctx, MOUSE_LEFT))
+	if (ftgr_mouse_down(ctx, MOUSE_LEFT))
 	{
 		for (int i = 0; i < 3; i++)
 		{
@@ -58,7 +58,7 @@ void draw_bezier(t_ftgr_ctx *ctx, t_ftgr_win *win, t_ftgr_img *img)
 
 	if (dirty)
 	{
-		ft_memset(img->data, 0, img->data_size * (img->pixel_size / 8));
+		ft_memset(img->data, 0, img->data_size);
 		ftgr_draw_bezier(img, COL_WHITE, points[0], points[1], points[2], increments);
 		ftgr_draw_disc(img, vec2_int(points[0]), 10, COL_GRAY);
 		ftgr_draw_disc(img, vec2_int(points[1]), 10, COL_GRAY);
@@ -79,14 +79,14 @@ int main()
 
 	t_ftgr_img *img = ftgr_new_img(ctx, ivec2(sizex, sizey));
 
-	file fd = ft_fopen("./font2.ttf", "r");
-	ftgr_load_font(fd, img);
-	ft_fclose(fd);
-	ftgr_display_image(img, win, ivec2(0, 0));
+	//file fd = ft_fopen("./font3.ttf", "r");
+	//ftgr_load_font(fd, img);
+	//ft_fclose(fd);
+	//ftgr_display_image(img, win, ivec2(0, 0));
 
 	while (ftgr_poll(ctx))
 	{
 		ftgr_display_fps(win);
-		//draw_bezier(ctx, win, img);
+		draw_bezier(ctx, win, img);
 	}
 }

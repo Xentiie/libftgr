@@ -13,6 +13,37 @@ while [[ $# -gt 0 ]]; do
             shift # past argument
             shift # past value
             ;;
+		-c|--coverage)
+			COVERAGE="true"
+			shift
+			;;
+		--post-coverage)
+			echo Available profiling data:
+			for f in $(find ./objs -name "*.gcda"); do
+				f_basename=$(basename $f)
+				srcs_path=$(find ./srcs -name "${f_basename%.gcda}.c")
+				echo "	$srcs_path"
+				mv $f `dirname $srcs_path`
+			done
+			exit 0
+			;;
+		--coverage-clean)
+			echo "This will remove:"
+			find ./srcs -name "*.gcda" -or -name "*.gcno"
+			read -r -p "Are you sure? [y/N] " response
+			case "$response" in
+			    [yY][eE][sS]|[yY])
+					for f in $(find ./srcs -name "*.gcda" -or -name "*.gcno"); do
+						echo "Removing $f"
+						rm $f
+					done
+			        ;;
+			    *)
+					echo "Nothing done"
+			        ;;
+			esac
+			exit 0
+			;;
         --glfw)
             GLFW="true"
             shift
@@ -32,13 +63,18 @@ OBJS_PATH="./objs"
 
 CC_WINDOWS=x86_64-w64-mingw32-gcc
 #CC_WINDOWS=gcc.exe
-CC_LINUX=gcc
+CC_LINUX=gcc-11
 
 RM="rm -rf"
 CFLAGS=
 INCLUDES=
 LIBS_PATHS=
 LIBS=
+
+if [[ "$COVERAGE" == "true" ]]; then
+	CFLAGS="$CFLAGS -fprofile-arcs -ftest-coverage -O0"
+	CC_LINUX=gcc-11
+fi
 
 if [ -z "$TARGET" ]; then
     if [ -f "/proc/sys/fs/binfmt_misc/WSLInterop" ]; then
@@ -102,7 +138,11 @@ echo "" >> config.mk
 
 for i in "${!SRCS[@]}"; do
     printf "%s: %s\n" "${OBJS[i]}" "${SRCS[i]}" >> config.mk
-    printf "\t%s %s %s -c %s -o %s\n\n" '$(CC)' '$(CFLAGS)' '$(INCLUDES)' "${SRCS[i]}" "${OBJS[i]}" >> config.mk
+    printf "\t%s %s %s -c %s -o %s\n" '$(CC)' '$(CFLAGS)' '$(INCLUDES)' "${SRCS[i]}" "${OBJS[i]}" >> config.mk
+	if [[ "$COVERAGE" == "true" ]]; then
+		printf "\tmv %s %s\n" "${OBJS[i]%.o}.gcno" `dirname ${SRCS[i]}` >> config.mk
+	fi
+	printf "\n" >> config.mk
 done
 echo "" >> config.mk
 

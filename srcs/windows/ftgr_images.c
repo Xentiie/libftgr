@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/24 14:51:47 by reclaire          #+#    #+#             */
-/*   Updated: 2024/05/07 02:31:43 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/07/02 03:06:42 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,7 @@ void ftgr_display_image(t_ftgr_img *img, t_ftgr_win *win, t_iv2 pos)
 
 void ftgr_set_pixel(t_ftgr_img *img, t_iv2 p, t_color col)
 {
-	U8 *addr = &(((U64 *)img->data)[p.x + p.y * img->size.x]);
+	U8 *addr = &(((U64 *)img->data)[(p.x + p.y * img->size.x) * img->pixel_size/8]);
 	addr[0] = col.b;
 	addr[1] = col.g;
 	addr[2] = col.r;

@@ -6,7 +6,7 @@
 #    By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/04/15 17:26:47 by reclaire          #+#    #+#              #
-#    Updated: 2024/06/08 22:51:39 by reclaire         ###   ########.fr        #
+#    Updated: 2024/07/02 18:33:07 by reclaire         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -27,7 +27,7 @@ _libft:
 #			mingw32-make.exe -C ../libft
 
 test:	$(NAME) _libft
-			$(CC) $(CFLAGS) $(INCLUDES) -L./ -L../libft test.c -lftgr -lft -lm
+			$(CC) $(CFLAGS) $(INCLUDES) -L./ -L../libft test2.c -lftgr -lft -lm -lz -lX11 -lXext
 #			$(CC) $(CFLAGS) $(INCLUDES) -L./ -L./3rdparty/OpenCL/lib -L../libft test.c -lftgr -lft -lm -lgdi32 -lopengl32 -lOpenCL
 
 test_deflate:	$(NAME) _libft

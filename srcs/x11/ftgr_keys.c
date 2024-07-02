@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 08:26:57 by reclaire          #+#    #+#             */
-/*   Updated: 2024/06/11 00:28:36 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/07/02 05:08:33 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,6 +61,10 @@ void _ftx11_keys_cleanup(t_ftgr_ctx *ctx)
 {
 	if (ctx->keys)
 		ft_lstiter(ctx->keys, _ftx11_keys_cleanup_chk);
+
+	ctx->left_mouse_released = FALSE;
+	ctx->middle_mouse_released = FALSE;
+	ctx->right_mouse_released = FALSE;
 	//ft_lstremoveif(&ctx->keys, free, _ftx11_keys_cleanup_chk, NULL);
 }
 /*

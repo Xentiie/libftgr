@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/13 01:58:46 by reclaire          #+#    #+#             */
-/*   Updated: 2024/06/09 23:40:38 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/07/02 05:09:15 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,7 +93,8 @@ void ftgr_mouse_hide(t_ftgr_ctx *ctx, t_ftgr_win *win);
 void ftgr_mouse_show(t_ftgr_ctx *ctx, t_ftgr_win *win);
 t_iv2 ftgr_mouse_get_pos(t_ftgr_ctx *ctx, t_ftgr_win *win);
 bool ftgr_mouse_pressed(t_ftgr_ctx *ctx, S32 button);
-bool ftgr_mouse_click(t_ftgr_ctx *ctx, S32 button);
+bool ftgr_mouse_down(t_ftgr_ctx *ctx, S32 button);
+bool ftgr_mouse_released(t_ftgr_ctx *ctx, S32 button);
 
 bool ftgr_is_key_pressed(t_ftgr_ctx *ctx, U32 key);
 bool ftgr_is_key_down(t_ftgr_ctx *ctx, U32 key);
@@ -113,7 +114,7 @@ void ftgr_set_pixel(t_ftgr_img *img, t_iv2 p, t_color col);
 t_color ftgr_rand_color();
 
 void ftgr_display_fps(t_ftgr_win *win);
-S32 ftgr_color_to_int(t_color col);
+U32 ftgr_color_to_int(t_color col);
 
 
 void ftgr_draw_line(t_ftgr_img *img, t_iv2 p1, t_iv2 p2, t_color col);

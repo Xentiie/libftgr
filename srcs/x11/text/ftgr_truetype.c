@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/08 23:01:33 by reclaire          #+#    #+#             */
-/*   Updated: 2024/06/11 03:42:13 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/06/12 18:38:46 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,16 +76,11 @@ void *ftgr_load_font(file fd, t_ftgr_img *img)
 	print_truetype_loader(loader);
 	loader->get_glyphs(loader);	
 
-	draw_glyph(loader->glyphs[0], img, 70);
-	draw_glyph(loader->glyphs[5], img, 140);
-	draw_glyph(loader->glyphs[6], img, 210);
+	draw_glyph(loader->glyphs[4], img, 70);
+	//draw_glyph(loader->glyphs[5], img, 140);
+	//draw_glyph(loader->glyphs[6], img, 210);
 	//draw_glyph(loader->glyphs[3], img, 280);
 	//draw_glyph(loader->glyphs[4], img, 350);
-
-//	read_glyph(fd, &glyph);
-//	printf("Glyph:\n");
-//	print_glyph(&glyph);
-//	draw_glyph(glyph, img, 52);
 
 	return loader;
 }

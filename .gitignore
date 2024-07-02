@@ -10,6 +10,8 @@ config.mk
 libftgr/
 libftgr/
 
+*.gcda
+*.gcno
 
 #env
 .editorconfig

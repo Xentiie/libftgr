@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/22 23:38:56 by reclaire          #+#    #+#             */
-/*   Updated: 2024/04/23 01:30:30 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/07/02 03:07:13 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ void ftgr_display_fps(t_ftgr_win *win)
 	ftgr_set_win_name_infos(win, buffer);
 }
 
-S32 ftgr_color_to_int(t_color col)
+U32 ftgr_color_to_int(t_color col)
 {
 	return (((col.a & 0xff) << 24) + ((col.r & 0xff) << 16)
 			+ ((col.g & 0xff) << 8) + (col.b & 0xff));

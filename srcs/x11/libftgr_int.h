@@ -71,9 +71,9 @@ typedef struct
 	t_time delta_time_clk;
 	float delta_time;
 
-	bool left_mouse_pressed, left_mouse_clicked;
-	bool right_mouse_pressed, right_mouse_clicked;
-	bool middle_mouse_pressed, middle_mouse_clicked;
+	bool left_mouse_pressed, left_mouse_clicked, left_mouse_released;
+	bool right_mouse_pressed, right_mouse_clicked, right_mouse_released;
+	bool middle_mouse_pressed, middle_mouse_clicked, middle_mouse_released;
 
 	t_list *keys;
 } t_ftgr_ctx;
