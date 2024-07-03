@@ -27,7 +27,7 @@ while [[ $# -gt 0 ]]; do
 			done
 			exit 0
 			;;
-		--coverage-clean)
+		--clean-coverage)
 			echo "This will remove:"
 			find ./srcs -name "*.gcda" -or -name "*.gcno"
 			read -r -p "Are you sure? [y/N] " response

@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/09 19:55:22 by reclaire          #+#    #+#             */
-/*   Updated: 2024/06/11 03:25:13 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/07/03 16:02:44 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,7 @@ void print_table_sections(t_ftgr_truetype_loader *loader)
 	
 	printf("TrueType table:\n");
 	for (U16 i = 0; i < header->num_tables; i++)
-		printf("	'%.4s': (checksum:%#x) (offset:%u) (length:%u)\n", &sections[i].tag, sections[i].checksum, sections[i].offset, sections[i].length);
+		printf("	'%.4s': (checksum:%#x) (offset:%u) (length:%u)\n", (string)&sections[i].tag, sections[i].checksum, sections[i].offset, sections[i].length);
 }
 
 void print_table_kerning(t_ftgr_truetype_loader *loader)

@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/13 01:58:46 by reclaire          #+#    #+#             */
-/*   Updated: 2024/07/02 05:09:15 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/07/03 15:55:03 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,6 +129,8 @@ void ftgr_draw_circle(t_ftgr_img *img, t_iv2 pos, S32 radius, t_color col);
 void ftgr_draw_disc(t_ftgr_img *img, t_iv2 pos, S32 radius, t_color col);
 
 void *ftgr_load_font(file fd, t_ftgr_img *img);
+t_ftgr_img *ftgr_load_png(t_ftgr_ctx *ctx, const_string path);
+
 
 /*
 void		ftgr_clear_window(t_ftgr_ctx *xvar, t_ftgr_win *win);

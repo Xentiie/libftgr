@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 08:26:57 by reclaire          #+#    #+#             */
-/*   Updated: 2024/07/02 05:08:33 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/07/03 16:01:44 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,12 +49,11 @@ void _ftx11_register_key_up(t_ftgr_ctx *ctx, U32 key)
 }
 
 
-static bool _ftx11_keys_cleanup_chk(void *d)
+static void _ftx11_keys_cleanup_chk(void *d)
 {
 	t_key *key = (t_key *)d;
 	if (key->down)
 		key->down = FALSE;
-	return key->up;
 }
 
 void _ftx11_keys_cleanup(t_ftgr_ctx *ctx)

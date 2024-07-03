@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/09 16:46:04 by reclaire          #+#    #+#             */
-/*   Updated: 2024/06/09 15:56:31 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/07/03 16:02:21 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ static void	ftgr_init_shm(t_ftgr_ctx *ctx);
 
 static int error_handler(Display *display, XErrorEvent *event)
 {
-	printf("X11 ERROR: (%u:%u) req:%u resoureid:%d serial:%lu type:%d\n", event->error_code, event->minor_code, event->request_code, event->resourceid, event->serial, event->type);
+	printf("X11 ERROR: (%d:%u) req:%u resoureid:%ld serial:%lu type:%d\n", event->error_code, event->minor_code, event->request_code, event->resourceid, event->serial, event->type);
 }
 
 t_ftgr_ctx	*ftgr_create_ctx()
