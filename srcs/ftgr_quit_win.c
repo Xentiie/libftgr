@@ -1,27 +1,32 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ftgr_time.c                                        :+:      :+:    :+:   */
+/*   ftgr_on_quit.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/04/22 11:07:07 by reclaire          #+#    #+#             */
-/*   Updated: 2024/04/22 12:33:26 by reclaire         ###   ########.fr       */
+/*   Created: 2024/01/16 23:22:11 by reclaire          #+#    #+#             */
+/*   Updated: 2024/01/16 23:22:11 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libftgr_int.h"
-#include "libft/time.h"
+#include "libftgr_int_win.h"
 
-float ftgr_time(t_ftgr_ctx *ctx)
+void ftgr_free(t_ftgr_ctx *ctx)
 {
-    t_time t;
-    clk_get(&t);
-    return clk_diff_float(&ctx->global_time, &t);
-}
+	if (ctx->main_window_class)
+	{
+		UnregisterClass(FTGR_WINDOW_CLASS, ctx->instance_handle);
+		ctx->main_window_class = 0;
+	}
+	t_list *curr = ctx->windows;
+	ft_lstclear(&ctx->windows, ftgr_free_window);
 
-float ftgr_delta_time(t_ftgr_ctx *ctx)
-{
-    return ctx->delta_time;
-}
+	if (ctx->instance_handle)
+	{
+		FreeLibrary(ctx->instance_handle);
+		ctx->instance_handle = NULL;
+	}
 
+	free(ctx);
+}

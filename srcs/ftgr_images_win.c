@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ftgr_images.c                                      :+:      :+:    :+:   */
+/*   ftgr_images_win.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/24 14:51:47 by reclaire          #+#    #+#             */
-/*   Updated: 2024/07/02 03:06:42 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/07/04 16:09:54 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libftgr_int.h"
+#include "libftgr_int_win.h"
 #include "libft/time.h"
 
 t_ftgr_img *ftgr_new_img(t_ftgr_ctx *ctx, t_iv2 size)

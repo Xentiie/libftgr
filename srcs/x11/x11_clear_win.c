@@ -1,31 +1,20 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ftgr_free.c                                        :+:      :+:    :+:   */
+/*   x11_clear_win.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/04/16 17:56:12 by reclaire          #+#    #+#             */
-/*   Updated: 2024/04/23 00:08:50 by reclaire         ###   ########.fr       */
+/*   Created: 2024/04/16 22:36:39 by reclaire          #+#    #+#             */
+/*   Updated: 2024/07/04 16:16:46 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libftgr_int.h"
+#include "libftgr_x11_int.h"
 
-void ftgr_free(t_ftgr_ctx *ctx)
+void	ftgr_clear_window(t_ftgr_ctx *xvar, t_ftgr_win *win)
 {
-    t_list *win = ctx->windows;
-    while (win)
-    {
-		t_list *nxt = win->next;
-        ftgr_free_window(FTGR_WINDOW(win));
-		free(win);
-        win = nxt;
-    }
-
-
-    XFreeColormap(ctx->display, ctx->cmap);
-    XDestroyWindow(ctx->display, ctx->root);
-    XCloseDisplay(ctx->display);
-    free(ctx);
+  XClearWindow(xvar->display, win->window);
+  if (xvar->flush)
+    XFlush(xvar->display);
 }

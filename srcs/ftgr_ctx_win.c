@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libftgr_int.h"
+#include "libftgr_int_win.h"
 
 t_ftgr_ctx   *ftgr_create_ctx()
 {

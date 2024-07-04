@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   libftgr_int.h                                   :+:      :+:    :+:   */
+/*   libftgr_int_win.h                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -20,7 +20,7 @@
 #include "libft/lists.h"
 #include "libft/strings.h"
 #include "libft/time.h"
-#include "../libftgr_constants.h"
+#include "libftgr_constants.h"
 
 typedef struct s_ftgr_ctx
 {

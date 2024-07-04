@@ -1,27 +1,29 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ftgr_utils.c                                       :+:      :+:    :+:   */
+/*   ftgr_ui_win.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/04/22 23:38:56 by reclaire          #+#    #+#             */
-/*   Updated: 2024/07/02 03:07:49 by reclaire         ###   ########.fr       */
+/*   Created: 2024/05/06 23:53:06 by reclaire          #+#    #+#             */
+/*   Updated: 2024/07/04 16:09:54 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libftgr_int.h"
+#include "libftgr_int_win.h"
 
-void ftgr_display_fps(t_ftgr_win *win)
+t_ui_element *ftgr_new_ui()
 {
-	char buffer[100];
-	snprintf(buffer, sizeof(buffer), "%.5f", 1.0f / ftgr_delta_time(win->ctx));
-	ftgr_set_win_name_infos(win, buffer);
+	t_ui_element *elem = malloc(sizeof(t_ui_element));
+
+	ft_memset(elem->callbacks, 0, sizeof(elem->callbacks));
+	elem->primitives = NULL;
+	return elem;
 }
 
-U32 ftgr_color_to_int(t_color col)
+t_ui_callback *ftgr_ui_bind(t_ui_element *ui, S32 event, t_ui_callback callback)
 {
-	return (((col.a & 0xff) << 24) + ((col.r & 0xff) << 16)
-			+ ((col.g & 0xff) << 8) + (col.b & 0xff));
+	t_ui_callback prev = ui->callbacks[event];
+	ui->callbacks[event] = callback;
+	return prev;
 }
-

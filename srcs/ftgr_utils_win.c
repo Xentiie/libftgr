@@ -1,20 +1,20 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ftgr_utils.c                                       :+:      :+:    :+:   */
+/*   ftgr_utils_win.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/22 23:38:56 by reclaire          #+#    #+#             */
-/*   Updated: 2024/07/02 03:07:13 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/07/04 16:09:54 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libftgr_int.h"
+#include "libftgr_int_win.h"
 
 void ftgr_display_fps(t_ftgr_win *win)
 {
-	char buffer[10];
+	char buffer[100];
 	snprintf(buffer, sizeof(buffer), "%.5f", 1.0f / ftgr_delta_time(win->ctx));
 	ftgr_set_win_name_infos(win, buffer);
 }

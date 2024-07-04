@@ -1,20 +1,27 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ftgr_clear_win.c                                   :+:      :+:    :+:   */
+/*   x11_time.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/04/16 22:36:39 by reclaire          #+#    #+#             */
-/*   Updated: 2024/04/16 22:36:40 by reclaire         ###   ########.fr       */
+/*   Created: 2024/04/22 11:07:07 by reclaire          #+#    #+#             */
+/*   Updated: 2024/07/04 16:16:46 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libftgr_int.h"
+#include "libftgr_x11_int.h"
+#include "libft/time.h"
 
-void	ftgr_clear_window(t_ftgr_ctx *xvar, t_ftgr_win *win)
+float ftgr_time(t_ftgr_ctx *ctx)
 {
-  XClearWindow(xvar->display, win->window);
-  if (xvar->flush)
-    XFlush(xvar->display);
+    t_time t;
+    clk_get(&t);
+    return clk_diff_float(&ctx->global_time, &t);
 }
+
+float ftgr_delta_time(t_ftgr_ctx *ctx)
+{
+    return ctx->delta_time;
+}
+

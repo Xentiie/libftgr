@@ -1,17 +1,17 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ftgr_ctx.c                                         :+:      :+:    :+:   */
+/*   x11_ctx.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/09 16:46:04 by reclaire          #+#    #+#             */
-/*   Updated: 2024/07/03 16:02:21 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/07/04 16:17:00 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libftgr_int.h"
 #include "libft/time.h"
+#include "libftgr_x11_int.h"
 #include <unistd.h>
 
 static void	ftgr_init_shm(t_ftgr_ctx *ctx);

@@ -1,21 +1,27 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ftgr_screen_size.c                                 :+:      :+:    :+:   */
+/*   x11_utils.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/01/10 08:10:06 by reclaire          #+#    #+#             */
-/*   Updated: 2024/04/16 22:36:30 by reclaire         ###   ########.fr       */
+/*   Created: 2024/04/22 23:38:56 by reclaire          #+#    #+#             */
+/*   Updated: 2024/07/04 16:16:46 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libftgr_int.h"
+#include "libftgr_x11_int.h"
 
-t_iv2 ftgr_get_screen_size(t_ftgr_ctx *ctx)
+void ftgr_display_fps(t_ftgr_win *win)
 {
-	XWindowAttributes	attr;
-	XGetWindowAttributes(ctx->display, ctx->root, &attr);
-
-	return ivec2(attr.width, attr.height);
+	char buffer[10];
+	snprintf(buffer, sizeof(buffer), "%.5f", 1.0f / ftgr_delta_time(win->ctx));
+	ftgr_set_win_name_infos(win, buffer);
 }
+
+U32 ftgr_color_to_int(t_color col)
+{
+	return (((col.a & 0xff) << 24) + ((col.r & 0xff) << 16)
+			+ ((col.g & 0xff) << 8) + (col.b & 0xff));
+}
+
