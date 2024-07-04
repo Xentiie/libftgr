@@ -10,10 +10,13 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef FTGR_INT_H
-#define FTGR_INT_H
+#ifndef LIBFTGR_X11_INT
+#define LIBFTGR_X11_INT
 
 #include "libft/std.h"
+
+#ifdef FT_OS_LINUX
+
 #include "libft/maths.h"
 #include "libft/lists.h"
 #include "libft/strings.h"
@@ -118,4 +121,5 @@ void _ftx11_keys_cleanup(t_ftgr_ctx *ctx);
 void _ftx11_register_key_up(t_ftgr_ctx *ctx, U32 key);
 void _ftx11_register_key_down(t_ftgr_ctx *ctx, U32 key);
 
+#endif
 #endif

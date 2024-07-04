@@ -6,12 +6,28 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/07 17:32:16 by reclaire          #+#    #+#             */
-/*   Updated: 2024/06/09 23:40:20 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/07/04 16:44:23 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libftgr.h"
+#include "libft/time.h"
+#include <time.h>
 #include <stdlib.h>
+
+void ftgr_set_pixel(t_ftgr_img *img, t_iv2 p, t_color col)
+{
+	U32 c = ftgr_color_to_int(col);
+	*(U32 *)(img->data + (p.y * img->line_size + p.x * (img->pixel_size / 8))) = c;
+}
+
+t_color ftgr_rand_color()
+{
+	t_time t;
+	clk_get(&t);
+
+	return (t_color){.r = ft_frand(t.nanoseconds), .g = ft_frand(t.nanoseconds + 1), .b = ft_frand(t.nanoseconds + 2), .a = 255};
+}
 
 void ftgr_draw_line(t_ftgr_img *img, t_iv2 p1, t_iv2 p2, t_color col)
 {

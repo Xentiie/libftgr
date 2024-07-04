@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "libftgr_x11_int.h"
+#ifdef FT_OS_LINUX
 
 static bool find_event_win(void *w1, void *w2)
 {
@@ -26,13 +27,6 @@ static void update_time(t_ftgr_ctx *ctx)
 	clk_get(&tmp);
 	ctx->delta_time = clk_diff_float(&ctx->delta_time_clk, &tmp);
 	ctx->delta_time_clk = tmp;
-}
-
-bool ftgr_wait(t_ftgr_ctx *ctx)
-{
-	while (!XPending(ctx->display))
-		;
-	return ftgr_poll(ctx);
 }
 
 bool ftgr_poll(t_ftgr_ctx *ctx)
@@ -119,3 +113,12 @@ bool ftgr_poll(t_ftgr_ctx *ctx)
 	XSync(ctx->display, False);
 	return TRUE;
 }
+
+bool ftgr_wait(t_ftgr_ctx *ctx)
+{
+	while (!XPending(ctx->display))
+		;
+	return ftgr_poll(ctx);
+}
+
+#endif

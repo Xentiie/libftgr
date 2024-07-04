@@ -10,7 +10,9 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libftgr_int_win.h"
+#include "libftgr_win_int.h"
+
+#ifdef FT_OS_WIN
 
 t_ftgr_ctx   *ftgr_create_ctx()
 {
@@ -42,7 +44,25 @@ t_ftgr_ctx   *ftgr_create_ctx()
 	ctx->right_mouse_pressed = FALSE;
 	ctx->right_mouse_clicked = FALSE;
 
-	ctx->ui_focus = FALSE;
-
 	return ctx;
 }
+
+void ftgr_free(t_ftgr_ctx *ctx)
+{
+    t_list *win = ctx->windows;
+    while (win)
+    {
+		t_list *nxt = win->next;
+        ftgr_free_window(FTGR_WINDOW(win));
+		free(win);
+        win = nxt;
+    }
+
+
+    XFreeColormap(ctx->display, ctx->cmap);
+    XDestroyWindow(ctx->display, ctx->root);
+    XCloseDisplay(ctx->display);
+    free(ctx);
+}
+
+#endif

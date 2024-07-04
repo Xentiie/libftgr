@@ -6,11 +6,13 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/16 22:36:34 by reclaire          #+#    #+#             */
-/*   Updated: 2024/07/04 16:16:46 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/07/04 16:41:06 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libftgr_x11_int.h"
+
+#ifdef FT_OS_LINUX
 
 t_ftgr_win *ftgr_new_window(t_ftgr_ctx *ctx, t_iv2 size, const_string title)
 {
@@ -106,3 +108,12 @@ void ftgr_move_window(t_ftgr_win *win, t_iv2 pos)
 {
 	XMoveWindow(win->ctx->display, win->window, pos.x, pos.y);
 }
+
+void	ftgr_clear_window(t_ftgr_ctx *xvar, t_ftgr_win *win)
+{
+  XClearWindow(xvar->display, win->window);
+  if (xvar->flush)
+    XFlush(xvar->display);
+}
+
+#endif

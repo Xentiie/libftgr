@@ -1,21 +1,19 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ftgr_keys_win.c                                    :+:      :+:    :+:   */
+/*   win_keys.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/23 14:29:50 by reclaire          #+#    #+#             */
-/*   Updated: 2024/07/04 16:09:54 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/07/04 16:37:57 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libftgr_int_win.h"
+#include "libftgr_win_int.h"
 
+#ifdef FT_OS_WIN
 
-/*
-==================================================
-*/
 static bool _cmp_keys(void *d1, void *d2)
 {
 	return ((t_key*)d1)->k == *((U32*)(d2));
@@ -88,3 +86,5 @@ void ftgr_key_autorepeat(t_ftgr_ctx *ctx, bool active)
 {
     ctx->key_autorepeat = active;
 }
+
+#endif

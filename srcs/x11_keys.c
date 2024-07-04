@@ -6,11 +6,13 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 08:26:57 by reclaire          #+#    #+#             */
-/*   Updated: 2024/07/04 16:16:46 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/07/04 16:40:21 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libftgr_x11_int.h"
+#ifdef FT_OS_LINUX
+
 #include "libft/limits.h"
 
 /*
@@ -103,3 +105,5 @@ void ftgr_key_autorepeat(t_ftgr_ctx *ctx, bool active)
 		XAutoRepeatOff(ctx->display);
 	XFlush(ctx->display);
 }
+
+#endif

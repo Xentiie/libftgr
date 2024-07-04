@@ -6,11 +6,12 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 08:07:44 by reclaire          #+#    #+#             */
-/*   Updated: 2024/07/04 16:16:46 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/07/04 16:40:24 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libftgr_x11_int.h"
+#ifdef FT_OS_LINUX
 
 void ftgr_mouse_move(t_ftgr_ctx *ctx, t_ftgr_win *win, t_iv2 pos)
 {
@@ -95,3 +96,5 @@ bool	ftgr_mouse_released(t_ftgr_ctx *ctx, S32 button)
 		return FALSE;
 	}
 }
+
+#endif

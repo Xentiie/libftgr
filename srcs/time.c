@@ -1,31 +1,30 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   x11_free.c                                         :+:      :+:    :+:   */
+/*   time.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/04/16 17:56:12 by reclaire          #+#    #+#             */
-/*   Updated: 2024/07/04 16:16:46 by reclaire         ###   ########.fr       */
+/*   Created: 2024/07/04 16:49:09 by reclaire          #+#    #+#             */
+/*   Updated: 2024/07/04 16:49:20 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libftgr_x11_int.h"
+#include "libft/std.h"
+#ifdef FT_OS_WIN
+# include "libftgr_win_int.h"
+#else
+# include "libftgr_x11_int.h"
+#endif
 
-void ftgr_free(t_ftgr_ctx *ctx)
+float ftgr_time(t_ftgr_ctx *ctx)
 {
-    t_list *win = ctx->windows;
-    while (win)
-    {
-		t_list *nxt = win->next;
-        ftgr_free_window(FTGR_WINDOW(win));
-		free(win);
-        win = nxt;
-    }
+    t_time t;
+    clk_get(&t);
+    return clk_diff_float(&ctx->global_time, &t);
+}
 
-
-    XFreeColormap(ctx->display, ctx->cmap);
-    XDestroyWindow(ctx->display, ctx->root);
-    XCloseDisplay(ctx->display);
-    free(ctx);
+float ftgr_delta_time(t_ftgr_ctx *ctx)
+{
+    return ctx->delta_time;
 }

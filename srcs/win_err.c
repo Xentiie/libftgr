@@ -10,7 +10,9 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libftgr_int_win.h"
+#include "libftgr_win_int.h"
+
+#ifdef FT_OS_WIN
 
 #define PRINT_ERROR(name, error_code, msg) printf("(%s:%d) ["name":%d] %s\n", file, line, error_code, msg)
 #define PRINT_ERROR_WIN(error_code, msg) PRINT_ERROR("WIN", error_code, msg)
@@ -47,3 +49,5 @@ void (_ftgr_error)(char *file, int line)
 	else
 		PRINT_ERROR("UNKNOWN", -1, "Unknown error");
 }
+
+#endif

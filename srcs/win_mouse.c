@@ -10,7 +10,9 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libftgr_int_win.h"
+#include "libftgr_win_int.h"
+
+#ifdef FT_OS_WIN
 
 void		ftgr_mouse_move(t_ftgr_ctx *ctx, t_ftgr_win *win, t_iv2 pos)
 {
@@ -73,3 +75,5 @@ bool	ftgr_mouse_click(t_ftgr_ctx *ctx, S32 button)
 		return FALSE;
 	}
 }
+
+#endif

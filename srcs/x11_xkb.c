@@ -6,13 +6,15 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 08:47:06 by reclaire          #+#    #+#             */
-/*   Updated: 2024/07/04 16:16:46 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/07/04 16:40:08 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 //Shamelessly stolen from glfw: https://github.com/glfw/glfw/blob/master/src/xkb_unicode.c
 
 #include "libftgr_x11_int.h"
+
+#ifdef FT_OS_LINUX
 
 static const struct codepair {
   unsigned short keysym;
@@ -881,3 +883,5 @@ U32	_ftgr_keysym2uni(U32 keysym)
     // No matching Unicode value found
     return 0;
 }
+
+#endif

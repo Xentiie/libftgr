@@ -6,7 +6,7 @@ POSITIONAL_ARGS=()
 while [[ $# -gt 0 ]]; do
     case $1 in
         -t|--target)
-            if [ "$2" != "windows" ] && [ "$2" != "linux" ] && [ "$2" != "glfw" ]; then
+            if [ "$2" != "windows" ] && [ "$2" != "linux" ]; then
                 echo "Invalid option for -t: $2"
             fi
             TARGET="$2"
@@ -63,7 +63,7 @@ OBJS_PATH="./objs"
 
 CC_WINDOWS=x86_64-w64-mingw32-gcc
 #CC_WINDOWS=gcc.exe
-CC_LINUX=gcc-11
+CC_LINUX=gcc
 
 RM="rm -rf"
 CFLAGS=
@@ -87,12 +87,10 @@ fi
 if [ "$TARGET" = "windows" ]; then
     CC=$CC_WINDOWS
     CFLAGS="-DFT_OS_WIN $CFLAGS"
-    SRCS_PATH="./srcs/windows"
 
 elif [ "$TARGET" = "linux" ]; then
     CC=$CC_LINUX
     CFLAGS="-DFT_OS_LINUX $CFLAGS"
-    SRCS_PATH="./srcs/x11"
 
 else
     echo Not supported, defaulting to linux/glfw
@@ -102,17 +100,10 @@ else
     GLFW="true"
 fi
 
-if [ -n "$GLFW" ]; then
-    SRCS_PATH="./srcs/glfw"
-fi
-
-echo "$TARGET -> `basename "$SRCS_PATH"`"
-
 SRCS=()
 OBJS=()
-SRCS+=($(find $SRCS_PATH -type f -name "*.c"))
-SRCS+=($(find ./srcs -maxdepth 1 -type f -name "*.c"))
 
+SRCS+=($(find ./srcs -maxdepth 1 -type f -name "*.c"))
 OBJS+=($(for i in "${!SRCS[@]}"; do printf "$OBJS_PATH/`basename ${SRCS[i]%.c}.o` "; done))
 
 echo -n > config.mk

@@ -10,17 +10,20 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef libftgr_int_H
-#define libftgr_int_H
+#ifndef LIBFTGR_WIN_INT
+#define LIBFTGR_WIN_INT
 
-#include <windows.h>
-#include <stdio.h>
 #include "libft/std.h"
+
+#ifdef FT_OS_WIN
+
 #include "libft/maths.h"
 #include "libft/lists.h"
 #include "libft/strings.h"
 #include "libft/time.h"
 #include "libftgr_constants.h"
+#include <windows.h>
+#include <stdio.h>
 
 typedef struct s_ftgr_ctx
 {
@@ -40,8 +43,6 @@ typedef struct s_ftgr_ctx
 	bool left_mouse_pressed, left_mouse_clicked;
 	bool right_mouse_pressed, right_mouse_clicked;
 	bool middle_mouse_pressed, middle_mouse_clicked;
-
-	bool ui_focus;
 
 } t_ftgr_ctx;
 
@@ -97,21 +98,6 @@ void _ftwin32_keys_cleanup(t_ftgr_ctx *ctx);
 void _ftwin32_register_key_up(t_ftgr_ctx *ctx, U32 key);
 void _ftwin32_register_key_down(t_ftgr_ctx *ctx, U32 key);
 
-
-typedef struct s_ui_element t_ui_element;
-typedef void (*t_ui_callback)(t_ui_element *ui, void *param1, void *param2);
-
-#define T_UI_ELEMENT
-#define T_UI_CALLBACK
-#include "libftgr_ui.h"
-
-typedef struct s_ui_element
-{
-	t_list *callbacks[UI_EVENT_MAX];
-	t_v2 pos;
-	t_v2 size;
-	t_ftgr_img *img;
-	U32 flags;
-}	t_ui_element;
+#endif
 
 #endif

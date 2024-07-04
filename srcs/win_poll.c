@@ -10,8 +10,9 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libftgr_int_win.h"
+#include "libftgr_win_int.h"
 
+#ifdef FT_OS_WIN
 #include <stdio.h>
 
 static void update_time(t_ftgr_ctx *ctx)
@@ -45,3 +46,12 @@ bool ftgr_poll(t_ftgr_ctx *ctx)
 	}
 	return TRUE;
 }
+
+bool ftgr_wait(t_ftgr_ctx *ctx)
+{
+	while (!XPending(ctx->display))
+		;
+	return ftgr_poll(ctx);
+}
+
+#endif

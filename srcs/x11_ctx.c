@@ -6,12 +6,14 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/09 16:46:04 by reclaire          #+#    #+#             */
-/*   Updated: 2024/07/04 16:17:00 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/07/04 16:50:03 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft/time.h"
 #include "libftgr_x11_int.h"
+
+#ifdef FT_OS_LINUX
+#include "libft/time.h"
 #include <unistd.h>
 
 static void	ftgr_init_shm(t_ftgr_ctx *ctx);
@@ -111,3 +113,22 @@ static void	ftgr_init_shm(t_ftgr_ctx *ctx)
 		fprintf(stderr, "Warning: not using shared memory\n");
 }
 
+void ftgr_free(t_ftgr_ctx *ctx)
+{
+    t_list *win = ctx->windows;
+    while (win)
+    {
+		t_list *nxt = win->next;
+        ftgr_free_window(FTGR_WINDOW(win));
+		free(win);
+        win = nxt;
+    }
+
+
+    XFreeColormap(ctx->display, ctx->cmap);
+    XDestroyWindow(ctx->display, ctx->root);
+    XCloseDisplay(ctx->display);
+    free(ctx);
+}
+
+#endif

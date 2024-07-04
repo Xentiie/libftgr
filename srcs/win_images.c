@@ -1,17 +1,19 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ftgr_images_win.c                                  :+:      :+:    :+:   */
+/*   win_images.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/24 14:51:47 by reclaire          #+#    #+#             */
-/*   Updated: 2024/07/04 16:09:54 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/07/04 16:44:54 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libftgr_int_win.h"
+#include "libftgr_win_int.h"
 #include "libft/time.h"
+
+#ifdef FT_OS_WIN
 
 t_ftgr_img *ftgr_new_img(t_ftgr_ctx *ctx, t_iv2 size)
 {
@@ -58,6 +60,12 @@ void ftgr_display_image(t_ftgr_img *img, t_ftgr_win *win, t_iv2 pos)
 	CHECKRET(DeleteDC(memDC));
 }
 
+void ftgr_free_img(t_ftgr_img *img)
+{
+	
+}
+
+/*
 void ftgr_set_pixel(t_ftgr_img *img, t_iv2 p, t_color col)
 {
 	U8 *addr = &(((U64 *)img->data)[(p.x + p.y * img->size.x) * img->pixel_size/8]);
@@ -66,11 +74,6 @@ void ftgr_set_pixel(t_ftgr_img *img, t_iv2 p, t_color col)
 	addr[2] = col.r;
 	addr[3] = col.a;
 }
+*/
 
-t_color ftgr_rand_color()
-{
-	t_time t;
-	clk_get(&t);
-
-	return (t_color){.r = ft_frand(t.nanoseconds), .g = ft_frand(t.nanoseconds + 1), .b = ft_frand(t.nanoseconds + 2), .a = 255};
-}
+#endif

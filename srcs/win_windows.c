@@ -10,8 +10,9 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libftgr_int_win.h"
+#include "libftgr_win_int.h"
 
+#ifdef FT_OS_WIN
 #include <stdio.h>
 
 LRESULT CALLBACK windowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -159,11 +160,8 @@ t_ftgr_win *ftgr_new_window(t_ftgr_ctx *ctx, t_iv2 size, const_string title)
 	return win;
 }
 
-static bool _find_win(void *w1, void *w2)
-{
-	return w1 == w2;
-}
-
+static bool cmp_window(void *a1, void *a2)
+{return a1 == a2;}
 void ftgr_free_window(t_ftgr_win *win)
 {
 	if (win->window_handle)
@@ -177,9 +175,7 @@ void ftgr_free_window(t_ftgr_win *win)
 		win->window_handle = NULL;
 	}
 
-	t_list *lst = ft_lstfind(win->ctx->windows, _find_win, win);
-	if (lst)
-		ft_lstremove(&win->ctx->windows, lst, NULL);
+	ft_lstremoveif(&win->ctx->windows, NULL, cmp_window, win);
 	free(win);
 }
 
@@ -208,3 +204,17 @@ void ftgr_set_win_name_infos(t_ftgr_win *win, string infos)
 	if (SetWindowTextA(win->window_handle, buffer) == FALSE)
 		_ftgr_error();
 }
+
+void ftgr_move_window(t_ftgr_win *win, t_iv2 pos)
+{
+	XMoveWindow(win->ctx->display, win->window, pos.x, pos.y);
+}
+
+void	ftgr_clear_window(t_ftgr_ctx *xvar, t_ftgr_win *win)
+{
+  XClearWindow(xvar->display, win->window);
+  if (xvar->flush)
+    XFlush(xvar->display);
+}
+
+#endif
