@@ -36,11 +36,7 @@ LRESULT CALLBACK windowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		if (!ctx->key_autorepeat && (lParam >> 30) & 1)
 			return 0;
 	case WM_KEYUP:
-	case WM_SYSKEYUP:
-		if (0)
-		{
-		}
-
+	case WM_SYSKEYUP:;
 		// FALSE: release, TRUE: pressed
 		bool action = (HIWORD(lParam) & KF_UP) ? FALSE : TRUE;
 
@@ -70,16 +66,39 @@ LRESULT CALLBACK windowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	case WM_LBUTTONDOWN:
 	case WM_MBUTTONDOWN:
 	case WM_RBUTTONDOWN:
-		ctx->left_mouse_clicked |= !!(wParam & 0x0001);
-		ctx->middle_mouse_clicked |= !!(wParam & 0x0010);
-		ctx->right_mouse_clicked |= !!(wParam & 0x0002);
-	case WM_LBUTTONUP:
-	case WM_MBUTTONUP:
-	case WM_RBUTTONUP:
+		ctx->left_mouse_clicked = !!(wParam & 0x0001);
+		ctx->middle_mouse_clicked = !!(wParam & 0x0010);
+		ctx->right_mouse_clicked = !!(wParam & 0x0002);
+
 		ctx->left_mouse_pressed = !!(wParam & 0x0001);
 		ctx->middle_mouse_pressed = !!(wParam & 0x0010);
 		ctx->right_mouse_pressed = !!(wParam & 0x0002);
 		return FALSE;
+	case WM_LBUTTONUP:
+	case WM_MBUTTONUP:
+	case WM_RBUTTONUP:
+		ctx->left_mouse_released = !!(wParam & 0x0001);
+		ctx->middle_mouse_released = !!(wParam & 0x0010);
+		ctx->right_mouse_released = !!(wParam & 0x0002);
+
+		ctx->left_mouse_pressed = !(wParam & 0x0001);
+		ctx->middle_mouse_pressed = !(wParam & 0x0010);
+		ctx->right_mouse_pressed = !(wParam & 0x0002);
+		return FALSE;
+
+	case WM_PAINT:
+	{
+		PAINTSTRUCT ps;
+		t_iv4 rect;
+        HDC hdc = BeginPaint(hwnd, &ps);
+
+		rect = ivec4(ps.rcPaint.left, ps.rcPaint.top, ps.rcPaint.right, ps.rcPaint.bottom);
+		ftgr_draw_widget_recursive(win, ctx->widget_root, rect);
+
+        EndPaint(hwnd, &ps);
+		return FALSE;
+	}
+
 
 	default:
 		return DefWindowProc(hwnd, msg, wParam, lParam);
@@ -103,7 +122,7 @@ t_ftgr_win *ftgr_new_window(t_ftgr_ctx *ctx, t_iv2 size, const_string title)
 		wc.cbSize = sizeof(WNDCLASSEX);
 		wc.lpfnWndProc = windowProc;
 		wc.hInstance = ctx->instance_handle;
-		wc.hbrBackground = (HBRUSH)(COLOR_BACKGROUND);
+		wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);;
 		wc.lpszMenuName = NULL;
 		wc.cbClsExtra = 0;
 		wc.cbWndExtra = 0;
@@ -156,6 +175,7 @@ t_ftgr_win *ftgr_new_window(t_ftgr_ctx *ctx, t_iv2 size, const_string title)
 
 	win->cursor_mode = FTGR_CURSOR_NORMAL;
 	win->name = ft_strdup(title);
+	win->size = size;
 
 	return win;
 }
@@ -205,6 +225,7 @@ void ftgr_set_win_name_infos(t_ftgr_win *win, string infos)
 		_ftgr_error();
 }
 
+/*
 void ftgr_move_window(t_ftgr_win *win, t_iv2 pos)
 {
 	XMoveWindow(win->ctx->display, win->window, pos.x, pos.y);
@@ -216,5 +237,6 @@ void	ftgr_clear_window(t_ftgr_ctx *xvar, t_ftgr_win *win)
   if (xvar->flush)
     XFlush(xvar->display);
 }
+*/
 
 #endif

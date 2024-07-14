@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/07 17:32:16 by reclaire          #+#    #+#             */
-/*   Updated: 2024/07/04 16:44:23 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/07/09 00:51:35 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,26 +18,31 @@
 void ftgr_set_pixel(t_ftgr_img *img, t_iv2 p, t_color col)
 {
 	U32 c = ftgr_color_to_int(col);
-	*(U32 *)(img->data + (p.y * img->line_size + p.x * (img->pixel_size / 8))) = c;
+	*(U32 *)ftgr_get_pixel_addr(img, p.x, p.y) = c;
+}
+
+t_color ftgr_get_pixel(t_ftgr_img *img, t_iv2 p)
+{
+	return ftgr_int_to_color(*(U32 *)ftgr_get_pixel_addr(img, p.x, p.y));
 }
 
 t_color ftgr_rand_color()
 {
 	t_time t;
 	clk_get(&t);
-
 	return (t_color){.r = ft_frand(t.nanoseconds), .g = ft_frand(t.nanoseconds + 1), .b = ft_frand(t.nanoseconds + 2), .a = 255};
 }
 
 void ftgr_draw_line(t_ftgr_img *img, t_iv2 p1, t_iv2 p2, t_color col)
 {
+	U32 col_i = ftgr_color_to_int(col);
 	int dx = abs(p2.x - p1.x), sx = p1.x < p2.x ? 1 : -1;
 	int dy = abs(p2.y - p1.y), sy = p1.y < p2.y ? 1 : -1;
 	int err = (dx > dy ? dx : -dy) / 2, e2;
 
 	for (;;)
 	{
-		ftgr_set_pixel(img, ivec2(p1.x, p1.y), col);
+		*(U32 *)ftgr_get_pixel_addr(img, p1.x, p1.y) = col_i;
 		if (p1.x == p2.x && p1.y == p2.y)
 			break;
 		e2 = err;
@@ -56,13 +61,15 @@ void ftgr_draw_line(t_ftgr_img *img, t_iv2 p1, t_iv2 p2, t_color col)
 
 void ftgr_draw_line_horizontal(t_ftgr_img *img, t_iv2 p1, S32 x2, t_color col)
 {
+	U32 col_i = ftgr_color_to_int(col);
 	for (S32 x = p1.x; x <= x2; x++)
-		ftgr_set_pixel(img, ivec2(x, p1.y), col);
+		*(U32 *)ftgr_get_pixel_addr(img, x, p1.y) = col_i;
 }
 
 void ftgr_draw_line_e(t_ftgr_img *img, t_iv2 p1, t_iv2 p2, t_color (*eval)(t_iv2 p1, t_iv2 p2, t_iv2 p))
 {
-	t_iv2 _p1 = p1, _p2 = p2;
+	t_iv2 st = p1, nd = p2;
+	U32 col_i;
 
 	int dx = abs(p2.x - p1.x), sx = p1.x < p2.x ? 1 : -1;
 	int dy = abs(p2.y - p1.y), sy = p1.y < p2.y ? 1 : -1;
@@ -70,7 +77,8 @@ void ftgr_draw_line_e(t_ftgr_img *img, t_iv2 p1, t_iv2 p2, t_color (*eval)(t_iv2
 
 	for (;;)
 	{
-		ftgr_set_pixel(img, ivec2(p1.x, p1.y), eval(_p1, _p2, p1));
+		col_i = ftgr_color_to_int(eval(st, nd, p1));
+		*(U32 *)ftgr_get_pixel_addr(img, p1.x, p1.y) = col_i;
 		if (p1.x == p2.x && p1.y == p2.y)
 			break;
 		e2 = err;
@@ -105,19 +113,17 @@ void ftgr_draw_rect_e(t_ftgr_img *img, t_iv2 c1, t_iv2 c2, t_color (*eval)(t_iv2
 
 void ftgr_fill_rect(t_ftgr_img *img, t_iv2 c1, t_iv2 c2, t_color col)
 {
+	U32 col_i = ftgr_color_to_int(col);
 	for (S32 y = c1.y; y < c2.y; y++)
 		for (S32 x = c1.x; x < c2.x; x++)
-			ftgr_set_pixel(img, ivec2(x, y), col);
+			*(U32 *)ftgr_get_pixel_addr(img, x, y) = col_i;
 }
 
 void ftgr_fill_rect_e(t_ftgr_img *img, t_iv2 c1, t_iv2 c2, t_color (*eval)(t_iv2 p1, t_iv2 p2, t_iv2 p))
 {
 	for (S32 y = c1.y; y < c2.y; y++)
 		for (S32 x = c1.x; x < c2.x; x++)
-		{
-			t_iv2 p = ivec2(x, y);
-			ftgr_set_pixel(img, p, eval(c1, c2, p));
-		}
+			*(U32 *)ftgr_get_pixel_addr(img, x, y) = ftgr_color_to_int(eval(c1, c2, ivec2(x, y)));
 }
 
 void ftgr_draw_bezier(t_ftgr_img *img, t_color col, t_v2 p1, t_v2 p2, t_v2 p3, S32 res)
@@ -136,16 +142,17 @@ void ftgr_draw_circle(t_ftgr_img *img, t_iv2 pos, S32 radius, t_color col)
 {
 	S32 x = 0, y = radius;
 	S32 d = 1 - radius; // Decision parameter
+	U32 col_i = ftgr_color_to_int(col);
 
 	// Draw initial points on all octants
-	ftgr_set_pixel(img, ivec2(pos.x + x, pos.y + y), col);
-	ftgr_set_pixel(img, ivec2(pos.x - x, pos.y + y), col);
-	ftgr_set_pixel(img, ivec2(pos.x + x, pos.y - y), col);
-	ftgr_set_pixel(img, ivec2(pos.x - x, pos.y - y), col);
-	ftgr_set_pixel(img, ivec2(pos.x + y, pos.y + x), col);
-	ftgr_set_pixel(img, ivec2(pos.x - y, pos.y + x), col);
-	ftgr_set_pixel(img, ivec2(pos.x + y, pos.y - x), col);
-	ftgr_set_pixel(img, ivec2(pos.x - y, pos.y - x), col);
+	*(U32 *)ftgr_get_pixel_addr(img, pos.x + x, pos.y + y) = col_i;
+	*(U32 *)ftgr_get_pixel_addr(img, pos.x - x, pos.y + y) = col_i;
+	*(U32 *)ftgr_get_pixel_addr(img, pos.x + x, pos.y - y) = col_i;
+	*(U32 *)ftgr_get_pixel_addr(img, pos.x - x, pos.y - y) = col_i;
+	*(U32 *)ftgr_get_pixel_addr(img, pos.x + y, pos.y + x) = col_i;
+	*(U32 *)ftgr_get_pixel_addr(img, pos.x - y, pos.y + x) = col_i;
+	*(U32 *)ftgr_get_pixel_addr(img, pos.x + y, pos.y - x) = col_i;
+	*(U32 *)ftgr_get_pixel_addr(img, pos.x - y, pos.y - x) = col_i;
 
 	while (x < y)
 	{
@@ -160,14 +167,14 @@ void ftgr_draw_circle(t_ftgr_img *img, t_iv2 pos, S32 radius, t_color col)
 		}
 
 		// Draw points for each octant
-		ftgr_set_pixel(img, ivec2(pos.x + x, pos.y + y), col);
-		ftgr_set_pixel(img, ivec2(pos.x - x, pos.y + y), col);
-		ftgr_set_pixel(img, ivec2(pos.x + x, pos.y - y), col);
-		ftgr_set_pixel(img, ivec2(pos.x - x, pos.y - y), col);
-		ftgr_set_pixel(img, ivec2(pos.x + y, pos.y + x), col);
-		ftgr_set_pixel(img, ivec2(pos.x - y, pos.y + x), col);
-		ftgr_set_pixel(img, ivec2(pos.x + y, pos.y - x), col);
-		ftgr_set_pixel(img, ivec2(pos.x - y, pos.y - x), col);
+	*(U32 *)ftgr_get_pixel_addr(img, pos.x + x, pos.y + y) = col_i;
+	*(U32 *)ftgr_get_pixel_addr(img, pos.x - x, pos.y + y) = col_i;
+	*(U32 *)ftgr_get_pixel_addr(img, pos.x + x, pos.y - y) = col_i;
+	*(U32 *)ftgr_get_pixel_addr(img, pos.x - x, pos.y - y) = col_i;
+	*(U32 *)ftgr_get_pixel_addr(img, pos.x + y, pos.y + x) = col_i;
+	*(U32 *)ftgr_get_pixel_addr(img, pos.x - y, pos.y + x) = col_i;
+	*(U32 *)ftgr_get_pixel_addr(img, pos.x + y, pos.y - x) = col_i;
+	*(U32 *)ftgr_get_pixel_addr(img, pos.x - y, pos.y - x) = col_i;
 	}
 }
 
@@ -199,5 +206,31 @@ void ftgr_draw_disc(t_ftgr_img *img, t_iv2 pos, S32 radius, t_color col)
 		ftgr_draw_line_horizontal(img, ivec2(pos.x - x, pos.y - y), pos.x + x, col);
 		ftgr_draw_line_horizontal(img, ivec2(pos.x - y, pos.y + x), pos.x + y, col);
 		ftgr_draw_line_horizontal(img, ivec2(pos.x - y, pos.y - x), pos.x + y, col);
+	}
+}
+
+void ftgr_stretch_img(t_ftgr_img *dst, t_iv4 dst_rect, t_ftgr_img *src, t_iv4 src_rect)
+{
+	S32 dst_w = dst_rect.z - dst_rect.x;
+	S32 dst_h = dst_rect.w - dst_rect.y;
+
+	S32 src_w = src_rect.z - src_rect.x;
+	S32 src_h = src_rect.w - src_rect.y;
+
+	S32 *x_vals = alloca(sizeof(S32) * dst_w);
+	for (S32 x = dst_rect.x; x < dst_rect.z; x++)
+		x_vals[x - dst_rect.x] = (S32)(src_rect.x + ((x - dst_rect.x) / (F32)dst_w) * src_w);
+
+	for (S32 y = dst_rect.y; y < dst_rect.w; y++)
+	{
+		for (S32 x = dst_rect.x; x < dst_rect.z; x++)
+		{
+			U32 dst_addr = ((x + y * dst->size.x) * dst->bpp);
+			U32 src_addr = ((
+								x_vals[x - dst_rect.x] +
+								((S32)(src_rect.y + ((y - dst_rect.y) / (F32)dst_h) * src_h) * src->size.x)) *
+							src->bpp);
+			*(U32 *)(dst->data + dst_addr) = *(U32 *)(src->data + src_addr);
+		}
 	}
 }

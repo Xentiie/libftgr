@@ -14,72 +14,44 @@
 
 #ifdef FT_OS_WIN
 
-static bool _cmp_keys(void *d1, void *d2)
+void _ftwin32_register_key_down(t_ftgr_ctx *ctx, U8 key)
 {
-	return ((t_key*)d1)->k == *((U32*)(d2));
+	ctx->keys[key].down = TRUE;
+	ctx->keys[key].pressed = TRUE;
 }
 
-void _ftwin32_register_key_down(t_ftgr_ctx *ctx, U32 key)
+void _ftwin32_register_key_up(t_ftgr_ctx *ctx, U8 key)
 {
-	t_list *fnd = ft_lstfind(ctx->keys, _cmp_keys, &key);
-	if (fnd)
-	{
-		((t_key*)(fnd->content))->down = TRUE;
-		return;
-	}
-
-	t_key k = (t_key){ .down = TRUE, .up = FALSE, .k = key };
-	ft_lstadd_front(&ctx->keys, ft_lstnew(ft_memdup(&k, sizeof(t_key))));
-}
-
-void _ftwin32_register_key_up(t_ftgr_ctx *ctx, U32 key)
-{
-	t_list *fnd = ft_lstfind(ctx->keys, _cmp_keys, &key);
-	if (fnd)
-	{
-		((t_key*)(fnd->content))->down = FALSE;
-		((t_key*)(fnd->content))->up = TRUE;
-		return;
-	}
-
-	t_key k = (t_key){ .down = TRUE, .up = FALSE, .k = key };
-	ft_lstadd_front(&ctx->keys, ft_lstnew(ft_memdup(&k, sizeof(t_key))));
-}
-
-
-static bool _ftwin32_keys_cleanup_chk(void *d, void *dummy)
-{
-	t_key *key = (t_key *)d;
-	if (key->down)
-		key->down = FALSE;
-	return key->up;
+	ctx->keys[key].up = TRUE;
+	ctx->keys[key].pressed = FALSE;
 }
 
 void _ftwin32_keys_cleanup(t_ftgr_ctx *ctx)
 {
-	ft_lstremoveif(&ctx->keys, free, _ftwin32_keys_cleanup_chk, NULL);
+	for (U32 i = 0; i < sizeof(ctx->keys)/sizeof(ctx->keys[0]); i++)
+	{
+		ctx->keys[i].down = FALSE;
+		ctx->keys[i].up = FALSE;
+	}
+
+	ctx->left_mouse_released = FALSE;
+	ctx->middle_mouse_released = FALSE;
+	ctx->right_mouse_released = FALSE;
 }
 
-bool ftgr_is_key_pressed(t_ftgr_ctx *ctx, U32 key)
+bool ftgr_is_key_pressed(t_ftgr_ctx *ctx, U8 key)
 {
-	t_list *fnd = ft_lstfind(ctx->keys, _cmp_keys, &key);
-	return fnd != NULL && !((t_key*)(fnd->content))->up;
+	return ctx->keys[key].pressed;
 }
 
-bool ftgr_is_key_down(t_ftgr_ctx *ctx, U32 key)
+bool ftgr_is_key_down(t_ftgr_ctx *ctx, U8 key)
 {
-	t_list *fnd = ft_lstfind(ctx->keys, _cmp_keys, &key);
-	if (!fnd)
-		return FALSE;
-	return ((t_key*)(fnd->content))->down;
+	return ctx->keys[key].down;
 }
 
-bool ftgr_is_key_up(t_ftgr_ctx *ctx, U32 key)
+bool ftgr_is_key_up(t_ftgr_ctx *ctx, U8 key)
 {
-	t_list *fnd = ft_lstfind(ctx->keys, _cmp_keys, &key);
-	if (!fnd)
-		return FALSE;
-	return ((t_key*)(fnd->content))->up;
+	return ctx->keys[key].up;
 }
 
 void ftgr_key_autorepeat(t_ftgr_ctx *ctx, bool active)

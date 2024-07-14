@@ -13,7 +13,7 @@
 #include "libftgr_win_int.h"
 
 #ifdef FT_OS_WIN
-
+/*
 t_iv2 ftgr_get_screen_size(t_ftgr_ctx *ctx)
 {
 	XWindowAttributes	attr;
@@ -21,5 +21,6 @@ t_iv2 ftgr_get_screen_size(t_ftgr_ctx *ctx)
 
 	return ivec2(attr.width, attr.height);
 }
+*/
 
 #endif

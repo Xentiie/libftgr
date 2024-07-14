@@ -16,7 +16,7 @@ include config.mk
 INCLUDES	+=	-I../libft -I./ -I./srcs -I./3rdparty/OpenCL/include
 #CFLAGS		+=	-Wall -Wextra -Werror -O3 -g
 #CFLAGS		+=	-g -fsanitize=address
-CFLAGS		+=	-g
+CFLAGS		+=	-g -O3
 
 $(NAME):	objs $(OBJS)
 			ar -rcs $(NAME) $(OBJS)
@@ -27,7 +27,8 @@ _libft:
 #			mingw32-make.exe -C ../libft
 
 test:	$(NAME) _libft
-			$(CC) $(CFLAGS) $(INCLUDES) -L./ -L../libft test2.c -lftgr -lft -lm -lz -lX11 -lXext
+			$(CC) $(CFLAGS) $(INCLUDES) -L./ -L../libft test2.c -lftgr -lft -lm -lgdi32
+#			$(CC) $(CFLAGS) $(INCLUDES) -L./ -L../libft test2.c -lftgr -lft -lm -lX11 -lXext
 #			$(CC) $(CFLAGS) $(INCLUDES) -L./ -L./3rdparty/OpenCL/lib -L../libft test.c -lftgr -lft -lm -lgdi32 -lopengl32 -lOpenCL
 
 test_deflate:	$(NAME) _libft

@@ -36,13 +36,17 @@ t_ftgr_ctx   *ftgr_create_ctx()
 	clk_get(&ctx->global_time);
 	clk_get(&ctx->delta_time_clk);
 
-	ctx->keys = NULL;
+	for (U32 i = 0; i < sizeof(ctx->keys)/sizeof(ctx->keys[0]); i++)
+		ctx->keys[i] = (t_key){0, 0, 0};
+
 	ctx->left_mouse_pressed = FALSE;
 	ctx->left_mouse_clicked = FALSE;
 	ctx->middle_mouse_pressed = FALSE;
 	ctx->middle_mouse_clicked = FALSE;
 	ctx->right_mouse_pressed = FALSE;
 	ctx->right_mouse_clicked = FALSE;
+
+	ctx->widget_root = ftgr_new_widget();
 
 	return ctx;
 }
@@ -58,10 +62,11 @@ void ftgr_free(t_ftgr_ctx *ctx)
         win = nxt;
     }
 
-
+/*
     XFreeColormap(ctx->display, ctx->cmap);
     XDestroyWindow(ctx->display, ctx->root);
     XCloseDisplay(ctx->display);
+*/
     free(ctx);
 }
 

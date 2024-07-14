@@ -15,6 +15,9 @@
 
 #include "libft/std.h"
 
+// Set to 0 to test performances later
+#define CACHE_IMAGE_DC 1
+
 #ifdef FT_OS_WIN
 
 #include "libft/maths.h"
@@ -24,6 +27,16 @@
 #include "libftgr_constants.h"
 #include <windows.h>
 #include <stdio.h>
+
+#include "libftgr.h"
+
+typedef struct
+{
+	bool up;
+	bool down;
+	bool pressed;
+	U8 k;
+} t_key;
 
 typedef struct s_ftgr_ctx
 {
@@ -38,25 +51,36 @@ typedef struct s_ftgr_ctx
 	t_time delta_time_clk;
 	float delta_time;
 
-	t_list *keys;
+	t_key keys[256];
 
-	bool left_mouse_pressed, left_mouse_clicked;
-	bool right_mouse_pressed, right_mouse_clicked;
-	bool middle_mouse_pressed, middle_mouse_clicked;
+	bool left_mouse_pressed, left_mouse_clicked, left_mouse_released;
+	bool right_mouse_pressed, right_mouse_clicked,  right_mouse_released;
+	bool middle_mouse_pressed, middle_mouse_clicked, middle_mouse_released;
 
+	t_widget *widget_root;
 } t_ftgr_ctx;
+
+typedef enum {
+	IMAGE,
+	WINDOW
+}	e_surface_type;
+
+#define MK_SURFACE() e_surface_type surface_type; HDC dc;
+#define PEEK_SURFACE(x) (((t_surface*)x)->surface_type)
+typedef struct s_surface
+{
+	MK_SURFACE();
+}	t_surface;
 
 typedef struct s_ftgr_win
 {
+	MK_SURFACE();
 	t_ftgr_ctx *ctx;
 	HWND window_handle;
 	S32 cursor_mode;
 	string name;
-	HDC dc;
+	t_iv2 size;
 } t_ftgr_win;
-#define T_FTGR_CTX
-#define T_FTGR_WIN
-#include "libftgr.h"
 
 #define FTGR_WINDOW_CLASS "FtMainWindowClass"
 #define FTGR_PROP_NAME L"ftgr"
@@ -68,13 +92,7 @@ typedef struct s_ftgr_win
 
 typedef struct
 {
-	bool up;
-	bool down;
-	U32 k;
-} t_key;
-
-typedef struct
-{
+	MK_SURFACE();
 	HBITMAP bitmap;
 } t_ftgr_img_int;
 
@@ -93,10 +111,10 @@ typedef struct
 		clk_get(&__freq_t1);                               \
 	} while (0)
 
-void(_ftgr_error)();
+void(_ftgr_error)(char *file, int line);
 void _ftwin32_keys_cleanup(t_ftgr_ctx *ctx);
-void _ftwin32_register_key_up(t_ftgr_ctx *ctx, U32 key);
-void _ftwin32_register_key_down(t_ftgr_ctx *ctx, U32 key);
+void _ftwin32_register_key_up(t_ftgr_ctx *ctx, U8 key);
+void _ftwin32_register_key_down(t_ftgr_ctx *ctx, U8 key);
 
 #endif
 
