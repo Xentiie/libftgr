@@ -11,11 +11,8 @@
 /* ************************************************************************** */
 
 #include "libft/std.h"
-#ifdef FT_OS_WIN
-# include "libftgr_win_int.h"
-#else
-# include "libftgr_x11_int.h"
-#endif
+#include "libftgr.h"
+#include <stdio.h>
 
 void ftgr_display_fps(t_ftgr_win *win)
 {

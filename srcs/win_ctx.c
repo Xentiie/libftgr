@@ -46,8 +46,6 @@ t_ftgr_ctx   *ftgr_create_ctx()
 	ctx->right_mouse_pressed = FALSE;
 	ctx->right_mouse_clicked = FALSE;
 
-	ctx->widget_root = ftgr_new_widget();
-
 	return ctx;
 }
 

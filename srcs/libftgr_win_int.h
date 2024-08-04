@@ -30,6 +30,17 @@
 
 #include "libftgr.h"
 
+//Window class name for win32 api
+#define FTGR_WINDOW_CLASS "FtMainWindowClass"
+//Prop name for window handle's ftgr_window struct
+#define FTGR_PROP_NAME L"win_struct"
+#define FTGR_GET_HWIN_t_ftgr_window(hwnd) ((t_ftgr_win *)GetPropW(hwnd, FTGR_PROP_NAME))
+
+#define _ftgr_error() _ftgr_error(__FILE__, __LINE__)
+#define CHECKRET(v) \
+	if (!v)         \
+		_ftgr_error();
+
 typedef struct
 {
 	bool up;
@@ -56,48 +67,22 @@ typedef struct s_ftgr_ctx
 	bool left_mouse_pressed, left_mouse_clicked, left_mouse_released;
 	bool right_mouse_pressed, right_mouse_clicked,  right_mouse_released;
 	bool middle_mouse_pressed, middle_mouse_clicked, middle_mouse_released;
-
-	t_widget *widget_root;
 } t_ftgr_ctx;
 
-typedef enum {
-	IMAGE,
-	WINDOW
-}	e_surface_type;
-
-#define MK_SURFACE() e_surface_type surface_type; HDC dc;
-#define PEEK_SURFACE(x) (((t_surface*)x)->surface_type)
-typedef struct s_surface
+typedef struct s_ftgr_win_int
 {
-	MK_SURFACE();
-}	t_surface;
-
-typedef struct s_ftgr_win
-{
-	MK_SURFACE();
-	t_ftgr_ctx *ctx;
 	HWND window_handle;
-	S32 cursor_mode;
-	string name;
-	t_iv2 size;
-} t_ftgr_win;
+	HDC dc;
+	t_ftgr_img buffers[2];
+	U8 front;
+	U8 back;
 
-#define FTGR_WINDOW_CLASS "FtMainWindowClass"
-#define FTGR_PROP_NAME L"ftgr"
-
-#define _ftgr_error() _ftgr_error(__FILE__, __LINE__)
-#define CHECKRET(v) \
-	if (!v)         \
-		_ftgr_error();
-
-typedef struct
-{
-	MK_SURFACE();
-	HBITMAP bitmap;
-} t_ftgr_img_int;
+	BITMAPINFO preset_bmi;
+} t_ftgr_win_int;
 
 #define FTGR_WINDOW(lst) ((t_ftgr_win *)(lst->content))
 #define FTGR_IMAGE_INT(img) ((t_ftgr_img_int *)(img->internal))
+#define FTGR_WINDOW_INT(win) ((t_ftgr_win_int *)(win->internal))
 #define LIMIT_FREQ(secs, ...)                              \
 	do                                                     \
 	{                                                      \

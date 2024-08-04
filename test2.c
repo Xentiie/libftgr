@@ -23,33 +23,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+//https://bobobobo.wordpress.com/2008/02/11/opengl-in-a-proper-windows-app-no-glut/
+
 #define MIN(a, b) (a < b ? a : b)
 
-void stretch(t_ftgr_img *dst, t_iv4 dst_rect, t_ftgr_img *src, t_iv4 src_rect)
-{
-	S32 dst_w = dst_rect.z - dst_rect.x;
-	S32 dst_h = dst_rect.w - dst_rect.y;
-
-	S32 src_w = src_rect.z - src_rect.x;
-	S32 src_h = src_rect.w - src_rect.y;
-
-	S32 *x_vals = alloca(sizeof(S32) * dst_w);
-	for (S32 x = dst_rect.x; x < dst_rect.z; x++)
-		x_vals[x - dst_rect.x] = (S32)(src_rect.x + ((x - dst_rect.x) / (F32)dst_w) * src_w);
-
-	for (S32 y = dst_rect.y; y < dst_rect.w; y++)
-	{
-		for (S32 x = dst_rect.x; x < dst_rect.z; x++)
-		{
-			U32 dst_addr = ((x + y * dst->size.x) * dst->bpp);
-			U32 src_addr = ((
-								x_vals[x - dst_rect.x] +
-								((S32)(src_rect.y + ((y - dst_rect.y) / (F32)dst_h) * src_h) * src->size.x)) *
-							src->bpp);
-			*(U32 *)(dst->data + dst_addr) = *(U32 *)(src->data + src_addr);
-		}
-	}
-}
+t_color bg_col = (t_color){ .a = 255, .r = 0, .g = 0, .b = 0 };
+t_color bg_col2 = (t_color){ .a = 255, .r = 0, .g = 255, .b = 0 };
 
 int main(int argc, char **argv)
 {
@@ -65,34 +44,60 @@ int main(int argc, char **argv)
 	if (png == NULL)
 		return 1;
 
-	ctx->widget_root->pos = vec2(0, 0);
-	ctx->widget_root->size = vec2(700, 700);
-	ftgr_wdrawer_stretch_img_cpu(ctx->widget_root, png);
-
 	t_widget *widget_img = ftgr_new_widget();
 	widget_img->size = vec2(100, 100);
-	ftgr_wdrawer_stretch_img_cpu(widget_img, png);
-	ftgr_add_widget(widget_img, ctx->widget_root);
+	widget_img->pos = vec2(0, 100);
+
+	t_color col2 = (t_color){.r = 255, .g = 0, .b = 0, .a = 0};
+	ftgr_wdrawer_paint_rect(widget_img, &col2);
+	ftgr_add_widget(widget_img, win->w_root);
 
 	float speed = 30.0f;
 
+	t_v2 pos = vec2(0, 0);
 	while (ftgr_poll(ctx))
 	{
 		t_v2 vel = vec2(0, 0);
 
+		//if (ftgr_is_key_pressed(ctx, 'z'))
+		//	vel.y -= 1;
+		//if (ftgr_is_key_pressed(ctx, 's'))
+		//	vel.y += 1;
+		//if (ftgr_is_key_pressed(ctx, 'q'))
+		//	vel.x -= 1;
+		//if (ftgr_is_key_pressed(ctx, 'd'))
+		//	vel.x += 1;
+
+		//vel = vec2_scl(vel, ftgr_delta_time(ctx));
+		//vel = vec2_scl(vel, speed);
+		
+		//if (vel.x != 0 || vel.y != 0)
+		//	ftgr_move_widget(win, widget_img, vec2_add(widget_img->pos, vel));
+
+		if (ftgr_is_key_down(ctx, 'd'))
+		{
+			ftgr_draw_widget_recursive(win->surface, win->w_root);
+			printf("DRAWING\n");
+		}
+
+		if (ftgr_is_key_down(ctx, 's'))
+		{
+			ftgr_swap_buffers(win);
+			col2 = ftgr_rand_color();
+			printf("SWAPPED\n");
+		}
+
 		if (ftgr_is_key_pressed(ctx, 'z'))
-			vel.y -= 1;
-		if (ftgr_is_key_pressed(ctx, 's'))
-			vel.y += 1;
-		if (ftgr_is_key_pressed(ctx, 'q'))
-			vel.x -= 1;
-		if (ftgr_is_key_pressed(ctx, 'd'))
-			vel.x += 1;
+		{
+			ftgr_draw_widget_recursive(win->surface, win->w_root);
+			ftgr_swap_buffers(win);
+			col2 = ftgr_rand_color();
+		}
 
-		vel = vec2_scl(vel, ftgr_delta_time(ctx));
-		vel = vec2_scl(vel, speed);
-		ftgr_move_widget(win, widget_img, vec2_add(widget_img->pos, vel));
+		//ftgr_redraw_rect(win, ivec4(0, 0, win->size.x, win->size.y));
 
+		//ftgr_swap_buffers(win);
+		//printf("%p\n", win->surface);
 		ftgr_display_fps(win);
 	}
 	printf("Graceful exit\n");

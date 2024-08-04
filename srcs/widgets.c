@@ -10,87 +10,22 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "libft/std.h"
+
 #ifdef FT_OS_WIN
 #include "libftgr_win_int.h"
 #else
+#include "libftgr_x11_int.h"
 #endif
 
-#ifdef FT_OS_WIN
-void __ftgr_wdrawer_stretch_img_cpu(t_ftgr_ctx *ctx, t_surface *surface, t_widget *widget, void *data, t_iv4 rect)
-{
-	t_ftgr_img *img = (t_ftgr_img *)data;
-	t_ftgr_img_int *img_int = FTGR_IMAGE_INT(img);
-	CHECKRET(StretchBlt(
-		surface->dc, widget->pos.x, widget->pos.y, widget->size.x, widget->size.y,
-		img_int->dc, 0, 0, img->size.x, img->size.y,
-		SRCCOPY));
-}
-
-bool ftgr_wdrawer_stretch_img_cpu(t_widget *widget, t_ftgr_img *img)
-{
-	if (widget == NULL || img == NULL || widget->drawers_n >= (sizeof(widget->drawers) / sizeof(widget->drawers[0])))
-		return FALSE;
-	widget->drawers[widget->drawers_n++] = (t_widget_drawer){.draw_f = __ftgr_wdrawer_stretch_img_cpu, .data = img};
-	return TRUE;
-}
-
-void __ftgr_wdrawer_stretch_img_cpu2(t_ftgr_ctx *ctx, t_surface *surface, t_widget *widget, void *data, t_iv4 rect)
-{
-	t_ftgr_img *img = (t_ftgr_img *)data;
-	t_ftgr_img_int *img_int = FTGR_IMAGE_INT(img);
-	CHECKRET(StretchBlt(
-		surface->dc, widget->pos.x, widget->pos.y, widget->size.x, widget->size.y,
-		img_int->dc, 0, 0, img->size.x, img->size.y,
-		SRCCOPY));
-}
-
-bool ftgr_wdrawer_stretch_img_cpu2(t_widget *widget, t_ftgr_img *img)
-{
-	if (widget == NULL || img == NULL || widget->drawers_n >= (sizeof(widget->drawers) / sizeof(widget->drawers[0])))
-		return FALSE;
-	widget->drawers[widget->drawers_n++] = (t_widget_drawer){.draw_f = __ftgr_wdrawer_stretch_img_cpu, .data = img};
-	return TRUE;
-}
-
-#else
-
-void __ftgr_wdrawer_stretch_img_cpu(t_ftgr_ctx *ctx, t_surface *surface, t_widget *widget, void *data, t_iv4 rect)
-{
-	t_ftgr_img *img = (t_ftgr_img *)data;
-
-	S32 x_start = ft_imax(rect.x, widget->pos.x);
-	S32 y_start = ft_imax(rect.y, widget->pos.y);
-
-	S32 x_end = ft_imin(rect.w, widget->pos.x + widget->size.x);
-	S32 y_end = ft_imin(rect.z, widget->pos.y + widget->size.y);
-
-	for (S32 y = y_start; y < y_end; y++)
-	{
-		F32 ty = (F32)(y - widget->pos.y) / (F32)(widget->size.y);
-		for (S32 x = x_start; x < x_end; x++)
-		{
-			F32 tx = (F32)(x - widget->pos.x) / (F32)(widget->size.x);
-			t_color col = ftgr_get_pixel(img, ivec2(
-												  tx * img->size.x,
-												  ty * img->size.y));
-			ftgr_set_pixel(surface, ivec2(x, y), col);
-		}
-	}
-}
-
-bool ftgr_wdrawer_stretch_img_cpu(t_widget *widget, t_ftgr_img *img)
-{
-	if (widget == NULL || img == NULL || widget->drawers_n >= (sizeof(widget->drawers) / sizeof(widget->drawers[0])))
-		return FALSE;
-	widget->drawers[widget->drawers_n++] = (t_widget_drawer){.draw_f = __ftgr_wdrawer_stretch_img_cpu, .data = img};
-	return TRUE;
-}
-
-#endif
+static void __ftgr_wdrawer_stretch_img_cpu(t_ftgr_img *out, t_widget *widget, void *data);
+static void __ftgr_wdrawer_paint_rect(t_ftgr_img *out, t_widget *widget, void *data);
 
 t_widget *ftgr_new_widget()
 {
 	t_widget *widget = malloc(sizeof(t_widget));
+	if (widget == NULL)
+		return NULL;
 	ft_bzero(widget, sizeof(t_widget));
 	return widget;
 }
@@ -175,68 +110,54 @@ void ftgr_free_widget_recursive(t_widget *widget)
 	free(widget);
 }
 
-void ftgr_draw_widget_recursive(t_ftgr_win *win, t_widget *widget, t_iv4 rect)
+void ftgr_draw_widget_recursive(t_ftgr_img *out, t_widget *widget)
 {
-	t_widget *w;
-
-	ftgr_draw_widget(win, widget, rect);
-
-	w = widget->childrens;
-	while (w)
-	{
-		ftgr_draw_widget(win, w, rect);
-		w = w->next;
-	}
+	ftgr_draw_widget(out, widget);
+	for (t_widget *w = widget->childrens; w; w = w->next)
+		ftgr_draw_widget(out, w);
 }
 
-void ftgr_draw_widget(t_ftgr_win *win, t_widget *widget, t_iv4 rect)
+void ftgr_draw_widget(t_ftgr_img *out, t_widget *widget)
 {
 	for (U8 i = 0; i < widget->drawers_n; i++)
-		widget->drawers[i].draw_f(win->ctx, (t_surface *)win, widget, widget->drawers[i].data, rect);
+		widget->drawers[i].draw_f(out, widget, widget->drawers[i].data);
 }
 
-void ftgr_move_widget(t_ftgr_win *win, t_widget *widget, t_v2 pos)
+/*
+WIDGETS DRAWERS
+*/
+static void __ftgr_wdrawer_stretch_img_cpu(t_ftgr_img *out, t_widget *widget, void *data)
 {
-	t_v2 old_pos = widget->pos;
-	widget->pos = pos;
+	t_ftgr_img *img = (t_ftgr_img *)data;
 
-	t_iv4 rect = {
-		.x = old_pos.x,
-		.y = old_pos.y,
-		.z = old_pos.x + widget->size.x,
-		.w = old_pos.y + widget->size.y};
-	ftgr_redraw_rect(win, rect);
-
-	rect.z = pos.x + widget->size.x;
-	rect.w = pos.y + widget->size.y;
-	ftgr_redraw_rect(win, rect);
+	ftgr_stretch_img(
+		out, ivec4(widget->pos.x, widget->pos.y, widget->pos.x + widget->size.x, widget->pos.y + widget->size.y),
+		img, ivec4(0, 0, img->size.x, img->size.y));
 }
 
-void ftgr_resize_widget(t_ftgr_win *win, t_widget *widget, t_v2 size)
+bool ftgr_wdrawer_stretch_img_cpu(t_widget *widget, t_ftgr_img *img)
 {
-	t_iv4 rect = {
-		.x = widget->pos.x,
-		.y = widget->pos.y,
-		.z = widget->pos.x + widget->size.x,
-		.w = widget->pos.y + widget->size.y};
-	ftgr_redraw_rect(win, rect);
-
-	widget->size = size;
-	rect.z = widget->pos.x + widget->size.x;
-	rect.w = widget->pos.y + widget->size.y;
-	ftgr_redraw_rect(win, rect);
+	if (widget == NULL || img == NULL || widget->drawers_n >= (sizeof(widget->drawers) / sizeof(widget->drawers[0])))
+		return FALSE;
+	widget->drawers[widget->drawers_n++] = (t_widget_drawer){.draw_f = __ftgr_wdrawer_stretch_img_cpu, .data = img};
+	return TRUE;
 }
 
-void ftgr_redraw_rect(t_ftgr_win *win, t_iv4 rect)
+
+static void __ftgr_wdrawer_paint_rect(t_ftgr_img *out, t_widget *widget, void *data)
 {
-	RECT r;
+	t_color *color = (t_color *)data;
+	ftgr_fill_rect(out,
+		ivec4(widget->pos.x, widget->pos.y,
+		widget->size.x + widget->pos.x,
+		widget->size.y + widget->pos.y),
+		*color);
+}
 
-	r = (RECT){
-		.left = rect.x,
-		.top = rect.y,
-
-		.right = rect.z,
-		.bottom = rect.w};
-	CHECKRET(InvalidateRect(win->window_handle, &r, TRUE));
-//	UpdateWindow(win->window_handle);
+bool ftgr_wdrawer_paint_rect(t_widget *widget, t_color *color)
+{
+	if (widget == NULL || color == NULL || widget->drawers_n >= (sizeof(widget->drawers) / sizeof(widget->drawers[0])))
+		return FALSE;
+	widget->drawers[widget->drawers_n++] = (t_widget_drawer){.draw_f = __ftgr_wdrawer_paint_rect, .data = color};
+	return TRUE;
 }

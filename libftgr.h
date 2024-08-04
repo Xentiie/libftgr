@@ -26,27 +26,39 @@
 
 typedef struct s_ftgr_ctx t_ftgr_ctx;
 typedef struct s_ftgr_win t_ftgr_win;
+typedef struct s_ftgr_img t_ftgr_img;
+typedef struct s_widget t_widget;
+typedef struct s_color t_color;
 
-typedef struct
+struct s_ftgr_win 
 {
-	U64 line_size;
-	U8 pixel_size;
+	t_ftgr_ctx *ctx;
+
+	t_ftgr_img *surface;
+
+	S32 cursor_mode;
+	string name;
+	t_iv2 size;
+	void *internal;
+	t_widget *w_root;
+};
+
+struct s_ftgr_img
+{
 	U8 bpp;
+	U64 line_size;
 	char *data;
 	U64 data_size;
 	t_iv2 size;
+};
 
-	t_ftgr_ctx *ctx;
-	void *internal;
-} t_ftgr_img;
-
-typedef struct
+struct s_color
 {
 	U8 r;
 	U8 g;
 	U8 b;
 	U8 a;
-} t_color;
+};
 
 #define COL_BLACK ((t_color){0, 0, 0, 255})
 #define COL_WHITE ((t_color){255, 255, 255, 255})
@@ -76,6 +88,7 @@ void ftgr_free_window(t_ftgr_win *win);
 void ftgr_set_win_name(t_ftgr_win *win, string name);
 void ftgr_set_win_name_infos(t_ftgr_win *win, string infos);
 void ftgr_move_window(t_ftgr_win *win, t_iv2 pos);
+void ftgr_swap_buffers(t_ftgr_win *win);
 
 void ftgr_free(t_ftgr_ctx *ctx);
 
@@ -116,22 +129,23 @@ void ftgr_draw_line(t_ftgr_img *img, t_iv2 p1, t_iv2 p2, t_color col);
 void ftgr_draw_line_e(t_ftgr_img *img, t_iv2 p1, t_iv2 p2, t_color (*eval)(t_iv2 p1, t_iv2 p2, t_iv2 p));
 void ftgr_draw_line_horizontal(t_ftgr_img *img, t_iv2 p1, S32 x2, t_color col);
 void ftgr_draw_bezier(t_ftgr_img *img, t_color col, t_v2 p1, t_v2 p2, t_v2 p3, S32 res);
-void ftgr_draw_rect(t_ftgr_img *img, t_iv2 c1, t_iv2 c2, t_color col);
-void ftgr_draw_rect_e(t_ftgr_img *img, t_iv2 c1, t_iv2 c2, t_color (*eval)(t_iv2 p1, t_iv2 p2, t_iv2 p));
-void ftgr_fill_rect(t_ftgr_img *img, t_iv2 c1, t_iv2 c2, t_color col);
-void ftgr_fill_rect_e(t_ftgr_img *img, t_iv2 c1, t_iv2 c2, t_color (*eval)(t_iv2 p1, t_iv2 p2, t_iv2 p));
+void ftgr_draw_rect(t_ftgr_img *img, t_iv4 rect, t_color col);
+void ftgr_draw_rect_e(t_ftgr_img *img, t_iv4 rect, t_color (*eval)(t_iv2 p1, t_iv2 p2, t_iv2 p));
+void ftgr_fill_rect(t_ftgr_img *img, t_iv4 rect, t_color col);
+void ftgr_fill_rect_e(t_ftgr_img *img, t_iv4 rect, t_color (*eval)(t_iv2 p1, t_iv2 p2, t_iv2 p));
 void ftgr_draw_circle(t_ftgr_img *img, t_iv2 pos, S32 radius, t_color col);
 void ftgr_draw_disc(t_ftgr_img *img, t_iv2 pos, S32 radius, t_color col);
+void ftgr_stretch_img(t_ftgr_img *dst, t_iv4 dst_rect, t_ftgr_img *src, t_iv4 src_rect);
+void ftgr_stretch_img2(t_ftgr_img *dst, t_iv4 dst_rect, t_iv4 dst_rect_st_nd, t_ftgr_img *src, t_iv4 src_rect);
+void ftgr_cpy_img(t_ftgr_img *dst, t_iv2 dst_pos, t_ftgr_img *src, t_iv4 src_rect);
 
 void *ftgr_load_font(file fd, t_ftgr_img *img);
 t_ftgr_img *ftgr_load_png(t_ftgr_ctx *ctx, const_string path);
 
-typedef struct s_surface t_surface;
-typedef struct s_widget t_widget;
 typedef struct s_widget_drawer
 {
 	void *data;
-	bool (*draw_f)(t_ftgr_ctx *ctx, t_surface *surface, t_widget *widget, void *data, t_iv4 rect);
+	void (*draw_f)(t_ftgr_img *out, t_widget *widget, void *data);
 } t_widget_drawer;
 
 /*
@@ -191,16 +205,14 @@ t_widget *ftgr_new_widget();
 void ftgr_free_widget_recursive(t_widget *widget);
 void ftgr_free_widget(t_widget *widget);
 
-void ftgr_move_widget(t_ftgr_win *win, t_widget *widget, t_v2 pos);
-void ftgr_resize_widget(t_ftgr_win *win, t_widget *widget, t_v2 size);
-
 void ftgr_add_widget(t_widget *widget, t_widget *master);
 void ftgr_remove_widget(t_widget *widget);
 
-void ftgr_draw_widget(t_ftgr_win *win, t_widget *widget, t_iv4 rect);
-void ftgr_draw_widget_recursive(t_ftgr_win *win, t_widget *widget, t_iv4 rect);
+void ftgr_draw_widget(t_ftgr_img *out, t_widget *widget);
+void ftgr_draw_widget_recursive(t_ftgr_img *out, t_widget *widget);
 
 bool ftgr_wdrawer_stretch_img_cpu(t_widget *widget, t_ftgr_img *img);
+bool ftgr_wdrawer_paint_rect(t_widget *widget, t_color *color);
 
 /*
 void		ftgr_clear_window(t_ftgr_ctx *xvar, t_ftgr_win *win);

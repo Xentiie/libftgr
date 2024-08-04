@@ -40,7 +40,7 @@ t_iv2		ftgr_mouse_get_pos(t_ftgr_ctx *ctx, t_ftgr_win *win)
 	if (GetCursorPos(&p) == FALSE)
 		_ftgr_error();
 
-	if (ScreenToClient(win->window_handle, &p) == FALSE)
+	if (ScreenToClient(FTGR_WINDOW_INT(win)->window_handle, &p) == FALSE)
 		_ftgr_error();
 
 	return ivec2(p.x + (win->size.x / 2), p.y + (win->size.y));
