@@ -1,10 +1,11 @@
-Chunk: IHDR (13 bytes)
-Chunk: pHYs (9 bytes)
+Chunk: IHDR (13 bytes) (CRC32: 0x5db4e828)
+Chunk: pHYs (9 bytes) (CRC32: 0x9a9c18)
 Unknown chunk found: pHYs (code: 1935231088) (9 bytes)
-Chunk: tIME (7 bytes)
+Chunk: tIME (7 bytes) (CRC32: 0x60cda84a)
 Unknown chunk found: tIME (code: 1162692980) (7 bytes)
-Chunk: tEXt (25 bytes)
-Chunk: IDAT (992 bytes)
+Chunk: tEXt (25 bytes) (CRC32: 0x57810e17)
+Chunk: IDAT (992 bytes) (CRC32: 0x5f838af1)
+992
 Reading block:
 	last: yes
 	block type: dynamic
@@ -4797,10 +4798,4 @@ Reading block:
 		extra length: 0
 		code:0xad(5)
 		base dist: 1
-		extra dist: 0
-		FULL: 258:1
-	Copying backref:
-		to copy: 258
-		window start offset: 21188
-		final to copy: 258
-	Ba
+		extra dist: 

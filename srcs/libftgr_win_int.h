@@ -67,6 +67,8 @@ typedef struct s_ftgr_ctx
 	bool left_mouse_pressed, left_mouse_clicked, left_mouse_released;
 	bool right_mouse_pressed, right_mouse_clicked,  right_mouse_released;
 	bool middle_mouse_pressed, middle_mouse_clicked, middle_mouse_released;
+
+	HCURSOR defaultCursor;
 } t_ftgr_ctx;
 
 typedef struct s_ftgr_win_int

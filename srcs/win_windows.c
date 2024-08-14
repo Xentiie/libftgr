@@ -13,14 +13,27 @@
 #include "libftgr_win_int.h"
 
 #ifdef FT_OS_WIN
+#include <windowsx.h>
 #include <stdio.h>
 
+LRESULT CALLBACK windowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+static inline ATOM _init_main_window_class(HINSTANCE hInstance);
+static inline HWND _create_window(string title, t_iv2 size, HINSTANCE hInstance);
+static inline bool _init_buffer(t_ftgr_img *buffer, t_iv2 size);
+
+static void send_events(t_ftgr_win *win, S32 event);
+
+#define RESIZE_TIMER_DELAY 300 // ms
+#define RESIZE_TIMER 1		   // For WM_TIMER
 LRESULT CALLBACK windowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	t_ftgr_win *win = FTGR_GET_HWIN_t_ftgr_window(hwnd);
 	if (!win)
 		return DefWindowProc(hwnd, msg, wParam, lParam);
 	t_ftgr_ctx *ctx = win->ctx;
+	t_ftgr_win_int *win_int = FTGR_WINDOW_INT(win);
+
+	U32 nHitTest = HTCLIENT;
 
 	switch (msg)
 	{
@@ -61,31 +74,56 @@ LRESULT CALLBACK windowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		return 0;
 
 	case WM_SETCURSOR:
-		if (win->cursor_mode & FTGR_CURSOR_HIDDEN && LOWORD(lParam) == HTCLIENT)
-			SetCursor(NULL);
-		return TRUE;
+		if (LOWORD(lParam) == HTCLIENT)
+			SetCursor(ctx->defaultCursor);
+		return DefWindowProc(hwnd, msg, wParam, lParam);
+
+		// case WM_SETCURSOR:
+		//	if (win->cursor_mode & FTGR_CURSOR_HIDDEN && LOWORD(lParam) == HTCLIENT)
+		//		SetCursor(NULL);
+		//	return TRUE;
 
 	case WM_LBUTTONDOWN:
-	case WM_MBUTTONDOWN:
-	case WM_RBUTTONDOWN:
-		ctx->left_mouse_clicked = !!(wParam & 0x0001);
-		ctx->middle_mouse_clicked = !!(wParam & 0x0010);
-		ctx->right_mouse_clicked = !!(wParam & 0x0002);
-
-		ctx->left_mouse_pressed = !!(wParam & 0x0001);
-		ctx->middle_mouse_pressed = !!(wParam & 0x0010);
-		ctx->right_mouse_pressed = !!(wParam & 0x0002);
+		ctx->left_mouse_clicked = TRUE;
 		return FALSE;
-	case WM_LBUTTONUP:
-	case WM_MBUTTONUP:
-	case WM_RBUTTONUP:
-		ctx->left_mouse_released = !!(wParam & 0x0001);
-		ctx->middle_mouse_released = !!(wParam & 0x0010);
-		ctx->right_mouse_released = !!(wParam & 0x0002);
+	case WM_MBUTTONDOWN:
+		ctx->middle_mouse_clicked = TRUE;
+		return FALSE;
+	case WM_RBUTTONDOWN:
+		ctx->right_mouse_clicked = TRUE;
+		return FALSE;
 
-		ctx->left_mouse_pressed = !(wParam & 0x0001);
-		ctx->middle_mouse_pressed = !(wParam & 0x0010);
-		ctx->right_mouse_pressed = !(wParam & 0x0002);
+	case WM_LBUTTONUP:
+		ctx->left_mouse_released = TRUE;
+		return FALSE;
+	case WM_MBUTTONUP:
+		ctx->middle_mouse_released = TRUE;
+		return FALSE;
+	case WM_RBUTTONUP:
+		ctx->right_mouse_released = TRUE;
+		return FALSE;
+
+	case WM_TIMER:
+		if (wParam == RESIZE_TIMER)
+		{
+			// Resize has stopped, so reallocate the framebuffer
+			KillTimer(hwnd, RESIZE_TIMER);
+
+			RECT r;
+			GetWindowRect(hwnd, &r);
+			t_iv2 size = ivec2(r.right - r.left, r.bottom - r.top);
+			win->size = size;
+			win->w_root->size = size;
+
+			free(win_int->buffers[0].data);
+			free(win_int->buffers[1].data);
+			_init_buffer(&win_int->buffers[0], size);
+			_init_buffer(&win_int->buffers[1], size);
+		}
+		break;
+
+	case WM_SIZE:;
+		SetTimer(hwnd, RESIZE_TIMER, RESIZE_TIMER_DELAY, NULL);
 		return FALSE;
 
 	default:
@@ -204,8 +242,8 @@ t_ftgr_win *ftgr_new_window(t_ftgr_ctx *ctx, t_iv2 size, const_string title)
 		win->w_root = ftgr_new_widget();
 		if (UNLIKELY(win->w_root == NULL))
 			goto bad_window2;
-		win->w_root->pos = vec2(0, 0);
-		win->w_root->size = ivec2_flt(size);
+		win->w_root->pos = ivec2(0, 0);
+		win->w_root->size = size;
 	}
 
 	ft_lstadd_front(&ctx->windows, lst);
@@ -287,7 +325,6 @@ void	ftgr_clear_window(t_ftgr_ctx *xvar, t_ftgr_win *win)
 }
 */
 
-
 void ftgr_swap_buffers(t_ftgr_win *win)
 {
 	t_ftgr_win_int *win_int = FTGR_WINDOW_INT(win);
@@ -302,14 +339,33 @@ void ftgr_swap_buffers(t_ftgr_win *win)
 	bmi.bmiHeader.biCompression = BI_RGB;
 
 	StretchDIBits(win_int->dc,
-		0, 0, win->size.x, win->size.y,
-		0, 0, win->size.x, win->size.y,
-		win->surface->data, &bmi,
-		0, SRCCOPY);
+				  0, 0, win->size.x, win->size.y,
+				  0, 0, win->size.x, win->size.y,
+				  win->surface->data, &bmi,
+				  0, SRCCOPY);
 
 	win_int->front = !win_int->front;
 	win_int->back = !win_int->back;
 	win->surface = &win_int->buffers[win_int->back];
+}
+
+static void send_events_rec(t_widget *w, struct s_widget_callback callback, t_iv2 mouse_pos)
+{
+	if (!w->capture_input)
+		return;
+	if (mouse_pos.x >= w->pos.x && mouse_pos.x <= w->pos.x + w->size.x && mouse_pos.y >= w->pos.y && mouse_pos.y <= w->pos.y + w->size.y)
+	{
+		callback.f(callback.data);
+		for (t_widget *w2 = w->childrens; w; w = w->next)
+			send_events_rec(w2, callback, mouse_pos);
+	}
+}
+
+static void send_events(t_ftgr_win *win, S32 event)
+{
+	t_iv2 mouse_pos = ftgr_mouse_get_pos(win->ctx, win);
+	struct s_widget_callback callback = ((struct s_widget_callback *)(&win->w_root->on_cursor_move))[event];
+	send_events_rec(win->w_root, callback, mouse_pos);
 }
 
 #endif

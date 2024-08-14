@@ -26,16 +26,23 @@ t_color ftgr_get_pixel(t_ftgr_img *img, t_iv2 p)
 	return ftgr_int_to_color(*(U32 *)ftgr_get_pixel_addr(img, p.x, p.y));
 }
 
-t_color ftgr_rand_color()
+t_color ftgr_rand_color(U32 ofs)
 {
 	t_time t;
 	clk_get(&t);
+	t.nanoseconds += ofs;
 	return (t_color){.r = ft_frand(t.nanoseconds) * 255, .g = ft_frand(t.nanoseconds + 1) * 255, .b = ft_frand(t.nanoseconds + 2) * 255, .a = 255};
 }
 
 void ftgr_draw_line(t_ftgr_img *img, t_iv2 p1, t_iv2 p2, t_color col)
 {
 	U32 col_i = ftgr_color_to_int(col);
+
+	p1.x = ft_clamp(0, img->size.x, p1.x);
+	p1.y = ft_clamp(0, img->size.y, p1.y);
+	p2.x = ft_clamp(0, img->size.x, p2.x);
+	p2.y = ft_clamp(0, img->size.y, p2.y);
+
 	int dx = abs(p2.x - p1.x), sx = p1.x < p2.x ? 1 : -1;
 	int dy = abs(p2.y - p1.y), sy = p1.y < p2.y ? 1 : -1;
 	int err = (dx > dy ? dx : -dy) / 2, e2;
@@ -244,14 +251,15 @@ void ftgr_stretch_img2(t_ftgr_img *dst, t_iv4 dst_rect, t_iv4 dst_rect_st_nd, t_
 
 void ftgr_stretch_img(t_ftgr_img *dst, t_iv4 dst_rect, t_ftgr_img *src, t_iv4 src_rect)
 {
-	if (dst_rect.x < 0) dst_rect.x = 0;
-	if (dst_rect.y < 0) dst_rect.y = 0;
-	if (dst_rect.z < 0) dst_rect.z = 0;
-	if (dst_rect.w < 0) dst_rect.w = 0;
-	if (src_rect.x < 0) src_rect.x = 0;
-	if (src_rect.y < 0) src_rect.y = 0;
-	if (src_rect.z < 0) src_rect.z = 0;
-	if (src_rect.w < 0) src_rect.w = 0;
+	dst_rect.x = ft_clamp(0, dst->size.x, dst_rect.x);
+	dst_rect.y = ft_clamp(0, dst->size.y, dst_rect.y);
+	dst_rect.z = ft_clamp(0, dst->size.x, dst_rect.z);
+	dst_rect.w = ft_clamp(0, dst->size.y, dst_rect.w);
+
+	src_rect.x = ft_clamp(0, dst->size.x, src_rect.x);
+	src_rect.y = ft_clamp(0, dst->size.y, src_rect.y);
+	src_rect.z = ft_clamp(0, dst->size.x, src_rect.z);
+	src_rect.w = ft_clamp(0, dst->size.y, src_rect.w);
 
 	S32 dst_w = dst_rect.z - dst_rect.x;
 	S32 dst_h = dst_rect.w - dst_rect.y;

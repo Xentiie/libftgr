@@ -46,6 +46,10 @@ t_ftgr_ctx   *ftgr_create_ctx()
 	ctx->right_mouse_pressed = FALSE;
 	ctx->right_mouse_clicked = FALSE;
 
+	ctx->defaultCursor = LoadCursor(NULL, IDC_ARROW);
+	SetCursor(ctx->defaultCursor);
+	ShowCursor(TRUE);
+
 	return ctx;
 }
 
