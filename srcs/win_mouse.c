@@ -40,9 +40,18 @@ t_iv2		ftgr_mouse_get_pos(t_ftgr_ctx *ctx, t_ftgr_win *win)
 	if (GetCursorPos(&p) == FALSE)
 		_ftgr_error();
 
-	if (ScreenToClient(win->window_handle, &p) == FALSE)
+	if (ScreenToClient(FTGR_WINDOW_INT(win)->window_handle, &p) == FALSE)
 		_ftgr_error();
 
+	//return ivec2(p.x + (win->size.x / 2), p.y + (win->size.y));
+	return ivec2(p.x, p.y);
+}
+
+t_iv2 ftgr_mouse_get_raw_pos(t_ftgr_ctx *ctx)
+{
+	POINT p;
+	if (GetCursorPos(&p) == FALSE)
+		_ftgr_error();
 	return ivec2(p.x, p.y);
 }
 
@@ -61,7 +70,22 @@ bool	ftgr_mouse_pressed(t_ftgr_ctx *ctx, S32 button)
 	}
 }
 
-bool	ftgr_mouse_click(t_ftgr_ctx *ctx, S32 button)
+bool	ftgr_mouse_released(t_ftgr_ctx *ctx, S32 button)
+{
+	switch (button)
+	{
+	case MOUSE_LEFT:
+		return ctx->left_mouse_released;
+	case MOUSE_MIDDLE:
+		return ctx->middle_mouse_released;
+	case MOUSE_RIGHT:
+		return ctx->right_mouse_released;
+	default:
+		return FALSE;
+	}
+}
+
+bool	ftgr_mouse_down(t_ftgr_ctx *ctx, S32 button)
 {
 	switch (button)
 	{

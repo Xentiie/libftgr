@@ -15,6 +15,7 @@
 #ifdef FT_OS_WIN
 
 #define PRINT_ERROR(name, error_code, msg) printf("(%s:%d) ["name":%d] %s\n", file, line, error_code, msg)
+#define PRINT_ERROR2(name, error_code, msg, ...) printf("(%s:%d) ["name":%d]"msg"\n", file, line, error_code, __VA_ARGS__)
 #define PRINT_ERROR_WIN(error_code, msg) PRINT_ERROR("WIN", error_code, msg)
 #define PRINT_ERROR_FT(error_code, msg) PRINT_ERROR("FT", error_code, msg)
 
@@ -47,7 +48,7 @@ void (_ftgr_error)(char *file, int line)
 	else if (ft_errno != FT_OK)
 		PRINT_ERROR_FT(ft_errno, ft_strerror(ft_errno));
 	else
-		PRINT_ERROR("UNKNOWN", -1, "Unknown error");
+		PRINT_ERROR2("UNKNOWN", -1, "Unknown error (%lu)", err);
 }
 
 #endif

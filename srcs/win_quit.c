@@ -22,7 +22,7 @@ void ftgr_free(t_ftgr_ctx *ctx)
 		ctx->main_window_class = 0;
 	}
 	t_list *curr = ctx->windows;
-	ft_lstclear(&ctx->windows, ftgr_free_window);
+	ft_lstclear(&ctx->windows, (void (*)(void *))ftgr_free_window);
 
 	if (ctx->instance_handle)
 	{

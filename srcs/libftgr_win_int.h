@@ -15,6 +15,9 @@
 
 #include "libft/std.h"
 
+// Set to 0 to test performances later
+#define CACHE_IMAGE_DC 1
+
 #ifdef FT_OS_WIN
 
 #include "libft/maths.h"
@@ -24,6 +27,27 @@
 #include "libftgr_constants.h"
 #include <windows.h>
 #include <stdio.h>
+
+#include "libftgr.h"
+
+//Window class name for win32 api
+#define FTGR_WINDOW_CLASS "FtMainWindowClass"
+//Prop name for window handle's ftgr_window struct
+#define FTGR_PROP_NAME L"win_struct"
+#define FTGR_GET_HWIN_t_ftgr_window(hwnd) ((t_ftgr_win *)GetPropW(hwnd, FTGR_PROP_NAME))
+
+#define _ftgr_error() _ftgr_error(__FILE__, __LINE__)
+#define CHECKRET(v) \
+	if (!v)         \
+		_ftgr_error();
+
+typedef struct
+{
+	bool up;
+	bool down;
+	bool pressed;
+	U8 k;
+} t_key;
 
 typedef struct s_ftgr_ctx
 {
@@ -38,48 +62,29 @@ typedef struct s_ftgr_ctx
 	t_time delta_time_clk;
 	float delta_time;
 
-	t_list *keys;
+	t_key keys[256];
 
-	bool left_mouse_pressed, left_mouse_clicked;
-	bool right_mouse_pressed, right_mouse_clicked;
-	bool middle_mouse_pressed, middle_mouse_clicked;
+	bool left_mouse_pressed, left_mouse_clicked, left_mouse_released;
+	bool right_mouse_pressed, right_mouse_clicked,  right_mouse_released;
+	bool middle_mouse_pressed, middle_mouse_clicked, middle_mouse_released;
 
+	HCURSOR defaultCursor;
 } t_ftgr_ctx;
 
-typedef struct s_ftgr_win
+typedef struct s_ftgr_win_int
 {
-	t_ftgr_ctx *ctx;
 	HWND window_handle;
-	S32 cursor_mode;
-	string name;
 	HDC dc;
-} t_ftgr_win;
-#define T_FTGR_CTX
-#define T_FTGR_WIN
-#include "libftgr.h"
+	t_ftgr_img buffers[2];
+	U8 front;
+	U8 back;
 
-#define FTGR_WINDOW_CLASS "FtMainWindowClass"
-#define FTGR_PROP_NAME L"ftgr"
-
-#define _ftgr_error() _ftgr_error(__FILE__, __LINE__)
-#define CHECKRET(v) \
-	if (!v)         \
-		_ftgr_error();
-
-typedef struct
-{
-	bool up;
-	bool down;
-	U32 k;
-} t_key;
-
-typedef struct
-{
-	HBITMAP bitmap;
-} t_ftgr_img_int;
+	BITMAPINFO preset_bmi;
+} t_ftgr_win_int;
 
 #define FTGR_WINDOW(lst) ((t_ftgr_win *)(lst->content))
 #define FTGR_IMAGE_INT(img) ((t_ftgr_img_int *)(img->internal))
+#define FTGR_WINDOW_INT(win) ((t_ftgr_win_int *)(win->internal))
 #define LIMIT_FREQ(secs, ...)                              \
 	do                                                     \
 	{                                                      \
@@ -93,10 +98,10 @@ typedef struct
 		clk_get(&__freq_t1);                               \
 	} while (0)
 
-void(_ftgr_error)();
+void(_ftgr_error)(char *file, int line);
 void _ftwin32_keys_cleanup(t_ftgr_ctx *ctx);
-void _ftwin32_register_key_up(t_ftgr_ctx *ctx, U32 key);
-void _ftwin32_register_key_down(t_ftgr_ctx *ctx, U32 key);
+void _ftwin32_register_key_up(t_ftgr_ctx *ctx, U8 key);
+void _ftwin32_register_key_down(t_ftgr_ctx *ctx, U8 key);
 
 #endif
 
