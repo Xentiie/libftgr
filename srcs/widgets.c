@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ui.c                                               :+:      :+:    :+:   */
+/*   widgets.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/09 00:44:07 by reclaire          #+#    #+#             */
-/*   Updated: 2024/07/09 00:44:07 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/08/24 00:08:31 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,11 +118,63 @@ void ftgr_free_widget_recursive(t_widget *widget)
 	free(widget);
 }
 
+static void ftgr_handle_widget_events_rec(t_ftgr_ctx *ctx, t_widget *w, t_iv2 mouse_pos)
+{
+	if (w->handle_input)
+	{
+		bool is_mouse_in = (mouse_pos.x >= w->pos.x && mouse_pos.y >= w->pos.y &&
+							mouse_pos.x <= w->pos.x + w->size.x && mouse_pos.y <= w->pos.y + w->size.y);
+
+		if (is_mouse_in)
+		{
+			if (!w->hovered)
+			{
+				w->hovered = TRUE;
+				if (w->on_cursor_enter)
+					w->on_cursor_enter(w, mouse_pos);
+			}
+			else
+			{
+				if (w->on_cursor_move)
+					w->on_cursor_move(w, mouse_pos);
+			}
+
+			if (ftgr_mouse_pressed(ctx, MOUSE_LEFT) && LIKELY(!w->clicked))
+			{
+				w->clicked = TRUE;
+				if (w->on_cursor_click)
+					w->on_cursor_click(w, mouse_pos);
+			}
+		}
+		else if (w->hovered)
+		{
+			w->hovered = FALSE;
+			if (w->on_cursor_exit)
+				w->on_cursor_exit(w, mouse_pos);
+		}
+
+		if (w->clicked && ftgr_mouse_released(ctx, MOUSE_LEFT))
+		{
+			w->clicked = FALSE;
+			if (w->on_cursor_release)
+				w->on_cursor_release(w, mouse_pos);
+		}
+	}
+	for (t_widget *c = w->childrens; c; c = c->next)
+		ftgr_handle_widget_events_rec(ctx, c, mouse_pos);
+}
+
+void ftgr_handle_widget_events(t_ftgr_win *win, t_widget *w)
+{
+	t_iv2 mouse_pos = ftgr_mouse_get_pos(win->ctx, win);
+	ftgr_handle_widget_events_rec(win->ctx, w, mouse_pos);
+}
+
 void ftgr_draw_widget_recursive(t_ftgr_img *out, t_widget *widget)
 {
 	ftgr_draw_widget(out, widget);
 	for (t_widget *w = widget->childrens; w; w = w->next)
-		ftgr_draw_widget(out, w);
+		ftgr_draw_widget_recursive(out, w);
 }
 
 void ftgr_draw_widget(t_ftgr_img *out, t_widget *widget)

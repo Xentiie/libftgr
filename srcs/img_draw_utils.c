@@ -26,12 +26,9 @@ t_color ftgr_get_pixel(t_ftgr_img *img, t_iv2 p)
 	return ftgr_int_to_color(*(U32 *)ftgr_get_pixel_addr(img, p.x, p.y));
 }
 
-t_color ftgr_rand_color(U32 ofs)
+t_color ftgr_rand_color(U32 seed)
 {
-	t_time t;
-	clk_get(&t);
-	t.nanoseconds += ofs;
-	return (t_color){.r = ft_frand(t.nanoseconds) * 255, .g = ft_frand(t.nanoseconds + 1) * 255, .b = ft_frand(t.nanoseconds + 2) * 255, .a = 255};
+	return (t_color){.r = ft_frand(seed) * 255, .g = ft_frand(seed + 1) * 255, .b = ft_frand(seed + 2) * 255, .a = 255};
 }
 
 void ftgr_draw_line(t_ftgr_img *img, t_iv2 p1, t_iv2 p2, t_color col)
@@ -66,9 +63,15 @@ void ftgr_draw_line(t_ftgr_img *img, t_iv2 p1, t_iv2 p2, t_color col)
 	}
 }
 
+/* flawed */
 void ftgr_draw_line_horizontal(t_ftgr_img *img, t_iv2 p1, S32 x2, t_color col)
 {
 	U32 col_i = ftgr_color_to_int(col);
+
+	p1.x = ft_clamp(0, img->size.x - 1, p1.x);
+	p1.y = ft_clamp(0, img->size.y - 1, p1.y);
+	x2 = ft_clamp(0, img->size.x - 1, x2);
+
 	for (S32 x = p1.x; x <= x2; x++)
 		*(U32 *)ftgr_get_pixel_addr(img, x, p1.y) = col_i;
 }
@@ -180,14 +183,14 @@ void ftgr_draw_circle(t_ftgr_img *img, t_iv2 pos, S32 radius, t_color col)
 		}
 
 		// Draw points for each octant
-	*(U32 *)ftgr_get_pixel_addr(img, pos.x + x, pos.y + y) = col_i;
-	*(U32 *)ftgr_get_pixel_addr(img, pos.x - x, pos.y + y) = col_i;
-	*(U32 *)ftgr_get_pixel_addr(img, pos.x + x, pos.y - y) = col_i;
-	*(U32 *)ftgr_get_pixel_addr(img, pos.x - x, pos.y - y) = col_i;
-	*(U32 *)ftgr_get_pixel_addr(img, pos.x + y, pos.y + x) = col_i;
-	*(U32 *)ftgr_get_pixel_addr(img, pos.x - y, pos.y + x) = col_i;
-	*(U32 *)ftgr_get_pixel_addr(img, pos.x + y, pos.y - x) = col_i;
-	*(U32 *)ftgr_get_pixel_addr(img, pos.x - y, pos.y - x) = col_i;
+		*(U32 *)ftgr_get_pixel_addr(img, pos.x + x, pos.y + y) = col_i;
+		*(U32 *)ftgr_get_pixel_addr(img, pos.x - x, pos.y + y) = col_i;
+		*(U32 *)ftgr_get_pixel_addr(img, pos.x + x, pos.y - y) = col_i;
+		*(U32 *)ftgr_get_pixel_addr(img, pos.x - x, pos.y - y) = col_i;
+		*(U32 *)ftgr_get_pixel_addr(img, pos.x + y, pos.y + x) = col_i;
+		*(U32 *)ftgr_get_pixel_addr(img, pos.x - y, pos.y + x) = col_i;
+		*(U32 *)ftgr_get_pixel_addr(img, pos.x + y, pos.y - x) = col_i;
+		*(U32 *)ftgr_get_pixel_addr(img, pos.x - y, pos.y - x) = col_i;
 	}
 }
 

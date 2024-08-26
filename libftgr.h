@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/13 01:58:46 by reclaire          #+#    #+#             */
-/*   Updated: 2024/07/10 00:17:09 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/08/24 17:25:57 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,7 +120,7 @@ t_ftgr_img *ftgr_new_img(t_ftgr_ctx *ctx, t_iv2 size);
 void ftgr_free_img(t_ftgr_img *img);
 void ftgr_display_image(t_ftgr_img *img, t_ftgr_win *win, t_iv2 pos);
 
-t_color ftgr_rand_color(U32 ofs);
+t_color ftgr_rand_color(U32 seed);
 
 void ftgr_display_fps(t_ftgr_win *win);
 U32 ftgr_color_to_int(t_color col);
@@ -193,28 +193,30 @@ root = {
 
 }
 */
-struct s_widget_callback
-{
-	void (*f)(void *data);
-	void *data;
-};
+typedef void (*t_widget_callback)(t_widget *widget, t_iv2 cursor_pos);
 typedef struct s_widget
 {
 	U8 drawers_n;
 	t_widget_drawer drawers[4];
 	t_iv2 pos;
 	t_iv2 size;
-	bool capture_input;
-	struct s_widget *last;
-	struct s_widget *childrens;
-	struct s_widget *next;
+	bool handle_input;	// Does this widget receives inputs events
+	bool capture_input;	// Does this widget captures inputs events (doesn't pass them down to childrens)
 	struct s_widget *master;
+	struct s_widget *childrens;
+	struct s_widget *last;
+	struct s_widget *next;
 
-	struct s_widget_callback on_cursor_move;
-	struct s_widget_callback on_cursor_click;
-	struct s_widget_callback on_cursor_release;
-	struct s_widget_callback on_cursor_enter;
-	struct s_widget_callback on_cursor_exit;
+	void *data;
+	string name; //optional, can be NULL
+
+	t_widget_callback on_cursor_move;
+	t_widget_callback on_cursor_click;
+	t_widget_callback on_cursor_release;
+	t_widget_callback on_cursor_enter;
+	t_widget_callback on_cursor_exit;
+	bool hovered;
+	bool clicked;
 } t_widget;
 
 void ftgr_redraw_rect(t_ftgr_win *win, t_iv4 rect);
@@ -235,6 +237,7 @@ bool ftgr_wdrawer_stretch_img_cpu(t_widget *widget, t_ftgr_img *img);
 bool ftgr_wdrawer_paint_rect(t_widget *widget, t_color *color);
 bool ftgr_wdrawer_bitmap_text(t_widget *widget, t_bitmap_text_infos *infos);
 
+void ftgr_handle_widget_events(t_ftgr_win *win, t_widget *w);
 
 
 struct s_bitmap

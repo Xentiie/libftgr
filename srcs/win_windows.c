@@ -85,21 +85,30 @@ LRESULT CALLBACK windowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 	case WM_LBUTTONDOWN:
 		ctx->left_mouse_clicked = TRUE;
+		ctx->left_mouse_pressed = TRUE;
 		return FALSE;
 	case WM_MBUTTONDOWN:
 		ctx->middle_mouse_clicked = TRUE;
+		ctx->left_mouse_pressed = TRUE;
 		return FALSE;
 	case WM_RBUTTONDOWN:
 		ctx->right_mouse_clicked = TRUE;
+		ctx->left_mouse_pressed = TRUE;
 		return FALSE;
 
 	case WM_LBUTTONUP:
+		ctx->right_mouse_clicked = FALSE;
+		ctx->left_mouse_pressed = FALSE;
 		ctx->left_mouse_released = TRUE;
 		return FALSE;
 	case WM_MBUTTONUP:
+		ctx->right_mouse_clicked = FALSE;
+		ctx->left_mouse_pressed = FALSE;
 		ctx->middle_mouse_released = TRUE;
 		return FALSE;
 	case WM_RBUTTONUP:
+		ctx->right_mouse_clicked = FALSE;
+		ctx->left_mouse_pressed = FALSE;
 		ctx->right_mouse_released = TRUE;
 		return FALSE;
 
@@ -347,25 +356,6 @@ void ftgr_swap_buffers(t_ftgr_win *win)
 	win_int->front = !win_int->front;
 	win_int->back = !win_int->back;
 	win->surface = &win_int->buffers[win_int->back];
-}
-
-static void send_events_rec(t_widget *w, struct s_widget_callback callback, t_iv2 mouse_pos)
-{
-	if (!w->capture_input)
-		return;
-	if (mouse_pos.x >= w->pos.x && mouse_pos.x <= w->pos.x + w->size.x && mouse_pos.y >= w->pos.y && mouse_pos.y <= w->pos.y + w->size.y)
-	{
-		callback.f(callback.data);
-		for (t_widget *w2 = w->childrens; w; w = w->next)
-			send_events_rec(w2, callback, mouse_pos);
-	}
-}
-
-static void send_events(t_ftgr_win *win, S32 event)
-{
-	t_iv2 mouse_pos = ftgr_mouse_get_pos(win->ctx, win);
-	struct s_widget_callback callback = ((struct s_widget_callback *)(&win->w_root->on_cursor_move))[event];
-	send_events_rec(win->w_root, callback, mouse_pos);
 }
 
 #endif

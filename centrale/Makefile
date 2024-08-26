@@ -25,4 +25,4 @@ _libft:
 			$(MAKE) -C ../../libft
 
 $(NAME):	_libft _libftgr objs $(OBJS)
-			$(CC) $(CFLAGS) $(INCLUDES) -L../../libft -L../ $(OBJS) -lftgr -lft -lm -lgdi32 -o $(NAME)
+			$(CC) $(CFLAGS) $(INCLUDES) $(LIBS_PATHS) $(OBJS) $(LIBS) -o $(NAME)

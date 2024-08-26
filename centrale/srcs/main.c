@@ -6,69 +6,85 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/04 03:12:47 by reclaire          #+#    #+#             */
-/*   Updated: 2024/08/04 03:12:47 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/08/23 22:17:55 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "centrale.h"
+#include "libft/io.h"
+#include "libft/lists.h"
+#include "libfthttp.h"
+#include "libft/socket.h"
+#include <stdio.h>
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#include <windows.h>
 
-#define WIN_SIZE_X 300
-#define WIN_SIZE_Y 300
-
-t_color background_col = COL_WHITE;
-t_color col = COL_RED;
-
-t_ftgr_ctx *ctx;
-t_ftgr_win *main_win;
-
-t_ftgr_img *main_bitmap_img;
-t_bitmap main_bitmap;
-
-static void init_bitmap()
+void *get_in_addr(struct sockaddr *sa)
 {
-	main_bitmap_img = ftgr_load_png(ctx, BITMAP_BLACK_PATH);
-	main_bitmap = (t_bitmap){.char_height = 7, .char_width = 5, .img = main_bitmap_img, .line_width = 18, .sep_width = 2, .sep_height = 2};
+	if (sa->sa_family == AF_INET)
+		return &(((struct sockaddr_in *)sa)->sin_addr);
+	return &(((struct sockaddr_in6 *)sa)->sin6_addr);
 }
 
-void draw_widget_editor_recursive(t_widget *widget, t_ftgr_img *img)
+LPCSTR inet_ntop(INT Family, LPCVOID pAddr, LPSTR pStringBuf, size_t StringBufSize);
+int main2(int argc, char **argv)
 {
-	ftgr_draw_rect(img, ivec4(widget->pos.x, widget->pos.y, widget->pos.x + widget->size.x, widget->pos.y + widget->size.y), ftgr_rand_color(0));
-	for (t_widget *w = widget->childrens; w; w = w->next)
-		draw_widget_editor_recursive(w, img);
-}
+	t_http_request *request = fthttp_new_request();
+	request->method = GET;
+	fthttp_set_url(request, "http://api.brawlstars.com/v1/players/%s/battlelog");
+	//fthttp_set_url(request, "google.com/%s");
+	fthttp_resolve_url_params(request, argv[1], NULL);
+	fthttp_url_encode(request);
 
-void draw_all()
-{
-	ftgr_draw_widget_recursive(main_win->surface, main_win->w_root);
-	draw_widget_editor_recursive(main_win->w_root, main_win->surface);
-	ftgr_swap_buffers(main_win);
-}
+	fthttp_request_print(request);
 
-int main()
-{
-	t_widget *text_widget;
-	t_bitmap_text_infos text_infos;
+	t_http_response response;
+	fthttp_request_send(request, &response);
+	return 0;
 
-	ctx = ftgr_create_ctx();
-	init_bitmap();
-	main_win = ftgr_new_window(ctx, ivec2(main_bitmap_img->size.x * 4, main_bitmap_img->size.y * 4), "Bitmap");
+	S32 ret;
+	string port = argc >= 3 ? port = argv[2] : NULL;
 
+	struct addrinfo addr;
+	if (ft_resolve_hostname(&addr, argv[1], port) != 0)
 	{
-		// ftgr_wdrawer_stretch_img_cpu(bitmap_widget, main_bitmap_img);
-		//ftgr_wdrawer_paint_rect(main_win->w_root, &background_col);
+		ft_dprintf(ft_stderr, "couldn't resolve hostname\n");
+		return 1;
 	}
 
-	t_label_widget *label = ftgr_label_widget(&main_bitmap);
-	ftgr_label_update(label, "TEST");
-	label->widget.pos = ivec2(0, 0);
-	label->widget.size = ivec2(100, 100);
-	ftgr_add_widget(label, main_win->w_root);
+	char s[INET6_ADDRSTRLEN];
+	inet_ntop(addr.ai_family, get_in_addr((struct sockaddr *)addr.ai_addr), s, sizeof s);
+	if (port)
+		ft_printf("ADDRESSE: %s:%s\n", argv[1], port);
+	else
+		ft_printf("ADDRESSE: %s\n", argv[1]);
+	ft_printf("IP: %s\n", s);
 
-	draw_all();
-
-	while (ftgr_wait(ctx))
+	file sock = ft_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+	if (sock == (file)-1)
 	{
-		draw_all();
-
+		ft_dprintf(ft_stderr, "couldn't open socket\n");
+		return 1;
 	}
+
+	if ((ret = connect((SOCKET)sock, addr.ai_addr, addr.ai_addrlen)) != 0)
+	{
+		ft_dprintf(ft_stderr, "couldn't connect: %d\n", ret);
+		return 1;
+	}
+
+	char http_request[200];
+
+	U64 length = ft_snprintf(http_request, sizeof(http_request), "GET / HTTP/1.1\r\nHost: %s/imghp?hl=en&authuser=0&ogbl\r\n\r\n", argv[1]);
+
+	//printf("Sent: %d\n", ft_fwrite(sock, http_request, length));
+
+	//send(sock, http_request, length, 0);
+	ft_send(sock, http_request, length, 0);
+
+
+	char buf[256];
+	length = ft_recv(sock, buf, sizeof(buf), 0);
+	printf("|%.*s| (%d)\n", length, buf, length);
 }
