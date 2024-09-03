@@ -15,7 +15,7 @@
 
 static bool find_event_win(void *w1, void *w2)
 {
-	t_ftgr_win *win1 = (t_ftgr_win *)w1;
+	t_ftgr_win_int *win1 = FTGR_WINDOW_INT((t_ftgr_win *)w1);
 	Window *win2 = (Window *)w2;
 
 	return win1->window == *win2;
@@ -24,8 +24,8 @@ static bool find_event_win(void *w1, void *w2)
 static void update_time(t_ftgr_ctx *ctx)
 {
 	t_time tmp;
-	clk_get(&tmp);
-	ctx->delta_time = clk_diff_float(&ctx->delta_time_clk, &tmp);
+	ft_clk_get(&tmp);
+	ctx->delta_time = ft_clk_diff_float(&ctx->delta_time_clk, &tmp);
 	ctx->delta_time_clk = tmp;
 }
 

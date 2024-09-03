@@ -22,6 +22,8 @@
 #include "libft/strings.h"
 #include "libft/time.h"
 
+#include "libftgr.h"
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -35,13 +37,29 @@
 #include <X11/extensions/XShm.h>
 #include <X11/XKBlib.h>
 
-# define __FTRETURN_OK(ret) do { ft_errno=FT_OK; return ret; } while (0)
+#define __FTRETURN_OK(ret) \
+	do                     \
+	{                      \
+		ft_errno = FT_OK;  \
+		return ret;        \
+	} while (0)
 
-# ifdef DEBUG
-#  define __FTRETURN_ERR(ret, err) do { ft_errno = err ; ft_debug_break(); return ret; } while (0)
-# else
-#  define __FTRETURN_ERR(ret, err) do { ft_errno = err ; return ret; } while (0)
-# endif
+#ifdef DEBUG
+#define __FTRETURN_ERR(ret, err) \
+	do                           \
+	{                            \
+		ft_errno = err;          \
+		ft_debug_break();        \
+		return ret;              \
+	} while (0)
+#else
+#define __FTRETURN_ERR(ret, err) \
+	do                           \
+	{                            \
+		ft_errno = err;          \
+		return ret;              \
+	} while (0)
+#endif
 
 typedef struct
 {
@@ -50,7 +68,7 @@ typedef struct
 	U32 k;
 } t_key;
 
-typedef struct
+typedef struct s_ftgr_ctx
 {
 	Display *display;
 	Window root;
@@ -81,40 +99,41 @@ typedef struct
 	t_list *keys;
 } t_ftgr_ctx;
 
-#define LIMIT_FREQ(secs, ...)                              \
-	do                                                     \
-	{                                                      \
-		static t_time __freq_t1 = (t_time){0};             \
-                                                           \
-		t_time __freq_t2;                                  \
-		clk_get(&__freq_t2);                               \
-		if (clk_diff_float(&__freq_t1, &__freq_t2) < secs) \
-			return __VA_ARGS__;                            \
-                                                           \
-		clk_get(&__freq_t1);                               \
+#define LIMIT_FREQ(secs, ...)                                 \
+	do                                                        \
+	{                                                         \
+		static t_time __freq_t1 = (t_time){0};                \
+                                                              \
+		t_time __freq_t2;                                     \
+		ft_clk_get(&__freq_t2);                               \
+		if (ft_clk_diff_float(&__freq_t1, &__freq_t2) < secs) \
+			return __VA_ARGS__;                               \
+                                                              \
+		ft_clk_get(&__freq_t1);                               \
 	} while (0)
 
-#define FTGR_WINDOW(lst) ((t_ftgr_win *)(lst->content))
-#define FTGR_IMAGE_INT(img) ((t_ftgr_img_int *)(img->internal))
+#define FTGR_WINDOW(lst) ((t_ftgr_win *)((lst)->content))
+#define FTGR_WINDOW_INT(win) ((t_ftgr_win_int *)((win)->internal))
+
 typedef struct
 {
-	t_ftgr_ctx *ctx;
-	Window window;
-	GC gc;
-	string name;
-} t_ftgr_win;
-#define T_FTGR_CTX
-#define T_FTGR_WIN
-#include "libftgr.h"
-
-typedef struct 
-{
 	Pixmap pixmap;
-	XImage *img;
+	XImage *ximage;
 	GC gc;
 	S32 format;
 	bool shm;
-} t_ftgr_img_int;
+
+	t_ftgr_img img;
+} t_framebuffer_data;
+
+typedef struct
+{
+	Window window;
+	GC gc;
+	string name;
+	U8 front, back;
+	t_framebuffer_data buffers[2];
+} t_ftgr_win_int;
 
 U32 _ftgr_keysym2uni(U32 keysym);
 void _ftx11_keys_cleanup(t_ftgr_ctx *ctx);

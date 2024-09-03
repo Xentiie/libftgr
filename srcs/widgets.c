@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/09 00:44:07 by reclaire          #+#    #+#             */
-/*   Updated: 2024/08/24 00:08:31 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/09/02 03:21:10 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -197,7 +197,7 @@ bool ftgr_wdrawer_stretch_img_cpu(t_widget *widget, t_ftgr_img *img)
 {
 	if (widget == NULL || img == NULL || widget->drawers_n >= (sizeof(widget->drawers) / sizeof(widget->drawers[0])))
 		return FALSE;
-	widget->drawers[widget->drawers_n++] = (t_widget_drawer){.draw_f = __ftgr_wdrawer_stretch_img_cpu, .data = img, .cleanup_data = FALSE};
+	widget->drawers[widget->drawers_n++] = (t_widget_drawer){.draw_f = (t_widget_drawer_draw_f *)__ftgr_wdrawer_stretch_img_cpu, .data = img, .cleanup_data = FALSE};
 	return TRUE;
 }
 
@@ -261,7 +261,7 @@ t_label_widget *ftgr_label_widget(t_bitmap *bitmap)
 	label->infos.scale = 2;
 	label->infos.text = "";
 
-	ftgr_wdrawer_bitmap_text(label, &label->infos);
+	ftgr_wdrawer_bitmap_text((t_widget *)label, &label->infos);
 
 	return label;
 }

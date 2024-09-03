@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 08:26:57 by reclaire          #+#    #+#             */
-/*   Updated: 2024/07/04 16:40:21 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/08/27 14:47:39 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,13 +75,13 @@ void _ftx11_keys_cleanup(t_ftgr_ctx *ctx)
 
 
 
-bool ftgr_is_key_pressed(t_ftgr_ctx *ctx, U32 key)
+bool ftgr_is_key_pressed(t_ftgr_ctx *ctx, U8 key)
 {
 	t_list *fnd = ft_lstfind(ctx->keys, _cmp_keys, &key);
 	return fnd != NULL && !((t_key*)(fnd->content))->up;
 }
 
-bool ftgr_is_key_down(t_ftgr_ctx *ctx, U32 key)
+bool ftgr_is_key_down(t_ftgr_ctx *ctx, U8 key)
 {
 	t_list *fnd = ft_lstfind(ctx->keys, _cmp_keys, &key);
 	if (!fnd)
@@ -89,7 +89,7 @@ bool ftgr_is_key_down(t_ftgr_ctx *ctx, U32 key)
 	return ((t_key*)(fnd->content))->down;
 }
 
-bool ftgr_is_key_up(t_ftgr_ctx *ctx, U32 key)
+bool ftgr_is_key_up(t_ftgr_ctx *ctx, U8 key)
 {
 	t_list *fnd = ft_lstfind(ctx->keys, _cmp_keys, &key);
 	if (!fnd)

@@ -33,8 +33,8 @@ t_ftgr_ctx   *ftgr_create_ctx()
 
 	ctx->windows = NULL;
 
-	clk_get(&ctx->global_time);
-	clk_get(&ctx->delta_time_clk);
+	ft_clk_get(&ctx->global_time);
+	ft_clk_get(&ctx->delta_time_clk);
 
 	for (U32 i = 0; i < sizeof(ctx->keys)/sizeof(ctx->keys[0]); i++)
 		ctx->keys[i] = (t_key){0, 0, 0};

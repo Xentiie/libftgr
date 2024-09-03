@@ -6,9 +6,11 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/04 03:12:47 by reclaire          #+#    #+#             */
-/*   Updated: 2024/08/23 22:17:55 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/08/27 14:54:37 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
+#if 0
 
 #include "centrale.h"
 #include "libft/io.h"
@@ -88,3 +90,5 @@ int main2(int argc, char **argv)
 	length = ft_recv(sock, buf, sizeof(buf), 0);
 	printf("|%.*s| (%d)\n", length, buf, length);
 }
+
+#endif
