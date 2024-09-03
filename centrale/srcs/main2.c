@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/04 03:12:47 by reclaire          #+#    #+#             */
-/*   Updated: 2024/08/24 17:20:14 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/08/27 04:24:50 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,7 @@ int main()
 	//ftgr_wdrawer_copy_img_cpu(main_win->w_root, main_bitmap_img);
 
 	t_label_widget *label = ftgr_label_widget(&main_bitmap);
+	label->widget.name = "Label";
 	ftgr_label_update(label, "TEST");
 	label->widget.pos = ivec2(10, 10);
 	label->widget.size = ivec2(100, 100);
@@ -62,6 +63,7 @@ int main()
 	debug_infos.text = "CAA";
 
 	t_widget *debug_label = ftgr_new_widget();
+	debug_label->name = "Debug label";
 	debug_label->pos = ivec2(main_win->size.x - 75, 10);
 	debug_label->size = ivec2(50, 20);
 	ftgr_wdrawer_bitmap_text(debug_label, &debug_infos);
@@ -73,7 +75,7 @@ int main()
 	{
 		ftgr_draw_widget_recursive(main_win->surface, main_win->w_root);
 		ftgr_draw_widget_recursive(main_win->surface, editor);
-		ftgr_handle_widget_events(main_win, editor);
+		//ftgr_handle_widget_events(main_win, editor);
 		ftgr_swap_buffers(main_win);
 	}
 }

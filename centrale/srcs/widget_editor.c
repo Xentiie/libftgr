@@ -6,19 +6,20 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/14 15:17:29 by reclaire          #+#    #+#             */
-/*   Updated: 2024/08/24 17:32:53 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/08/27 04:24:34 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libftgr.h"
 #include "libft/io.h"
+#include <stdlib.h>
 
 #define RADIUS 2
 
 extern t_bitmap_text_infos debug_infos;
 
 // Drawer function for the widget rect ('casing')
-static void widget_casing_drawer(t_ftgr_img *out, t_widget *widget, void *data);
+static void widget_casing_drawer(t_ftgr_img *out, t_widget *widget, t_iv2 abs_pos, void *data);
 // Darwer function for the size handles (corner dots)
 static void widget_size_handle_drawer(t_ftgr_img *out, t_widget *widget, void *data);
 
@@ -48,10 +49,11 @@ typedef struct s_widget_editor_data
 	S32 dots_radius;
 } t_widget_editor_data;
 
-static void widget_casing_drawer(t_ftgr_img *out, t_widget *widget, void *data)
+static void widget_casing_drawer(t_ftgr_img *out, t_widget *widget, t_iv2 abs_pos, void *data)
 {
 	t_widget_editor_data *editor_data = (t_widget_editor_data *)data;
-	t_iv4 rect = ivec4(widget->pos.x + editor_data->dots_radius, widget->pos.y + editor_data->dots_radius, widget->pos.x + widget->size.x, widget->pos.y + widget->size.y);
+	t_iv4 rect = ivec4(abs_pos.x + editor_data->dots_radius, abs_pos.y + editor_data->dots_radius, abs_pos.x + widget->size.x, abs_pos.y + widget->size.y);
+	printf("DRAWING RECT: %d %d %d %d\n", rect.x, rect.y, rect.z, rect.w);
 	ftgr_draw_rect(out, rect, COL_BLACK);
 }
 
@@ -83,8 +85,8 @@ static void handle_move_ul(t_widget *widget, t_iv2 cursor_pos)
 	if (widget->clicked)
 	{
 		t_iv2 delta = ivec2_sub((ivec2_sub(cursor_pos, ivec2(3, 3))), widget->pos);
-		move_recursif(widget->master, delta);
-		move_recursif(target, delta);
+		//move_recursif(widget->master, delta);
+		//move_recursif(target, delta);
 	}
 }
 
@@ -120,23 +122,22 @@ static t_widget *init_widget_casing(t_widget_editor_data *data, t_widget *w)
 		name = w->name;
 	else
 	{
-		name = ft_snprintf(buff, sizeof(buff), "%p", w);
+		buff[ft_snprintf(buff, sizeof(buff) - 1, "%p", w)] = '\0';
+		name = buff;
 	}
 
-	rect->name = ft_strjoin(
-		"Casing: ",
-		w->name ? w->name : (ft_snprintf(buff, sizeof(buff), "%p", w) ? buff : "None"));
+	rect->name = ft_strjoin("Casing: ", name);
 
 	rect->pos = ivec2(w->pos.x - data->dots_radius, w->pos.y - data->dots_radius);
 	rect->size = ivec2(w->size.x + data->dots_radius, w->size.y + data->dots_radius);
-	rect->drawers[rect->drawers_n++] = (t_widget_drawer){.data = data, .cleanup_data = FALSE, .draw_f = widget_casing_drawer};
+	rect->drawers[rect->drawers_n++] = (t_widget_drawer){.data = data, .cleanup_data = FALSE, .draw_f = (t_widget_drawer_draw_f *)widget_casing_drawer};
 	rect->data = w;
 
 	ul = ftgr_new_widget();
 	ul->name = "Upper left corner handle";
 	ul->pos = ivec2(w->pos.x - data->dots_radius, w->pos.y - data->dots_radius);
 	ul->size = ivec2(data->dots_radius * 2, data->dots_radius * 2);
-	ul->drawers[ul->drawers_n++] = (t_widget_drawer){.data = NULL, .cleanup_data = FALSE, .draw_f = widget_size_handle_drawer};
+	ul->drawers[ul->drawers_n++] = (t_widget_drawer){.data = NULL, .cleanup_data = FALSE, .draw_f = (t_widget_drawer_draw_f *)widget_size_handle_drawer};
 	ul->handle_input = TRUE;
 	ul->on_cursor_move = handle_move_ul;
 	ul->on_cursor_exit = on_exit;
@@ -145,27 +146,27 @@ static t_widget *init_widget_casing(t_widget_editor_data *data, t_widget *w)
 	ur->name = "Upper right corner handle";
 	ur->pos = ivec2((w->pos.x + w->size.x) - data->dots_radius, w->pos.y - data->dots_radius);
 	ur->size = ivec2(data->dots_radius * 2, data->dots_radius * 2);
-	ur->drawers[ur->drawers_n++] = (t_widget_drawer){.data = NULL, .cleanup_data = FALSE, .draw_f = widget_size_handle_drawer};
+	ur->drawers[ur->drawers_n++] = (t_widget_drawer){.data = NULL, .cleanup_data = FALSE, .draw_f = (t_widget_drawer_draw_f *)widget_size_handle_drawer};
 	ur->handle_input = TRUE;
 
 	ll = ftgr_new_widget();
 	ll->name = "Lower left corner handle";
 	ll->pos = ivec2(w->pos.x - data->dots_radius, (w->pos.y + w->size.y) - data->dots_radius);
 	ll->size = ivec2(data->dots_radius * 2, data->dots_radius * 2);
-	ll->drawers[ll->drawers_n++] = (t_widget_drawer){.data = NULL, .cleanup_data = FALSE, .draw_f = widget_size_handle_drawer};
+	ll->drawers[ll->drawers_n++] = (t_widget_drawer){.data = NULL, .cleanup_data = FALSE, .draw_f = (t_widget_drawer_draw_f *)widget_size_handle_drawer};
 	ll->handle_input = TRUE;
 
 	lr = ftgr_new_widget();
 	lr->name = "Lower right corner handle";
 	lr->pos = ivec2((w->pos.x + w->size.x) - data->dots_radius, (w->pos.y + w->size.y) - data->dots_radius);
 	lr->size = ivec2(data->dots_radius * 2, data->dots_radius * 2);
-	lr->drawers[lr->drawers_n++] = (t_widget_drawer){.data = NULL, .cleanup_data = FALSE, .draw_f = widget_size_handle_drawer};
+	lr->drawers[lr->drawers_n++] = (t_widget_drawer){.data = NULL, .cleanup_data = FALSE, .draw_f = (t_widget_drawer_draw_f *)widget_size_handle_drawer};
 	lr->handle_input = TRUE;
 
-	ftgr_add_widget(ul, rect);
-	ftgr_add_widget(ur, rect);
-	ftgr_add_widget(ll, rect);
-	ftgr_add_widget(lr, rect);
+	//ftgr_add_widget(ul, rect);
+	//ftgr_add_widget(ur, rect);
+	//ftgr_add_widget(ll, rect);
+	//ftgr_add_widget(lr, rect);
 
 	return rect;
 }
@@ -202,7 +203,7 @@ t_widget *init_widget_editor(t_widget *root)
 	{
 		for (t_widget *w = root->childrens; w; w = w->next)
 			init_widget_editor_rec(editor_root, w);
-		ftgr_add_widget(root, editor_root);
+		//ftgr_add_widget(root, editor_root);
 	}
 
 	return editor_root;

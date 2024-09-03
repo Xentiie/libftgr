@@ -251,6 +251,7 @@ t_ftgr_win *ftgr_new_window(t_ftgr_ctx *ctx, t_iv2 size, const_string title)
 		win->w_root = ftgr_new_widget();
 		if (UNLIKELY(win->w_root == NULL))
 			goto bad_window2;
+		win->w_root->name = "Window root";
 		win->w_root->pos = ivec2(0, 0);
 		win->w_root->size = size;
 	}

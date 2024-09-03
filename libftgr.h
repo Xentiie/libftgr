@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/13 01:58:46 by reclaire          #+#    #+#             */
-/*   Updated: 2024/08/24 17:25:57 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/08/27 04:11:13 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -146,7 +146,7 @@ void ftgr_cpy_img(t_ftgr_img *dst, t_iv2 dst_pos, t_ftgr_img *src, t_iv4 src_rec
 void *ftgr_load_font(file fd, t_ftgr_img *img);
 t_ftgr_img *ftgr_load_png(t_ftgr_ctx *ctx, const_string path);
 
-typedef void (t_widget_drawer_draw_f)(t_ftgr_img *out, t_widget *widget, void *data);
+typedef void (t_widget_drawer_draw_f)(t_ftgr_img *out, t_widget *widget, t_iv2 abs_pos, void *data);
 typedef struct s_widget_drawer
 {
 	void *data;
@@ -229,15 +229,18 @@ void ftgr_free_widget(t_widget *widget);
 void ftgr_add_widget(t_widget *widget, t_widget *master);
 void ftgr_remove_widget(t_widget *widget);
 
+void ftgr_handle_widget_events(t_ftgr_win *win, t_widget *w);
+
 void ftgr_draw_widget(t_ftgr_img *out, t_widget *widget);
 void ftgr_draw_widget_recursive(t_ftgr_img *out, t_widget *widget);
+
+t_iv2 ftgr_widget_abs_pos(t_widget *widget);
 
 bool ftgr_wdrawer_copy_img_cpu(t_widget *widget, t_ftgr_img *img);
 bool ftgr_wdrawer_stretch_img_cpu(t_widget *widget, t_ftgr_img *img);
 bool ftgr_wdrawer_paint_rect(t_widget *widget, t_color *color);
 bool ftgr_wdrawer_bitmap_text(t_widget *widget, t_bitmap_text_infos *infos);
 
-void ftgr_handle_widget_events(t_ftgr_win *win, t_widget *w);
 
 
 struct s_bitmap

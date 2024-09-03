@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/09 00:44:07 by reclaire          #+#    #+#             */
-/*   Updated: 2024/08/24 00:08:31 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/08/27 04:18:15 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,12 +118,27 @@ void ftgr_free_widget_recursive(t_widget *widget)
 	free(widget);
 }
 
-static void ftgr_handle_widget_events_rec(t_ftgr_ctx *ctx, t_widget *w, t_iv2 mouse_pos)
+t_iv2 ftgr_widget_abs_pos(t_widget *widget)
 {
+	t_iv2 pos = widget->pos;
+
+	while (widget->master)
+	{
+		widget = widget->master;
+		pos = ivec2_add(pos, widget->pos);
+	}
+
+	return pos;
+}
+
+static void ftgr_handle_widget_events_rec(t_ftgr_ctx *ctx, t_widget *w, t_iv2 mouse_pos, t_iv2 ofs)
+{
+	t_iv2 pos = ivec2_add(ofs, w->pos);
+
 	if (w->handle_input)
 	{
-		bool is_mouse_in = (mouse_pos.x >= w->pos.x && mouse_pos.y >= w->pos.y &&
-							mouse_pos.x <= w->pos.x + w->size.x && mouse_pos.y <= w->pos.y + w->size.y);
+		bool is_mouse_in = (mouse_pos.x >= pos.x && mouse_pos.y >= pos.y &&
+							mouse_pos.x <= pos.x + w->size.x && mouse_pos.y <= pos.y + w->size.y);
 
 		if (is_mouse_in)
 		{
@@ -161,13 +176,13 @@ static void ftgr_handle_widget_events_rec(t_ftgr_ctx *ctx, t_widget *w, t_iv2 mo
 		}
 	}
 	for (t_widget *c = w->childrens; c; c = c->next)
-		ftgr_handle_widget_events_rec(ctx, c, mouse_pos);
+		ftgr_handle_widget_events_rec(ctx, c, mouse_pos, pos);
 }
 
 void ftgr_handle_widget_events(t_ftgr_win *win, t_widget *w)
 {
 	t_iv2 mouse_pos = ftgr_mouse_get_pos(win->ctx, win);
-	ftgr_handle_widget_events_rec(win->ctx, w, mouse_pos);
+	ftgr_handle_widget_events_rec(win->ctx, w, mouse_pos, ivec2(0, 0));
 }
 
 void ftgr_draw_widget_recursive(t_ftgr_img *out, t_widget *widget)
@@ -179,17 +194,19 @@ void ftgr_draw_widget_recursive(t_ftgr_img *out, t_widget *widget)
 
 void ftgr_draw_widget(t_ftgr_img *out, t_widget *widget)
 {
+	t_iv2 abs_pos = ftgr_widget_abs_pos(widget);
+	printf("%s: %d %d\n", widget->name, abs_pos.x, abs_pos.y);
 	for (U8 i = 0; i < widget->drawers_n; i++)
-		widget->drawers[i].draw_f(out, widget, widget->drawers[i].data);
+		widget->drawers[i].draw_f(out, widget, abs_pos, widget->drawers[i].data);
 }
 
 /*
 WIDGETS DRAWERS
 */
-static void __ftgr_wdrawer_stretch_img_cpu(t_ftgr_img *out, t_widget *widget, t_ftgr_img *img)
+static void __ftgr_wdrawer_stretch_img_cpu(t_ftgr_img *out, t_widget *widget, t_iv2 abs_pos, t_ftgr_img *img)
 {
 	ftgr_stretch_img(
-		out, ivec4(widget->pos.x, widget->pos.y, widget->pos.x + widget->size.x, widget->pos.y + widget->size.y),
+		out, ivec4(abs_pos.x, abs_pos.y, abs_pos.x + widget->size.x, abs_pos.y + widget->size.y),
 		img, ivec4(0, 0, img->size.x, img->size.y));
 }
 
@@ -197,14 +214,14 @@ bool ftgr_wdrawer_stretch_img_cpu(t_widget *widget, t_ftgr_img *img)
 {
 	if (widget == NULL || img == NULL || widget->drawers_n >= (sizeof(widget->drawers) / sizeof(widget->drawers[0])))
 		return FALSE;
-	widget->drawers[widget->drawers_n++] = (t_widget_drawer){.draw_f = __ftgr_wdrawer_stretch_img_cpu, .data = img, .cleanup_data = FALSE};
+	widget->drawers[widget->drawers_n++] = (t_widget_drawer){.draw_f = (t_widget_drawer_draw_f *)__ftgr_wdrawer_stretch_img_cpu, .data = img, .cleanup_data = FALSE};
 	return TRUE;
 }
 
-static void __ftgr_wdrawer_copy_img_cpu(t_ftgr_img *out, t_widget *widget, t_ftgr_img *img)
+static void __ftgr_wdrawer_copy_img_cpu(t_ftgr_img *out, t_widget *widget, t_iv2 abs_pos, t_ftgr_img *img)
 {
 	ftgr_cpy_img(
-		out, ivec2(widget->pos.x, widget->pos.y),
+		out, ivec2(abs_pos.x, abs_pos.y),
 		img, ivec4(0, 0, img->size.x, img->size.y));
 }
 
@@ -216,12 +233,12 @@ bool ftgr_wdrawer_copy_img_cpu(t_widget *widget, t_ftgr_img *img)
 	return TRUE;
 }
 
-static void __ftgr_wdrawer_paint_rect(t_ftgr_img *out, t_widget *widget, t_color *color)
+static void __ftgr_wdrawer_paint_rect(t_ftgr_img *out, t_widget *widget, t_iv2 abs_pos, t_color *color)
 {
 	ftgr_fill_rect(out,
-				   ivec4(widget->pos.x, widget->pos.y,
-						 widget->size.x + widget->pos.x,
-						 widget->size.y + widget->pos.y),
+				   ivec4(abs_pos.x, abs_pos.y,
+						 widget->size.x + abs_pos.x,
+						 widget->size.y + abs_pos.y),
 				   *color);
 }
 
@@ -233,9 +250,9 @@ bool ftgr_wdrawer_paint_rect(t_widget *widget, t_color *color)
 	return TRUE;
 }
 
-static void __ftgr_wdrawer_draw_bitmap_text(t_ftgr_img *out, t_widget *widget, t_bitmap_text_infos *infos)
+static void __ftgr_wdrawer_draw_bitmap_text(t_ftgr_img *out, t_widget *widget, t_iv2 abs_pos, t_bitmap_text_infos *infos)
 {
-	ftgr_draw_bitmap_text(out, ivec4(widget->pos.x, widget->pos.y, widget->size.x + widget->pos.x, widget->size.y + widget->pos.y),
+	ftgr_draw_bitmap_text(out, ivec4(abs_pos.x, abs_pos.y, widget->size.x + abs_pos.x, widget->size.y + abs_pos.y),
 						  *infos);
 }
 
@@ -261,7 +278,7 @@ t_label_widget *ftgr_label_widget(t_bitmap *bitmap)
 	label->infos.scale = 2;
 	label->infos.text = "";
 
-	ftgr_wdrawer_bitmap_text(label, &label->infos);
+	ftgr_wdrawer_bitmap_text((t_widget *)label, &label->infos);
 
 	return label;
 }
