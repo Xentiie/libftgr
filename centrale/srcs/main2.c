@@ -6,16 +6,13 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/04 03:12:47 by reclaire          #+#    #+#             */
-/*   Updated: 2024/08/27 04:24:50 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/09/04 01:37:32 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "centrale.h"
 #include "libft/io.h"
 #include <stdio.h>
-#include <winsock2.h>
-#include <ws2tcpip.h>
-#include <windows.h>
 
 #define WIN_SIZE_X 300
 #define WIN_SIZE_Y 300
@@ -57,25 +54,12 @@ int main()
 	label->widget.size = ivec2(100, 100);
 	ftgr_add_widget((t_widget *)label, main_win->w_root);
 
-	debug_infos.bitmap = &main_bitmap;
-	debug_infos.kerning = ivec2(2, 2);
-	debug_infos.scale = 2;
-	debug_infos.text = "CAA";
-
-	t_widget *debug_label = ftgr_new_widget();
-	debug_label->name = "Debug label";
-	debug_label->pos = ivec2(main_win->size.x - 75, 10);
-	debug_label->size = ivec2(50, 20);
-	ftgr_wdrawer_bitmap_text(debug_label, &debug_infos);
-	ftgr_add_widget(debug_label, main_win->w_root);
-
 	t_widget *editor = init_widget_editor(main_win->w_root);
 
 	while (ftgr_poll(ctx))
 	{
 		ftgr_draw_widget_recursive(main_win->surface, main_win->w_root);
-		ftgr_draw_widget_recursive(main_win->surface, editor);
-		//ftgr_handle_widget_events(main_win, editor);
+		ftgr_handle_widget_events(main_win, editor);
 		ftgr_swap_buffers(main_win);
 	}
 }

@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/04 16:49:09 by reclaire          #+#    #+#             */
-/*   Updated: 2024/07/04 16:49:20 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/09/02 03:14:40 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,8 +20,8 @@
 float ftgr_time(t_ftgr_ctx *ctx)
 {
     t_time t;
-    clk_get(&t);
-    return clk_diff_float(&ctx->global_time, &t);
+    ft_clk_get(&t);
+    return ft_clk_diff_float(&ctx->global_time, &t);
 }
 
 float ftgr_delta_time(t_ftgr_ctx *ctx)

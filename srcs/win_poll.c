@@ -18,8 +18,8 @@
 static void update_time(t_ftgr_ctx *ctx)
 {
 	t_time tmp;
-	clk_get(&tmp);
-	ctx->delta_time = clk_diff_float(&ctx->delta_time_clk, &tmp);
+	ft_clk_get(&tmp);
+	ctx->delta_time = ft_clk_diff_float(&ctx->delta_time_clk, &tmp);
 	ctx->delta_time_clk = tmp;
 }
 

@@ -6,9 +6,11 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/18 02:00:18 by reclaire          #+#    #+#             */
-/*   Updated: 2024/08/23 22:18:33 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/08/27 14:57:14 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
+#if 0
 
 #include "libfthttp.h"
 #include "libft/std.h"
@@ -344,3 +346,6 @@ void fthttp_request_print(t_http_request *request)
 		   request->protocol, request->domain, request->path,
 		   request->content, (request->content_size > 20 ? "..." : ""), request->content_size);
 }
+
+
+#endif

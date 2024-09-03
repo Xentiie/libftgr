@@ -6,13 +6,15 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/22 13:02:37 by reclaire          #+#    #+#             */
-/*   Updated: 2024/07/04 16:44:37 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/08/27 14:51:24 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libftgr_x11_int.h"
 #ifdef FT_OS_LINUX
 
+//LEGACY LINUX IMAGES
+#if 0
 t_ftgr_img *ftgr_new_img(t_ftgr_ctx *ctx, t_iv2 size)
 {
 	t_ftgr_img *img = malloc(sizeof(t_ftgr_img) + sizeof(t_ftgr_img_int));
@@ -89,5 +91,6 @@ void ftgr_free_img(t_ftgr_img *img)
 	// free(img->data);
 	free(img);
 }
+#endif
 
 #endif

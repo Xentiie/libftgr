@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/14 15:17:29 by reclaire          #+#    #+#             */
-/*   Updated: 2024/08/27 04:24:34 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/09/04 01:37:50 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ static void widget_casing_drawer(t_ftgr_img *out, t_widget *widget, t_iv2 abs_po
 static void widget_size_handle_drawer(t_ftgr_img *out, t_widget *widget, void *data);
 
 // Triggers the on_move callback, if the widget is still clicked, to fix the cursor exiting the widget while dragging
-static void on_exit(t_widget *widget, t_iv2 cursor_pos);
+static void handle_exit(t_widget *widget, t_iv2 cursor_pos);
 
 /*
 Pour chaque widgets:
@@ -71,26 +71,17 @@ static void widget_size_handle_drawer(t_ftgr_img *out, t_widget *widget, void *d
 	ftgr_draw_disc(out, p, editor_data->dots_radius, col);
 }
 
-static void move_recursif(t_widget *widget, t_iv2 delta)
-{
-	widget->pos.x += delta.x;
-	widget->pos.y += delta.y;
-	for (t_widget *w = widget->childrens; w; w = w->next)
-		move_recursif(w, delta);
-}
-
 static void handle_move_ul(t_widget *widget, t_iv2 cursor_pos)
 {
 	t_widget *target = widget->master->data;
 	if (widget->clicked)
 	{
 		t_iv2 delta = ivec2_sub((ivec2_sub(cursor_pos, ivec2(3, 3))), widget->pos);
-		//move_recursif(widget->master, delta);
-		//move_recursif(target, delta);
+		target->pos = ivec2_add(target->pos, delta);
 	}
 }
 
-static void on_exit(t_widget *widget, t_iv2 cursor_pos)
+static void handle_exit(t_widget *widget, t_iv2 cursor_pos)
 {
 	if (widget->clicked && widget->on_cursor_move)
 		widget->on_cursor_move(widget, cursor_pos);
@@ -140,7 +131,7 @@ static t_widget *init_widget_casing(t_widget_editor_data *data, t_widget *w)
 	ul->drawers[ul->drawers_n++] = (t_widget_drawer){.data = NULL, .cleanup_data = FALSE, .draw_f = (t_widget_drawer_draw_f *)widget_size_handle_drawer};
 	ul->handle_input = TRUE;
 	ul->on_cursor_move = handle_move_ul;
-	ul->on_cursor_exit = on_exit;
+	ul->on_cursor_exit = handle_exit;
 
 	ur = ftgr_new_widget();
 	ur->name = "Upper right corner handle";
@@ -203,7 +194,7 @@ t_widget *init_widget_editor(t_widget *root)
 	{
 		for (t_widget *w = root->childrens; w; w = w->next)
 			init_widget_editor_rec(editor_root, w);
-		//ftgr_add_widget(root, editor_root);
+		ftgr_add_widget(editor_root, root);
 	}
 
 	return editor_root;

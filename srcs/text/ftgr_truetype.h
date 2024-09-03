@@ -6,17 +6,20 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/09 04:09:57 by reclaire          #+#    #+#             */
-/*   Updated: 2024/06/11 03:37:33 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/07/05 11:48:53 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef FTGR_TRUETYPE_H
 #define FTGR_TRUETYPE_H
 
-#include "../libftgr_int.h"
+#include "../libftgr.h"
 #include "libft/io.h"
 #include "libft/limits.h"
 #include "libft/maths.h"
+
+#include <stdlib.h>
+#include <stdio.h>
 
 //#define printf(...) do { (printf)("(%s:%d)", __FILE__, __LINE__); (printf)(__VA_ARGS__); } while (0)
 

@@ -91,11 +91,11 @@ typedef struct s_ftgr_win_int
 		static t_time __freq_t1 = {0, 0};                  \
                                                            \
 		t_time __freq_t2;                                  \
-		clk_get(&__freq_t2);                               \
-		if (clk_diff_float(&__freq_t1, &__freq_t2) < secs) \
+		ft_clk_get(&__freq_t2);                               \
+		if (ft_clk_diff_float(&__freq_t1, &__freq_t2) < secs) \
 			return __VA_ARGS__;                            \
                                                            \
-		clk_get(&__freq_t1);                               \
+		ft_clk_get(&__freq_t1);                               \
 	} while (0)
 
 void(_ftgr_error)(char *file, int line);

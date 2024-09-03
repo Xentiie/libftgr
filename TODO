@@ -1,6 +1,0 @@
-Pour chaque objet de notre library, on a une fonction pour creer et une fonction pour detruire
-ca serait bien de n'avoir qu'une seule fonction pour detruire n'importe quelle objet, donc pour ca
-faudrait stocker dans chaque objet en tout premier un id qui defini le type de l'objet, pour savoir comment
-le detruire.
-Encore mieux: on stoque tout nos objet internalement dans une grande table, et le user n'aura que des
-'id' pour referencer chaque objets

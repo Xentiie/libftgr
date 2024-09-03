@@ -69,7 +69,9 @@ RM="rm -rf"
 CFLAGS=
 INCLUDES=
 LIBS_PATHS="-L../../libft -L../"
-LIBS="-lftgr -lft -lgdi32 -lws2_32"
+LIBS="-lftgr -lft -lX11 -lXext -lm"
+#windows:
+#LIBS="-lftgr -lft -lgdi32 -lws2_32"
 
 if [[ "$COVERAGE" == "true" ]]; then
 	CFLAGS="$CFLAGS -fprofile-arcs -ftest-coverage -O0"

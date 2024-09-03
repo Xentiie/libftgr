@@ -6,6 +6,10 @@
         "string_view": "c",
         "cstdlib": "c",
         "xutility": "c",
-        "cstdint": "c"
+        "cstdint": "c",
+        "initializer_list": "c",
+        "span": "c",
+        "utility": "c",
+        "format": "c"
     }
 }
