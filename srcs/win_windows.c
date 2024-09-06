@@ -18,7 +18,7 @@
 
 LRESULT CALLBACK windowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 static inline ATOM _init_main_window_class(HINSTANCE hInstance);
-static inline HWND _create_window(string title, t_iv2 size, HINSTANCE hInstance);
+static inline HWND _create_window(const_string title, t_iv2 size, HINSTANCE hInstance);
 static inline bool _init_buffer(t_ftgr_img *buffer, t_iv2 size);
 
 static void send_events(t_ftgr_win *win, S32 event);
@@ -159,7 +159,7 @@ static inline ATOM _init_main_window_class(HINSTANCE hInstance)
 	return RegisterClassEx(&wc);
 }
 
-static inline HWND _create_window(string title, t_iv2 size, HINSTANCE hInstance)
+static inline HWND _create_window(const_string title, t_iv2 size, HINSTANCE hInstance)
 {
 	return CreateWindowEx(
 		0,					 // Extended window style
@@ -210,7 +210,7 @@ t_ftgr_win *ftgr_new_window(t_ftgr_ctx *ctx, t_iv2 size, const_string title)
 
 	if (!ctx->main_window_class)
 	{
-		if (UNLIKELY((ctx->main_window_class = _init_main_window_class(ctx->instance_handle)) == NULL))
+		if (UNLIKELY((ctx->main_window_class = _init_main_window_class(ctx->instance_handle)) == 0))
 			goto bad_window1;
 	}
 	if (UNLIKELY((win_int->window_handle = _create_window(title, size, ctx->instance_handle)) == NULL))

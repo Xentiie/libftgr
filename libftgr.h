@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/13 01:58:46 by reclaire          #+#    #+#             */
-/*   Updated: 2024/08/27 04:11:13 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/09/05 04:32:54 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,14 @@
 
 #define FTGR_EX11 1000
 
+#define SWAP(x, y)               \
+	do                           \
+	{                            \
+		typeof(x) __tmp_##x = x; \
+		x = y;                   \
+		y = __tmp_##x;           \
+	} while (0)
+
 typedef struct s_ftgr_ctx t_ftgr_ctx;
 typedef struct s_ftgr_win t_ftgr_win;
 typedef struct s_ftgr_img t_ftgr_img;
@@ -33,7 +41,7 @@ typedef struct s_bitmap t_bitmap;
 typedef struct s_bitmap_text_infos t_bitmap_text_infos;
 typedef struct s_label_widget t_label_widget;
 
-struct s_ftgr_win 
+struct s_ftgr_win
 {
 	t_ftgr_ctx *ctx;
 
@@ -146,18 +154,33 @@ void ftgr_cpy_img(t_ftgr_img *dst, t_iv2 dst_pos, t_ftgr_img *src, t_iv4 src_rec
 void *ftgr_load_font(file fd, t_ftgr_img *img);
 t_ftgr_img *ftgr_load_png(t_ftgr_ctx *ctx, const_string path);
 
-typedef void (t_widget_drawer_draw_f)(t_ftgr_img *out, t_widget *widget, t_iv2 abs_pos, void *data);
+union u_widget_drawer_data;
+typedef void(t_widget_drawer_draw_f)(t_ftgr_img *out, t_widget *widget, t_iv2 abs_pos, union u_widget_drawer_data data);
 typedef struct s_widget_drawer
 {
-	void *data;
-	bool cleanup_data;
 	t_widget_drawer_draw_f *draw_f;
+	union u_widget_drawer_data
+	{
+		U8 u8[16];
+		U16 u16[8];
+		U32 u32[4];
+		U64 u64[2];
+
+		t_iv2 iv2[2];
+		t_iv3 iv3[1];
+		t_iv4 iv4[1];
+
+		void *ptr[2];
+
+		t_ftgr_img *img[2];
+		t_color color[4];
+	} data;
 } t_widget_drawer;
 
 /*
-              root
+			  root
 			 /    \
-		    /      \
+			/      \
 		child1   child2
 		/  |  \
 	   /   |   \
@@ -193,7 +216,7 @@ root = {
 
 }
 */
-typedef void (*t_widget_callback)(t_widget *widget, t_iv2 cursor_pos);
+typedef bool (*t_widget_callback)(t_widget *widget, t_iv2 cursor_pos);
 typedef struct s_widget
 {
 	U8 drawers_n;
@@ -201,20 +224,21 @@ typedef struct s_widget
 	t_iv2 pos;
 	t_iv2 size;
 	bool handle_input;	// Does this widget receives inputs events
-	bool capture_input;	// Does this widget captures inputs events (doesn't pass them down to childrens)
+	bool capture_input; // Does this widget captures inputs events (doesn't pass them down to childrens)
 	struct s_widget *master;
+	struct s_widget *next;
 	struct s_widget *childrens;
 	struct s_widget *last;
-	struct s_widget *next;
 
 	void *data;
-	string name; //optional, can be NULL
+	string name; // optional, can be NULL
 
 	t_widget_callback on_cursor_move;
 	t_widget_callback on_cursor_click;
 	t_widget_callback on_cursor_release;
 	t_widget_callback on_cursor_enter;
 	t_widget_callback on_cursor_exit;
+
 	bool hovered;
 	bool clicked;
 } t_widget;
@@ -238,10 +262,8 @@ t_iv2 ftgr_widget_abs_pos(t_widget *widget);
 
 bool ftgr_wdrawer_copy_img_cpu(t_widget *widget, t_ftgr_img *img);
 bool ftgr_wdrawer_stretch_img_cpu(t_widget *widget, t_ftgr_img *img);
-bool ftgr_wdrawer_paint_rect(t_widget *widget, t_color *color);
+bool ftgr_wdrawer_paint_rect(t_widget *widget, t_color color);
 bool ftgr_wdrawer_bitmap_text(t_widget *widget, t_bitmap_text_infos *infos);
-
-
 
 struct s_bitmap
 {
