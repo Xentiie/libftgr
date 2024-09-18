@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/04 03:12:47 by reclaire          #+#    #+#             */
-/*   Updated: 2024/09/06 01:44:41 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/09/12 04:14:35 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,8 +26,6 @@ t_ftgr_win *main_win;
 t_ftgr_img *main_bitmap_img;
 t_bitmap main_bitmap;
 
-t_bitmap_text_infos debug_infos;
-
 static void init_bitmap()
 {
 	main_bitmap_img = ftgr_load_png(ctx, BITMAP_BLACK_PATH);
@@ -36,9 +34,6 @@ static void init_bitmap()
 
 int main()
 {
-	t_widget *text_widget;
-	t_bitmap_text_infos text_infos;
-
 	ctx = ftgr_create_ctx();
 	init_bitmap();
 	main_win = ftgr_new_window(ctx, ivec2(main_bitmap_img->size.x * 4, main_bitmap_img->size.y * 4), "Bitmap");

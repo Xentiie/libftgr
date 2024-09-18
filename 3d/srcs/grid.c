@@ -1,30 +1,23 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   time.c                                             :+:      :+:    :+:   */
+/*   grid.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/07/04 16:49:09 by reclaire          #+#    #+#             */
-/*   Updated: 2024/09/13 02:38:43 by reclaire         ###   ########.fr       */
+/*   Created: 2024/09/12 01:04:23 by reclaire          #+#    #+#             */
+/*   Updated: 2024/09/13 22:05:23 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft/std.h"
-#ifdef FT_OS_WIN
-# include "libftgr_win_int.h"
-#else
-# include "libftgr_x11_int.h"
-#endif
+#include "./3d.h"
 
-float ftgr_time(t_ftgr_ctx *ctx)
+void draw_grid(struct s_camera cam, t_v3 grid_pos, t_v3 grid_up)
 {
-    t_time t;
-    ft_clk_get(&t);
-    return ft_clk_diff_float(&ctx->global_time, &t);
-}
+	t_v3 near[4];
+	t_v3 far[4];
 
-float ftgr_delta_time(t_ftgr_ctx *ctx)
-{
-    return ctx->delta_time;
+	cam_get_frustum(cam, near, far);
+	
+	
 }

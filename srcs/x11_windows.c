@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/16 22:36:34 by reclaire          #+#    #+#             */
-/*   Updated: 2024/09/02 03:21:03 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/09/11 16:44:14 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,6 +121,8 @@ t_ftgr_win *ftgr_new_window(t_ftgr_ctx *ctx, t_iv2 size, const_string title)
 	win->name = ft_strdup(title);
 	win->w_root = ftgr_new_widget();
 	win->w_root->size = size;
+
+	ftgr_swap_buffers(win);
 
 	return win;
 }

@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 08:07:44 by reclaire          #+#    #+#             */
-/*   Updated: 2024/08/27 14:47:07 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/09/11 19:24:15 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,11 +52,20 @@ t_iv2 ftgr_mouse_get_pos(t_ftgr_ctx *ctx, t_ftgr_win *win)
 
 	t_iv2 out;
 
-	t_ftgr_win_int *win_int = FTGR_WINDOW_INT(win);
+	if (win)
+	{
+		t_ftgr_win_int *win_int = FTGR_WINDOW_INT(win);
 
-	XQueryPointer(ctx->display, win_int->window,
-				  &root_return, &child_return, &root_x_return, &root_y_return,
-				  &out.x, &out.y, &mask_return);
+		XQueryPointer(ctx->display, win_int->window,
+					  &root_return, &child_return, &root_x_return, &root_y_return,
+					  &out.x, &out.y, &mask_return);
+	}
+	else
+	{
+		XQueryPointer(ctx->display, ctx->root,
+					  &root_return, &child_return, &root_x_return, &root_y_return,
+					  &out.x, &out.y, &mask_return);
+	}
 	return out;
 }
 

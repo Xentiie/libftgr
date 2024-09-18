@@ -6,11 +6,12 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/09 00:44:07 by reclaire          #+#    #+#             */
-/*   Updated: 2024/09/06 01:28:08 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/09/18 17:29:53 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft/std.h"
+#include "libft/limits.h"
 
 #ifdef FT_OS_WIN
 #include "libftgr_win_int.h"
@@ -18,18 +19,27 @@
 #include "libftgr_x11_int.h"
 #endif
 
+#pragma region "Widget new/free"
 t_widget *ftgr_new_widget()
 {
 	t_widget *widget = malloc(sizeof(t_widget));
-	if (widget == NULL)
+	if (widget == NULL || ftgr_init_widget(widget) == FALSE)
+	{
+		free(widget);
 		return NULL;
-	ftgr_init_widget(widget);
+	}
 	return widget;
 }
 
-void ftgr_init_widget(t_widget *widget)
+bool ftgr_init_widget(t_widget *widget)
 {
+	const U64 widget_init_drawers_alloc = 4;
+
 	ft_bzero(widget, sizeof(t_widget));
+	if ((widget->drawers = malloc(sizeof(t_widget_drawer) * widget_init_drawers_alloc)) == NULL)
+		return FALSE;
+	widget->drawers_alloc = widget_init_drawers_alloc;
+	return TRUE;
 }
 
 void ftgr_add_widget(t_widget *widget, t_widget *master)
@@ -92,6 +102,22 @@ void ftgr_free_widget(t_widget *widget)
 	free(widget);
 }
 
+bool ftgr_add_wdrawer(t_widget *widget, t_widget_drawer drawer)
+{
+	if (widget->drawers_n >= widget->drawers_alloc)
+	{
+		void *new = malloc(sizeof(t_widget_drawer) * widget->drawers_n * 2);
+		if (UNLIKELY(new == NULL))
+			return FALSE;
+		ft_memcpy(new, widget->drawers, sizeof(t_widget_drawer) * widget->drawers_n);
+		free(widget->drawers);
+		widget->drawers = new;
+		widget->drawers_alloc = widget->drawers_n * 2;
+	}
+
+	widget->drawers[widget->drawers_n++] = drawer;
+}
+
 static void _ftgr_free_widget_recursive(t_widget *widget)
 {
 	t_widget *next;
@@ -111,6 +137,7 @@ void ftgr_free_widget_recursive(t_widget *widget)
 	_ftgr_free_widget_recursive(widget);
 	free(widget);
 }
+#pragma endregion
 
 t_iv2 ftgr_widget_abs_pos(t_widget *widget)
 {
@@ -125,6 +152,7 @@ t_iv2 ftgr_widget_abs_pos(t_widget *widget)
 	return pos;
 }
 
+#pragma region "Widget events"
 static void ftgr_handle_widget_events_rec(t_ftgr_ctx *ctx, t_widget *w, t_iv2 mouse_pos, t_iv2 ofs)
 {
 	t_iv2 pos = ivec2_add(ofs, w->pos);
@@ -178,7 +206,9 @@ void ftgr_handle_widget_events(t_ftgr_win *win, t_widget *w)
 	t_iv2 mouse_pos = ftgr_mouse_get_pos(win->ctx, win);
 	ftgr_handle_widget_events_rec(win->ctx, w, mouse_pos, ivec2(0, 0));
 }
+#pragma endregion
 
+#pragma region "Widget draw"
 void ftgr_draw_widget_recursive(t_ftgr_img *out, t_widget *widget)
 {
 	ftgr_draw_widget(out, widget);
@@ -192,89 +222,4 @@ void ftgr_draw_widget(t_ftgr_img *out, t_widget *widget)
 	for (U8 i = 0; i < widget->drawers_n; i++)
 		widget->drawers[i].draw_f(out, widget, abs_pos, widget->drawers[i].data);
 }
-
-/*
-WIDGETS DRAWERS
-*/
-static void __ftgr_wdrawer_stretch_img_cpu(t_ftgr_img *out, t_widget *widget, t_iv2 abs_pos, union u_widget_drawer_data *data)
-{
-	ftgr_stretch_img(
-		out, ivec4(abs_pos.x, abs_pos.y, abs_pos.x + widget->size.x, abs_pos.y + widget->size.y),
-		data->img[0], ivec4(0, 0, data->img[0]->size.x, data->img[0]->size.y));
-}
-
-bool ftgr_wdrawer_stretch_img_cpu(t_widget *widget, t_ftgr_img *img)
-{
-	if (widget == NULL || img == NULL || widget->drawers_n >= (sizeof(widget->drawers) / sizeof(widget->drawers[0])))
-		return FALSE;
-	widget->drawers[widget->drawers_n++] = (t_widget_drawer){.draw_f = (t_widget_drawer_draw_f *)__ftgr_wdrawer_stretch_img_cpu, .data = {.img = {img}}};
-	return TRUE;
-}
-
-static void __ftgr_wdrawer_copy_img_cpu(t_ftgr_img *out, t_widget *widget, t_iv2 abs_pos, union u_widget_drawer_data *data)
-{
-	ftgr_cpy_img(
-		out, ivec2(abs_pos.x, abs_pos.y),
-		data->img[0], ivec4(0, 0, data->img[0]->size.x, data->img[0]->size.y));
-}
-
-bool ftgr_wdrawer_copy_img_cpu(t_widget *widget, t_ftgr_img *img)
-{
-	if (widget == NULL || img == NULL || widget->drawers_n >= (sizeof(widget->drawers) / sizeof(widget->drawers[0])))
-		return FALSE;
-	widget->drawers[widget->drawers_n++] = (t_widget_drawer){.draw_f = (t_widget_drawer_draw_f *)__ftgr_wdrawer_copy_img_cpu, .data = {.img = {img}}};
-	return TRUE;
-}
-
-static void __ftgr_wdrawer_paint_rect(t_ftgr_img *out, t_widget *widget, t_iv2 abs_pos, union u_widget_drawer_data *data)
-{
-	ftgr_fill_rect(out,
-				   ivec4(abs_pos.x, abs_pos.y,
-						 widget->size.x + abs_pos.x,
-						 widget->size.y + abs_pos.y),
-				   data->color[0]);
-}
-
-bool ftgr_wdrawer_paint_rect(t_widget *widget, t_color color)
-{
-	if (widget == NULL || widget->drawers_n >= (sizeof(widget->drawers) / sizeof(widget->drawers[0])))
-		return FALSE;
-	widget->drawers[widget->drawers_n++] = (t_widget_drawer){.draw_f = (t_widget_drawer_draw_f *)__ftgr_wdrawer_paint_rect, .data = {.color = {color}}};
-	return TRUE;
-}
-
-static void __ftgr_wdrawer_draw_bitmap_text(t_ftgr_img *out, t_widget *widget, t_iv2 abs_pos, union u_widget_drawer_data *data)
-{
-	ftgr_draw_bitmap_text(out, ivec4(abs_pos.x, abs_pos.y, widget->size.x + abs_pos.x, widget->size.y + abs_pos.y),
-						  *(t_bitmap_text_infos *)(data->ptr[0]));
-}
-
-bool ftgr_wdrawer_bitmap_text(t_widget *widget, t_bitmap_text_infos *infos)
-{
-	if (widget == NULL || infos == NULL || widget->drawers_n >= (sizeof(widget->drawers) / sizeof(widget->drawers[0])))
-		return FALSE;
-	widget->drawers[widget->drawers_n++] = (t_widget_drawer){.draw_f = (t_widget_drawer_draw_f *)__ftgr_wdrawer_draw_bitmap_text, .data = {.ptr = {infos}}};
-	return TRUE;
-}
-
-t_label_widget *ftgr_label_widget(t_bitmap *bitmap)
-{
-	t_label_widget *label = malloc(sizeof(t_label_widget));
-	if (label == NULL)
-		return NULL;
-	ft_bzero(label, sizeof(t_label_widget));
-
-	label->infos.bitmap = bitmap;
-	label->infos.kerning = ivec2(2, 2);
-	label->infos.scale = 2;
-	label->infos.text = "";
-
-	ftgr_wdrawer_bitmap_text((t_widget *)label, &label->infos);
-
-	return label;
-}
-
-void ftgr_label_update(t_label_widget *label, string text)
-{
-	label->infos.text = text;
-}
+#pragma endregion

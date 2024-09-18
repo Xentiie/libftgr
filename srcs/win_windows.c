@@ -234,16 +234,6 @@ t_ftgr_win *ftgr_new_window(t_ftgr_ctx *ctx, t_iv2 size, const_string title)
 	win_int->back = 1;
 	win->surface = &win_int->buffers[win_int->back];
 
-	BITMAPINFO bmi;
-	ZeroMemory(&bmi, sizeof(BITMAPINFO));
-	bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-	bmi.bmiHeader.biWidth = win->size.x;
-	bmi.bmiHeader.biHeight = -win->size.y; // Negative height to indicate top-down bitmap
-	bmi.bmiHeader.biPlanes = 1;
-	bmi.bmiHeader.biBitCount = 32; // Assuming 32-bit RGBA pixel format
-	bmi.bmiHeader.biCompression = BI_RGB;
-	win_int->preset_bmi = bmi;
-
 	win->cursor_mode = FTGR_CURSOR_NORMAL;
 	win->size = size;
 
@@ -257,6 +247,7 @@ t_ftgr_win *ftgr_new_window(t_ftgr_ctx *ctx, t_iv2 size, const_string title)
 	}
 
 	ft_lstadd_front(&ctx->windows, lst);
+	ftgr_swap_buffers(win);
 	return win;
 
 bad_window1:
