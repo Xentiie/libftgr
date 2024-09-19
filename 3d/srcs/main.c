@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/06 02:27:08 by reclaire          #+#    #+#             */
-/*   Updated: 2024/09/18 21:17:08 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/09/20 00:12:44 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -155,23 +155,27 @@ void draw_debug_scene(struct s_camera cam)
 	}
 	render_model(cam2_view ? cam2 : cam, cube2);
 
-	t_v3 p = screen_to_world(cam2, vec2(0, 0));
-	t_v4 p2 = world_to_screen(cam, p);
-	ftgr_draw_disc(cam.surface, ivec2(p2.x, p2.y), 5, COL_BLUE);
+	//t_v3 p = screen_to_world(cam2, vec2(0, 0));
+	//t_v4 p2 = world_to_screen(cam, p);
+	//ftgr_draw_disc(cam.surface, ivec2(p2.x, p2.y), 5, COL_BLUE);
 
-	t_mat4x4 m1 = cam_get_world_to_view(cam);
-	t_mat4x4 m2 = ft_mat4x4_invert(m1);
-
-	t_mat4x4 m3 = ft_mat4x4_mult_mat(m1, m2);
-	t_mat4x4 m4 = ft_mat4x4_mult_mat(m2, m1);
-	print_mat("m3", m3);
-	print_mat("m4", m4);
-
-	t_v4 _p1 = ft_mat4x4_mult_v4(m1, vec4(10, 20, 30, 0));
-	t_v4 _p2 = ft_mat4x4_mult_v4(m2, _p1);
-
-	printf("%f %f %f %f\n", _p1.x, _p1.y, _p1.z, _p1.w);
-	printf("%f %f %f %f\n\n", _p2.x, _p2.y, _p2.z, _p2.w);
+	//	t_mat4x4 m1 = cam_get_orientation(cam);
+	//	t_mat4x4 m2 = ft_mat4x4_invert(m1);
+	//
+	//	t_mat4x4 m3 = ft_mat4x4_mult_mat(m1, m2);
+	//	t_mat4x4 m4 = ft_mat4x4_mult_mat(m2, m1);
+	//	print_mat("m1", m3);
+	//	print_mat("m2", m3);
+	//	print_mat("m3", m3);
+	//	print_mat("m4", m4);
+	//
+	//	t_v4 _p1 = ft_mat4x4_mult_v4(m1, vec4(10, 20, 30, 0));
+	//	t_v4 _p2 = ft_mat4x4_mult_v4(m2, _p1);
+	//
+	//	printf("	%f\n", ft_mat4x4_det(m1));
+	//
+	//	printf("%f %f %f %f\n", _p1.x, _p1.y, _p1.z, _p1.w);
+	//	printf("%f %f %f %f\n\n", _p2.x, _p2.y, _p2.z, _p2.w);
 }
 
 int main()
@@ -184,22 +188,22 @@ int main()
 	ftgr_init_bitmap(&bitmap, bitmap_img, ivec2(5, 7), 18, ivec2(2, 2));
 
 	struct s_camera cam;
-	cam.pos = vec3(12.86, 3.31, 7.14);
-	cam.forward = vec3(-0.92, -0.14, -0.37);
-	cam.up = vec3(-0.12, 0.99, -0.09);
-
-	F32 *depth_buffer = malloc(sizeof(F32) * win->surface->size.x * win->surface->size.y);
-
-	cam.near = .1f;
-	cam.far = 90.0f;
-	cam.fov = 100.0f;
-	cam.surface = win->surface;
-	cam.depth_buffer = &(t_ftgr_img){
-		.bpp = sizeof(F32),
-		.data = (U8 *)depth_buffer,
-		.line_size = sizeof(F32) * cam.surface->size.x,
-		.data_size = sizeof(F32) * cam.surface->size.x * cam.surface->size.y,
-		.size = cam.surface->size};
+	{
+		F32 *depth_buffer = malloc(sizeof(F32) * win->surface->size.x * win->surface->size.y);
+		cam.pos = vec3(12.86, 3.31, 7.14);
+		cam.forward = vec3(-0.92, -0.14, -0.37);
+		cam.up = vec3(-0.12, 0.99, -0.09);
+		cam.near = .1f;
+		cam.far = 90.0f;
+		cam.fov = 70.0f;
+		cam.surface = win->surface;
+		cam.depth_buffer = &(t_ftgr_img){
+			.bpp = sizeof(F32),
+			.data = (U8 *)depth_buffer,
+			.line_size = sizeof(F32) * cam.surface->size.x,
+			.data_size = sizeof(F32) * cam.surface->size.x * cam.surface->size.y,
+			.size = cam.surface->size};
+	}
 
 	cube.pos = vec3(-4.28, -0.34, -0.27);
 	cube.rot = vec3(0, 37, 0);
@@ -270,7 +274,7 @@ int main()
 				rotate.y += dtime * 0.5f;
 
 			if (rotate.x != 0.0f || rotate.y != 0.0f || rotate.z != 0.0f)
-				camera_orientation = cam_get_camera_orientation(cam);
+				camera_orientation = cam_get_orientation(cam);
 
 			if (rotate.x != 0.0f || rotate.y != 0.0f)
 			{

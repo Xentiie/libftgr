@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/12 01:02:07 by reclaire          #+#    #+#             */
-/*   Updated: 2024/09/18 20:57:52 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/09/19 16:38:19 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,9 +46,10 @@ struct s_camera {
 	t_ftgr_img *depth_buffer;
 };
 
-t_mat4x4 cam_get_projection(struct s_camera cam);
-t_mat4x4 cam_get_camera_orientation(struct s_camera cam);
-t_mat4x4 cam_get_world_to_view(struct s_camera cam);
+t_mat4x4 cam_get_cam_to_clip(struct s_camera cam);
+t_mat4x4 cam_get_orientation(struct s_camera cam);
+t_mat4x4 cam_get_world_to_cam(struct s_camera cam);
+t_mat4x4 cam_get_cam_to_world(struct s_camera cam);
 t_mat4x4 cam_get_world_to_clip(struct s_camera cam);
 void cam_get_frustum(struct s_camera cam, t_v3 near[4], t_v3 far[4]);
 

@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/12 01:05:42 by reclaire          #+#    #+#             */
-/*   Updated: 2024/09/12 01:05:50 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/09/19 16:08:48 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,9 +15,12 @@
 void print_mat(string name, t_mat4x4 mat)
 {
 	printf("%s {\n", name);
-	printf("% 7f % 7f % 7f % 7f\n", mat.m00, mat.m01, mat.m02, mat.m03);
-	printf("% 7f % 7f % 7f % 7f\n", mat.m10, mat.m11, mat.m12, mat.m13);
-	printf("% 7f % 7f % 7f % 7f\n", mat.m20, mat.m21, mat.m22, mat.m23);
-	printf("% 7f % 7f % 7f % 7f\n", mat.m30, mat.m31, mat.m32, mat.m33);
+    for (int i = 0; i < 4; i++)
+    {
+		printf("\t");
+        for (int j = 0; j < 4; j++)
+            printf("% 7f, ", *ft_mat4x4_get(&mat, i, j));
+        printf("\n");
+    }
 	printf("}\n");
 }

@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/13 01:25:15 by reclaire          #+#    #+#             */
-/*   Updated: 2024/09/18 21:14:01 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/09/19 16:42:19 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,8 +44,8 @@ t_v4 world_to_screen(struct s_camera cam, t_v3 point)
 
 t_v3 screen_to_world(struct s_camera cam, t_v2 point)
 {
-	t_mat4x4 clip_to_view = ft_mat4x4_invert(cam_get_projection(cam));
-	t_mat4x4 view_to_world = ft_mat4x4_invert(cam_get_world_to_view(cam));
+	t_mat4x4 clip_to_view = ft_mat4x4_invert(cam_get_cam_to_clip(cam));
+	t_mat4x4 view_to_world = ft_mat4x4_invert(cam_get_world_to_cam(cam));
 
 	point.x = (point.x / (F32)cam.surface->size.x * 2.0f) - 1.0f;
 	point.y = (point.y / (F32)cam.surface->size.y * 2.0f) - 1.0f;
@@ -196,8 +196,8 @@ static void _draw_3d_line(t_ftgr_img *img, t_iv2 xy, t_iv4 lp1lp2, void *data)
 }
 void draw_3d_line(struct s_camera cam, t_v3 lp1, t_v3 lp2, t_color col, bool depth)
 {
-	//if (!clip_line_with_cam(cam, &lp1, &lp2))
-	//	return;
+	if (!clip_line_with_cam(cam, &lp1, &lp2))
+		return;
 
 	t_v4 p1 = world_to_screen(cam, lp1);
 	t_v4 p2 = world_to_screen(cam, lp2);
@@ -224,20 +224,20 @@ void draw_3d_line(struct s_camera cam, t_v3 lp1, t_v3 lp2, t_color col, bool dep
 
 void draw_frustum(struct s_camera cam, t_v3 c1[4], t_v3 c2[4], t_color col)
 {
-	draw_3d_line(cam, c1[0], c1[1], COL_BLUE, TRUE);
-	draw_3d_line(cam, c1[1], c1[2], COL_RED, TRUE);
-	draw_3d_line(cam, c1[2], c1[3], COL_GREEN, TRUE);
-	draw_3d_line(cam, c1[3], c1[0], COL_WHITE, TRUE);
+	draw_3d_line(cam, c1[0], c1[1], col, TRUE);
+	draw_3d_line(cam, c1[1], c1[2], col, TRUE);
+	draw_3d_line(cam, c1[2], c1[3], col, TRUE);
+	draw_3d_line(cam, c1[3], c1[0], col, TRUE);
 
-	draw_3d_line(cam, c2[0], c2[1], COL_DARK_GREEN, TRUE);
-	draw_3d_line(cam, c2[1], c2[2], COL_DARK_GREEN, TRUE);
-	draw_3d_line(cam, c2[2], c2[3], COL_DARK_GREEN, TRUE);
-	draw_3d_line(cam, c2[3], c2[0], COL_DARK_GREEN, TRUE);
+	draw_3d_line(cam, c2[0], c2[1], col, TRUE);
+	draw_3d_line(cam, c2[1], c2[2], col, TRUE);
+	draw_3d_line(cam, c2[2], c2[3], col, TRUE);
+	draw_3d_line(cam, c2[3], c2[0], col, TRUE);
 
-	draw_3d_line(cam, c1[0], c2[0], COL_GREEN, TRUE);
-	draw_3d_line(cam, c1[1], c2[1], COL_GREEN, TRUE);
-	draw_3d_line(cam, c1[2], c2[2], COL_GREEN, TRUE);
-	draw_3d_line(cam, c1[3], c2[3], COL_GREEN, TRUE);
+	draw_3d_line(cam, c1[0], c2[0], col, TRUE);
+	draw_3d_line(cam, c1[1], c2[1], col, TRUE);
+	draw_3d_line(cam, c1[2], c2[2], col, TRUE);
+	draw_3d_line(cam, c1[3], c2[3], col, TRUE);
 }
 
 void draw_camera(struct s_camera cam, struct s_camera target)
