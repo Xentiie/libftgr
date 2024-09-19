@@ -18,7 +18,7 @@
 
 LRESULT CALLBACK windowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 static inline ATOM _init_main_window_class(HINSTANCE hInstance);
-static inline HWND _create_window(string title, t_iv2 size, HINSTANCE hInstance);
+static inline HWND _create_window(const_string title, t_iv2 size, HINSTANCE hInstance);
 static inline bool _init_buffer(t_ftgr_img *buffer, t_iv2 size);
 
 static void send_events(t_ftgr_win *win, S32 event);
@@ -159,7 +159,7 @@ static inline ATOM _init_main_window_class(HINSTANCE hInstance)
 	return RegisterClassEx(&wc);
 }
 
-static inline HWND _create_window(string title, t_iv2 size, HINSTANCE hInstance)
+static inline HWND _create_window(const_string title, t_iv2 size, HINSTANCE hInstance)
 {
 	return CreateWindowEx(
 		0,					 // Extended window style
@@ -210,7 +210,7 @@ t_ftgr_win *ftgr_new_window(t_ftgr_ctx *ctx, t_iv2 size, const_string title)
 
 	if (!ctx->main_window_class)
 	{
-		if (UNLIKELY((ctx->main_window_class = _init_main_window_class(ctx->instance_handle)) == NULL))
+		if (UNLIKELY((ctx->main_window_class = _init_main_window_class(ctx->instance_handle)) == 0))
 			goto bad_window1;
 	}
 	if (UNLIKELY((win_int->window_handle = _create_window(title, size, ctx->instance_handle)) == NULL))
@@ -234,16 +234,6 @@ t_ftgr_win *ftgr_new_window(t_ftgr_ctx *ctx, t_iv2 size, const_string title)
 	win_int->back = 1;
 	win->surface = &win_int->buffers[win_int->back];
 
-	BITMAPINFO bmi;
-	ZeroMemory(&bmi, sizeof(BITMAPINFO));
-	bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-	bmi.bmiHeader.biWidth = win->size.x;
-	bmi.bmiHeader.biHeight = -win->size.y; // Negative height to indicate top-down bitmap
-	bmi.bmiHeader.biPlanes = 1;
-	bmi.bmiHeader.biBitCount = 32; // Assuming 32-bit RGBA pixel format
-	bmi.bmiHeader.biCompression = BI_RGB;
-	win_int->preset_bmi = bmi;
-
 	win->cursor_mode = FTGR_CURSOR_NORMAL;
 	win->size = size;
 
@@ -251,11 +241,13 @@ t_ftgr_win *ftgr_new_window(t_ftgr_ctx *ctx, t_iv2 size, const_string title)
 		win->w_root = ftgr_new_widget();
 		if (UNLIKELY(win->w_root == NULL))
 			goto bad_window2;
+		win->w_root->name = "Window root";
 		win->w_root->pos = ivec2(0, 0);
 		win->w_root->size = size;
 	}
 
 	ft_lstadd_front(&ctx->windows, lst);
+	ftgr_swap_buffers(win);
 	return win;
 
 bad_window1:

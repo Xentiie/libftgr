@@ -63,7 +63,6 @@ typedef struct s_ftgr_ctx
 	float delta_time;
 
 	t_key keys[256];
-
 	bool left_mouse_pressed, left_mouse_clicked, left_mouse_released;
 	bool right_mouse_pressed, right_mouse_clicked,  right_mouse_released;
 	bool middle_mouse_pressed, middle_mouse_clicked, middle_mouse_released;
@@ -78,8 +77,6 @@ typedef struct s_ftgr_win_int
 	t_ftgr_img buffers[2];
 	U8 front;
 	U8 back;
-
-	BITMAPINFO preset_bmi;
 } t_ftgr_win_int;
 
 #define FTGR_WINDOW(lst) ((t_ftgr_win *)(lst->content))

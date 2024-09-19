@@ -1,30 +1,21 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   time.c                                             :+:      :+:    :+:   */
+/*   object.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/07/04 16:49:09 by reclaire          #+#    #+#             */
-/*   Updated: 2024/09/13 02:38:43 by reclaire         ###   ########.fr       */
+/*   Created: 2024/09/13 18:17:18 by reclaire          #+#    #+#             */
+/*   Updated: 2024/09/14 15:45:34 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft/std.h"
-#ifdef FT_OS_WIN
-# include "libftgr_win_int.h"
-#else
-# include "libftgr_x11_int.h"
-#endif
+#include "3d.h"
 
-float ftgr_time(t_ftgr_ctx *ctx)
+t_mat4x4 object_get_model_to_world(struct s_object obj)
 {
-    t_time t;
-    ft_clk_get(&t);
-    return ft_clk_diff_float(&ctx->global_time, &t);
-}
-
-float ftgr_delta_time(t_ftgr_ctx *ctx)
-{
-    return ctx->delta_time;
+	return ft_mat4x4_mult_mat(ft_mat4x4_mult_mat(
+		ft_mat4x4_translate_v3(obj.pos),
+		ft_mat4x4_scale_v3(obj.scl)),
+		ft_mat4x4_rotate_euler(obj.rot));
 }

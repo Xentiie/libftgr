@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/09 16:46:04 by reclaire          #+#    #+#             */
-/*   Updated: 2024/09/02 03:14:40 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/09/11 18:10:43 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -192,6 +192,7 @@ t_ftgr_ctx *ftgr_create_ctx()
 	ctx = malloc(sizeof(t_ftgr_ctx));
 	if (!ctx)
 		__FTRETURN_ERR(NULL, FT_EOMEM);
+	ft_memset(ctx, 0, sizeof(t_ftgr_ctx));
 
 	ctx->display = XOpenDisplay("");
 	if (ctx->display == 0)
