@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/12 01:02:07 by reclaire          #+#    #+#             */
-/*   Updated: 2024/09/19 16:38:19 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/09/26 23:00:18 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,8 +15,7 @@
 
 #include "libftgr.h"
 #include "libft/lists.h"
-
-#define array_len(x) (sizeof(x) / sizeof(x[0]))
+#include "global.h"
 
 struct s_object {
 	t_v3 pos;
@@ -46,6 +45,7 @@ struct s_camera {
 	t_ftgr_img *depth_buffer;
 };
 
+bool cam_init_depth_buffer(struct s_camera *cam);
 t_mat4x4 cam_get_cam_to_clip(struct s_camera cam);
 t_mat4x4 cam_get_orientation(struct s_camera cam);
 t_mat4x4 cam_get_world_to_cam(struct s_camera cam);
@@ -55,6 +55,7 @@ void cam_get_frustum(struct s_camera cam, t_v3 near[4], t_v3 far[4]);
 
 t_v4 world_to_screen(struct s_camera cam, t_v3 point);
 t_v3 screen_to_world(struct s_camera cam, t_v2 point);
+t_v3 view_to_world(struct s_camera cam, t_v2 point);
 
 t_mat4x4 object_get_model_to_world(struct s_object obj);
 

@@ -1,24 +1,18 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   grid.c                                             :+:      :+:    :+:   */
+/*   simple_vertex_shader.cl.c                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/09/12 01:04:23 by reclaire          #+#    #+#             */
-/*   Updated: 2024/09/22 22:56:16 by reclaire         ###   ########.fr       */
+/*   Created: 2024/09/30 08:34:49 by reclaire          #+#    #+#             */
+/*   Updated: 2024/09/30 08:35:11 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "./3d.h"
+#include "maths.cl.h"
 
-void draw_grid(struct s_camera cam, t_v3 grid_pos, t_v3 grid_up)
+t_v4 vertex_shader(t_v3 p, t_mat4x4 world_to_clip)
 {
-	t_v3 near[4];
-	t_v3 far[4];
-
-	cam_get_frustum(cam, near, far);
-	
-	(void)grid_pos;
-	(void)grid_up;
+	return ft_mat4x4_mult_v4(world_to_clip, vec4(p.x, p.y, p.z, 1.0f));
 }

@@ -1,24 +1,21 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   grid.c                                             :+:      :+:    :+:   */
+/*   3d_objects.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/09/12 01:04:23 by reclaire          #+#    #+#             */
-/*   Updated: 2024/09/22 22:56:16 by reclaire         ###   ########.fr       */
+/*   Created: 2024/09/13 18:17:18 by reclaire          #+#    #+#             */
+/*   Updated: 2024/09/23 17:19:17 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "./3d.h"
+#include "3d.h"
 
-void draw_grid(struct s_camera cam, t_v3 grid_pos, t_v3 grid_up)
+t_mat4x4 object_get_model_to_world(struct s_object obj)
 {
-	t_v3 near[4];
-	t_v3 far[4];
-
-	cam_get_frustum(cam, near, far);
-	
-	(void)grid_pos;
-	(void)grid_up;
+	return ft_mat4x4_mult_mat(ft_mat4x4_mult_mat(
+		ft_mat4x4_translate_v3(obj.pos),
+		ft_mat4x4_scale_v3(obj.scl)),
+		ft_mat4x4_rotate_euler(obj.rot));
 }

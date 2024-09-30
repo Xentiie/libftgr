@@ -34,7 +34,7 @@ void (_ftgr_error)(char *file, int line)
 			0,
 			NULL);
 
-		for (size_t i = size - 1; i >= 0; i++)
+		for (ssize_t i = size - 1; i >= 0; i--)
 		{
 			if (buffer[i] == '\n')
 			{
@@ -42,7 +42,7 @@ void (_ftgr_error)(char *file, int line)
 				break;
 			}
 		}
-		PRINT_ERROR_WIN(err, buffer);
+		PRINT_ERROR_WIN((S64)err, buffer);
 	    LocalFree(buffer);
 	}
 	else if (ft_errno != FT_OK)

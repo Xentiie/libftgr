@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/07 17:32:16 by reclaire          #+#    #+#             */
-/*   Updated: 2024/09/18 17:52:10 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/09/21 01:08:16 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -281,7 +281,7 @@ void ftgr_draw_line_vertical(t_ftgr_img *img, t_iv2 p1, S32 y2, t_color col)
 
 	p1.y = ft_clamp(0, img->size.y - 1, p1.y);
 	y2 = ft_clamp(0, img->size.y - 1, y2);
-	for (U64 y = p1.y; y < y2; y++)
+	for (U64 y = p1.y; y < (U64)y2; y++)
 		ft_memcpy(ftgr_get_pixel_addr(img, p1.x, y), &col_i, img->bpp);
 }
 
@@ -432,7 +432,6 @@ void ftgr_draw_triangle_e(t_ftgr_img *img, t_iv2 p1, t_iv2 p2, t_iv2 p3, void (*
 
 FUNCTION_HOT void ftgr_fill_triangle_e(t_ftgr_img *img, t_iv2 ip1, t_iv2 ip2, t_iv2 ip3, void (*eval)(t_ftgr_img *img, t_iv2 xy, t_v3 w, void *data), void *data)
 {
-	U32 col_i;
 	t_v2 p1, p2, p3;
 	F32 area;
 	t_iv2 bbox_min, bbox_max;

@@ -14,6 +14,11 @@
  * limitations under the License.
  ******************************************************************************/
 
+/*
+Catch all functions regex:
+extern .+?(?=[a-z]).+?(?= CL_API_CALL) CL_API_CALL\n.+?(?=\()
+*/
+
 #ifndef __OPENCL_CL_H
 #define __OPENCL_CL_H
 

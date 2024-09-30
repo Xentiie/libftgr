@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/13 01:25:15 by reclaire          #+#    #+#             */
-/*   Updated: 2024/09/19 16:42:19 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/09/23 14:48:19 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,21 +44,25 @@ t_v4 world_to_screen(struct s_camera cam, t_v3 point)
 
 t_v3 screen_to_world(struct s_camera cam, t_v2 point)
 {
-	t_mat4x4 clip_to_view = ft_mat4x4_invert(cam_get_cam_to_clip(cam));
-	t_mat4x4 view_to_world = ft_mat4x4_invert(cam_get_world_to_cam(cam));
-
 	point.x = (point.x / (F32)cam.surface->size.x * 2.0f) - 1.0f;
 	point.y = (point.y / (F32)cam.surface->size.y * 2.0f) - 1.0f;
 
-	t_v4 view_point = ft_mat4x4_mult_v4(clip_to_view, vec4(point.x, point.y, 0.0f, 1.0f));
-	view_point.w = 1.f / view_point.w;
+	return view_to_world(cam, point);
+}
+
+t_v3 view_to_world(struct s_camera cam, t_v2 point)
+{
+	t_mat4x4 clip_to_view = ft_mat4x4_invert(cam_get_cam_to_clip(cam));
+	t_mat4x4 view_to_world = cam_get_cam_to_world(cam);
+
+	t_v4 view_point = ft_mat4x4_mult_v4(clip_to_view, vec4(point.x, point.y, -1.0f, 1.0f));
 	view_point.x /= view_point.w;
 	view_point.y /= view_point.w;
 	view_point.z /= view_point.w;
 	t_v4 world_point4 = ft_mat4x4_mult_v4(view_to_world, view_point);
 
 	t_v3 world_point = vec3(world_point4.x, world_point4.y, world_point4.z);
-	//world_point = vec3_add(world_point, vec3_scl(cam.forward, cam.near));
+	//world_point = vec3_sub(world_point, vec3_scl(cam.forward, cam.near));
 
 	return world_point;
 }
@@ -119,7 +123,6 @@ void render_model(struct s_camera cam, struct s_object obj)
 	t_v3 *verts = obj.verts;
 	U64 verts_cnt = obj.verts_cnt;
 	t_iv3 *tris = obj.tris;
-	U64 tris_cnt = obj.tris_cnt;
 
 	if (obj.wireframe)
 	{
@@ -194,6 +197,7 @@ static void _draw_3d_line(t_ftgr_img *img, t_iv2 xy, t_iv4 lp1lp2, void *data)
 		//*(U32 *)ftgr_get_pixel_addr(img, xy.x, xy.y) = ftgr_color_to_int((t_color){w * 25, w * 25, w * 25, 255});
 	}
 }
+
 void draw_3d_line(struct s_camera cam, t_v3 lp1, t_v3 lp2, t_color col, bool depth)
 {
 	if (!clip_line_with_cam(cam, &lp1, &lp2))
@@ -212,10 +216,11 @@ void draw_3d_line(struct s_camera cam, t_v3 lp1, t_v3 lp2, t_color col, bool dep
 			t_v4 p2;
 			t_color col;
 		} data = {
+			.depth_buffer = cam.depth_buffer,
 			.p1 = p1,
 			.p2 = p2,
-			.depth_buffer = cam.depth_buffer,
 			.col = col};
+		//printf("%p %p\n", cam.depth_buffer, data.depth_buffer);
 		ftgr_draw_line_e(cam.surface, ivec2(p1.x, p1.y), ivec2(p2.x, p2.y), _draw_3d_line, &data);
 	}
 	else

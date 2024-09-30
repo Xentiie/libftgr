@@ -1,21 +1,20 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   object.c                                           :+:      :+:    :+:   */
+/*   make_maths_cl.h                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/09/13 18:17:18 by reclaire          #+#    #+#             */
-/*   Updated: 2024/09/14 15:45:34 by reclaire         ###   ########.fr       */
+/*   Created: 2024/09/27 16:40:49 by reclaire          #+#    #+#             */
+/*   Updated: 2024/09/27 18:12:28 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "3d.h"
+#ifndef CL_MATHS_H
+#define CL_MATHS_H
 
-t_mat4x4 object_get_model_to_world(struct s_object obj)
-{
-	return ft_mat4x4_mult_mat(ft_mat4x4_mult_mat(
-		ft_mat4x4_translate_v3(obj.pos),
-		ft_mat4x4_scale_v3(obj.scl)),
-		ft_mat4x4_rotate_euler(obj.rot));
-}
+#include "gpu/clc/clc.h"
+
+cl_program make_maths_cl(cl_device_id device, cl_context ctx, LibraryCache cache);
+
+#endif

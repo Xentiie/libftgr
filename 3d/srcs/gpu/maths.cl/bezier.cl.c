@@ -1,24 +1,20 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   grid.c                                             :+:      :+:    :+:   */
+/*   bezier.cl.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/09/12 01:04:23 by reclaire          #+#    #+#             */
-/*   Updated: 2024/09/22 22:56:16 by reclaire         ###   ########.fr       */
+/*   Created: 2024/09/27 14:00:59 by reclaire          #+#    #+#             */
+/*   Updated: 2024/09/27 15:06:34 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "./3d.h"
+#include "maths.cl.h"
 
-void draw_grid(struct s_camera cam, t_v3 grid_pos, t_v3 grid_up)
+t_v2 ft_bezier_interp(t_v2 p1, t_v2 p2, t_v2 p3, F32 t)
 {
-	t_v3 near[4];
-	t_v3 far[4];
-
-	cam_get_frustum(cam, near, far);
-	
-	(void)grid_pos;
-	(void)grid_up;
+	t_v2 tmpa = ft_lerp(p1, p2, t);
+	t_v2 tmpb = ft_lerp(p2, p3, t);
+	return ft_lerp(tmpa, tmpb, t);
 }

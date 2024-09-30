@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/09 00:44:07 by reclaire          #+#    #+#             */
-/*   Updated: 2024/09/18 17:29:53 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/09/21 01:09:00 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,6 +116,7 @@ bool ftgr_add_wdrawer(t_widget *widget, t_widget_drawer drawer)
 	}
 
 	widget->drawers[widget->drawers_n++] = drawer;
+	return TRUE;
 }
 
 static void _ftgr_free_widget_recursive(t_widget *widget)

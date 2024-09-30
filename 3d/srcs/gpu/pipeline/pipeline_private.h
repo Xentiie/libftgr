@@ -1,24 +1,27 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   grid.c                                             :+:      :+:    :+:   */
+/*   pipeline_private.h                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/09/12 01:04:23 by reclaire          #+#    #+#             */
-/*   Updated: 2024/09/22 22:56:16 by reclaire         ###   ########.fr       */
+/*   Created: 2024/09/27 15:59:21 by reclaire          #+#    #+#             */
+/*   Updated: 2024/09/27 16:08:33 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "./3d.h"
+#ifndef PIPELINE_PRIVATE_H
+#define PIPELINE_PRIVATE_H
 
-void draw_grid(struct s_camera cam, t_v3 grid_pos, t_v3 grid_up)
-{
-	t_v3 near[4];
-	t_v3 far[4];
+#include "pipeline.h"
 
-	cam_get_frustum(cam, near, far);
-	
-	(void)grid_pos;
-	(void)grid_up;
-}
+struct s_pipeline {
+	cl_context ctx;
+	cl_device_id device;
+	cl_command_queue queue;
+
+	ProgramBuilder vertshdr_builder;
+	ProgramBuilder fragshdr_builder;
+};
+
+#endif

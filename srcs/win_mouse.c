@@ -36,6 +36,7 @@ void ftgr_mouse_show(t_ftgr_ctx *ctx, t_ftgr_win *win)
 
 t_iv2 ftgr_mouse_get_pos(t_ftgr_ctx *ctx, t_ftgr_win *win)
 {
+	(void)ctx;
 	POINT p;
 	if (GetCursorPos(&p) == FALSE)
 		_ftgr_error();

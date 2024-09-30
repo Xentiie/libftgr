@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/18 16:48:01 by reclaire          #+#    #+#             */
-/*   Updated: 2024/09/18 16:48:06 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/09/21 01:07:51 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,7 @@ bool ftgr_wdrawer_stretch_img_cpu(t_widget *widget, t_ftgr_img *img)
 
 static void __ftgr_wdrawer_copy_img_cpu(t_ftgr_img *out, t_widget *widget, t_iv2 abs_pos, union u_widget_data data)
 {
+	(void)widget;
 	ftgr_cpy_img(
 		out, ivec2(abs_pos.x, abs_pos.y),
 		data.img[0], ivec4(0, 0, data.img[0]->size.x, data.img[0]->size.y));

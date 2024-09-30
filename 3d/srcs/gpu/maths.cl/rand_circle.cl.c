@@ -1,24 +1,18 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   grid.c                                             :+:      :+:    :+:   */
+/*   rand_circle.cl.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/09/12 01:04:23 by reclaire          #+#    #+#             */
-/*   Updated: 2024/09/22 22:56:16 by reclaire         ###   ########.fr       */
+/*   Created: 2024/09/27 05:43:03 by reclaire          #+#    #+#             */
+/*   Updated: 2024/09/27 15:18:47 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "./3d.h"
+#include "maths.cl.h"
 
-void draw_grid(struct s_camera cam, t_v3 grid_pos, t_v3 grid_up)
+t_v2	ft_rand_circle(U32 seed)
 {
-	t_v3 near[4];
-	t_v3 far[4];
-
-	cam_get_frustum(cam, near, far);
-	
-	(void)grid_pos;
-	(void)grid_up;
+	return (vec2(sin(ft_noise2(vec2(seed, 0))), cos(ft_noise2(vec2(seed, 0)) + 1)));
 }

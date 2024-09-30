@@ -21,7 +21,6 @@ void ftgr_free(t_ftgr_ctx *ctx)
 		UnregisterClass(FTGR_WINDOW_CLASS, ctx->instance_handle);
 		ctx->main_window_class = 0;
 	}
-	t_list *curr = ctx->windows;
 	ft_lstclear(&ctx->windows, (void (*)(void *))ftgr_free_window);
 
 	if (ctx->instance_handle)

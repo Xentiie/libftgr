@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/12 01:07:27 by reclaire          #+#    #+#             */
-/*   Updated: 2024/09/18 17:53:52 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/09/23 17:17:26 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,7 @@ struct s_info_line
 
 static void info_line_draw(t_ftgr_img *out, t_widget *widget, t_iv2 abs_pos, union u_widget_data data)
 {
+	(void)data;
 	char buf[1250];
 
 	struct s_info_line *infoline = widget->data.ptr[0];
@@ -45,12 +46,14 @@ static void info_line_draw(t_ftgr_img *out, t_widget *widget, t_iv2 abs_pos, uni
 	});
 }
 
-static void info_line_dump(t_widget *widget, t_iv2 cursor_pos)
+static bool info_line_dump(t_widget *widget, t_iv2 cursor_pos)
 {
+	(void)cursor_pos;
 	struct s_info_line *infoline = widget->data.ptr[0];
 
 	string str = infoline->dump_value_str(infoline->ptr);
 	printf("--- Dump from widget %s\n%s\n---\n", widget->name, str);
+	return TRUE;
 }
 
 t_widget *new_info_line(t_list **lines, t_bitmap *bitmap, string label, string (*get_value_str)(void *), string (*dump_value_str)(void *), void *ptr)

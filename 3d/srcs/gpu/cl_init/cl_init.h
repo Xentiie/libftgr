@@ -1,24 +1,22 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   grid.c                                             :+:      :+:    :+:   */
+/*   cl_init.h                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/09/12 01:04:23 by reclaire          #+#    #+#             */
-/*   Updated: 2024/09/22 22:56:16 by reclaire         ###   ########.fr       */
+/*   Created: 2024/09/27 17:54:12 by reclaire          #+#    #+#             */
+/*   Updated: 2024/09/27 18:08:22 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "./3d.h"
+#ifndef CL_INIT_H
+#define CL_INIT_H
 
-void draw_grid(struct s_camera cam, t_v3 grid_pos, t_v3 grid_up)
-{
-	t_v3 near[4];
-	t_v3 far[4];
+#include "libft/types.h"
+#define CL_TARGET_OPENCL_VERSION 300
+#include "CL/cl.h"
 
-	cam_get_frustum(cam, near, far);
-	
-	(void)grid_pos;
-	(void)grid_up;
-}
+bool cl_init(cl_platform_id *o_platform, cl_device_id *o_device, cl_context *o_ctx, cl_command_queue *o_queue);
+
+#endif

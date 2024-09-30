@@ -1,24 +1,22 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   grid.c                                             :+:      :+:    :+:   */
+/*   pipeline.h                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/09/12 01:04:23 by reclaire          #+#    #+#             */
-/*   Updated: 2024/09/22 22:56:16 by reclaire         ###   ########.fr       */
+/*   Created: 2024/09/27 15:59:03 by reclaire          #+#    #+#             */
+/*   Updated: 2024/09/27 18:27:58 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "./3d.h"
+#ifndef PIPELINE_H
+#define PIPELINE_H
 
-void draw_grid(struct s_camera cam, t_v3 grid_pos, t_v3 grid_up)
-{
-	t_v3 near[4];
-	t_v3 far[4];
+#define CL_TARGET_OPENCL_VERSION 300
+#include "CL/cl.h"
+#include "gpu/clc/clc.h"
 
-	cam_get_frustum(cam, near, far);
-	
-	(void)grid_pos;
-	(void)grid_up;
-}
+typedef struct s_pipeline *Pipeline;
+
+#endif

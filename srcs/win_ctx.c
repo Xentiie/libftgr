@@ -37,7 +37,7 @@ t_ftgr_ctx   *ftgr_create_ctx()
 	ft_clk_get(&ctx->delta_time_clk);
 
 	for (U32 i = 0; i < sizeof(ctx->keys)/sizeof(ctx->keys[0]); i++)
-		ctx->keys[i] = (t_key){0, 0, 0};
+		ctx->keys[i] = (t_key){0, 0, 0, 0};
 
 	ctx->left_mouse_pressed = FALSE;
 	ctx->left_mouse_clicked = FALSE;

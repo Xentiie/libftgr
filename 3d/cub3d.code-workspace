@@ -1,0 +1,19 @@
+{
+	"folders": [
+		{
+			"path": "../../cub3d"
+		},
+		{
+			"path": "../../shady"
+		},
+		{
+			"path": "../../../Downloads/source-archive/cudaraster"
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"mlx_engine.h": "c",
+			"mlx_engine_int.h": "c"
+		}
+	}
+}
