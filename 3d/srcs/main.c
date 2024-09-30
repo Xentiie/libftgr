@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/06 02:27:08 by reclaire          #+#    #+#             */
-/*   Updated: 2024/09/30 09:27:04 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/09/30 13:32:53 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,19 +18,16 @@
 #include "libft/limits.h"
 #include "libft/path.h"
 
-#include "./3d.h"
+#include "3dfw/3dfw.h"
+#include "infolines/infolines.h"
 #include "gpu/clc/clc.h"
 #include "gpu/maths.cl/make_maths_cl.h"
 #include "gpu/cl_init/cl_init.h"
 #include "gpu/rasterizer/rasterizer.h"
 
-static void move_camera(struct s_camera *cam);
+#include "infolines_getters.h"
 
-static string get_float_str(void *ptr);
-static string get_cube_str(void *ptr);
-static string get_cam_str(void *ptr);
-static string dump_cam_str(void *ptr);
-static string get_fps_str(void *ptr);
+void camera_move(t_ftgr_ctx *ctx, struct s_camera *cam);
 
 const t_v3 cube_verts[] = {
 	{-1.0f, -1.0f, -1.0f},
@@ -114,15 +111,17 @@ void draw_debug_scene(struct s_camera cam)
 		t_v4 far_center_screen = world_to_screen(cam, far_center);
 		ftgr_draw_disc(cam.surface, ivec2(near_center_screen.x, near_center_screen.y), 3, COL_GREEN);
 		ftgr_draw_disc(cam.surface, ivec2(far_center_screen.x, far_center_screen.y), 3, COL_GREEN);
+
+		{ /* mouse dir */
+			t_iv2 mouse_pos = ftgr_mouse_get_pos(ctx, win);
+			t_v3 p = screen_to_world(cam2, ivec2_flt(mouse_pos));
+			t_v3 p_dir = ft_normalize3(vec3_sub(p, cam2.pos));
+			t_v4 p2 = world_to_screen(cam, p);
+			ftgr_draw_disc(cam.surface, ivec2(p2.x, p2.y), 5, COL_BLUE);
+			draw_3d_line(cam, cam2.pos, vec3_add(cam2.pos, vec3_scl(p_dir, 5)), COL_LIGHT_GREEN, TRUE);
+		}
 	}
 	render_model(cam2_view ? cam2 : cam, cube);
-
-	t_iv2 mouse_pos = ftgr_mouse_get_pos(ctx, win);
-	t_v3 p = screen_to_world(cam2, ivec2_flt(mouse_pos));
-	t_v3 p_dir = ft_normalize3(vec3_sub(p, cam2.pos));
-	t_v4 p2 = world_to_screen(cam, p);
-	ftgr_draw_disc(cam.surface, ivec2(p2.x, p2.y), 5, COL_BLUE);
-	draw_3d_line(cam, cam2.pos, vec3_add(cam2.pos, vec3_scl(p_dir, 5)), COL_LIGHT_GREEN, TRUE);
 }
 
 int main()
@@ -210,9 +209,16 @@ int main()
 	{
 		cam.surface = win->surface;
 		ft_bzero(cam.surface->data, cam.surface->data_size);
+		/*
+		//TODO:
+		pq je me fais chier a utiliser -cam.far ?
+		parce que actuellement le depth buffer contient des valeurs allant de 0 a -cam.far (-cam.far étant le plus éloigné)
+		ca serait cool de pouvoir just bzero le truc
+		*/
 		for (U64 i = 0; i < cam.depth_buffer->data_size; i += cam.depth_buffer->bpp)
 			*(F32 *)(cam.depth_buffer->data + i) = -cam.far;
-		move_camera(&cam);
+
+		camera_move(ctx, &cam);
 
 		ft3d_draw_lines(vertex_shader, cl_ctx, queue, points, array_len(points), indices, array_len(indices), cam);
 		draw_debug_scene(cam);
@@ -222,105 +228,3 @@ int main()
 		ftgr_display_fps(win);
 	}
 }
-
-static void move_camera(struct s_camera *cam)
-{
-	F32 dtime = ftgr_delta_time(ctx);
-	t_v3 cam_right;
-	{ /* camera movement */
-		t_v3 move = vec3(0, 0, 0);
-		move.x = ftgr_is_key_pressed(ctx, 'z') - ftgr_is_key_pressed(ctx, 's');
-		move.y = ftgr_is_key_pressed(ctx, ' ') - ftgr_is_key_pressed(ctx, 'c');
-		move.z = ftgr_is_key_pressed(ctx, 'd') - ftgr_is_key_pressed(ctx, 'q');
-		bool sprint = ftgr_mouse_pressed(ctx, MOUSE_LEFT);
-
-		cam_right = ft_normalize3(ft_cross3(cam->forward, cam->up));
-		cam->pos = vec3_add(cam->pos, vec3_scl(cam->forward, move.x * dtime * 10 * (sprint ? 8 : 1)));
-		cam->pos = vec3_add(cam->pos, vec3_scl(cam->up, move.y * dtime * 10 * (sprint ? 8 : 1)));
-		cam->pos = vec3_add(cam->pos, vec3_scl(cam_right, move.z * dtime * 10 * (sprint ? 8 : 1)));
-	}
-
-	{ /* camera rotation */
-		t_v3 rotate = vec3(0, 0, 0);
-		t_mat4x4 camera_orientation;
-
-		if (ftgr_is_key_pressed(ctx, 'j'))
-			rotate.x -= dtime * 0.5f;
-		if (ftgr_is_key_pressed(ctx, 'l'))
-			rotate.x += dtime * 0.5f;
-		if (ftgr_is_key_pressed(ctx, 'k'))
-			rotate.y -= dtime * 0.5f;
-		if (ftgr_is_key_pressed(ctx, 'i'))
-			rotate.y += dtime * 0.5f;
-
-		if (rotate.x != 0.0f || rotate.y != 0.0f || rotate.z != 0.0f)
-			camera_orientation = cam_get_orientation(*cam);
-
-		if (rotate.x != 0.0f || rotate.y != 0.0f)
-		{
-			t_v3 c0 = *(t_v3 *)ft_mat4x4_col(&camera_orientation, 0);
-			t_v3 c1 = *(t_v3 *)ft_mat4x4_col(&camera_orientation, 1);
-			t_v3 c2 = *(t_v3 *)ft_mat4x4_col(&camera_orientation, 2);
-
-			t_v3 tmp = vec3_sub(vec3_scl(c2, cosf(rotate.x)), vec3_scl(c0, sinf(rotate.x)));
-
-			cam->forward = ft_normalize3(vec3_sub(vec3_scl(c1, sinf(rotate.y)), vec3_scl(tmp, cosf(rotate.y))));
-			cam->up = ft_normalize3(vec3_add(vec3_scl(c1, cosf(rotate.y)), vec3_scl(tmp, sinf(rotate.y))));
-		}
-
-		if (rotate.z != 0.0f)
-		{
-			t_v4 up4 = ft_mat4x4_mult_v4(ft_mat4x4_transpose(camera_orientation), vec4(cam->up.x, cam->up.y, cam->up.z, 1.0f));
-			t_v4 tmp = ft_mat4x4_mult_v4(camera_orientation, vec4(up4.x * cos(rotate.z) - sin(rotate.z), up4.x * sin(rotate.z) + up4.y * cos(rotate.z), up4.z, 1.0f));
-			cam->up = vec3(tmp.x, tmp.y, tmp.z);
-		}
-	}
-}
-
-#pragma region Info lines funcs
-static string get_float_str(void *ptr)
-{
-	static char buf[10];
-	buf[snprintf(buf, sizeof(buf) - 1, "%f", *(F32 *)ptr)] = '\0';
-	return buf;
-}
-
-static string get_cube_str(void *ptr)
-{
-	static char buf[100];
-	struct s_object *cube = (struct s_object *)ptr;
-	buf[snprintf(buf, sizeof(buf) - 1, "pos:{%.2f %.2f %.2f} rot:{%.2f %.2f %.2f}",
-				 cube->pos.x, cube->pos.y, cube->pos.z,
-				 cube->rot.x, cube->rot.y, cube->rot.z)] = '\0';
-	return buf;
-}
-
-static string get_cam_str(void *ptr)
-{
-	static char buf[100];
-	struct s_camera *cam = (struct s_camera *)ptr;
-	buf[snprintf(buf, sizeof(buf) - 1, "pos:{%.2f %.2f %.2f} forward:{%.2f %.2f %.2f} up:{%.2f %.2f %.2f}",
-				 cam->pos.x, cam->pos.y, cam->pos.z,
-				 cam->forward.x, cam->forward.y, cam->forward.z,
-				 cam->up.x, cam->up.y, cam->up.z)] = '\0';
-	return buf;
-}
-
-static string dump_cam_str(void *ptr)
-{
-	static char buf[200];
-	struct s_camera *cam = (struct s_camera *)ptr;
-	buf[snprintf(buf, sizeof(buf) - 1, "cam.pos = vec3(%.2f, %.2f, %.2f);\ncam.forward = vec3(%.2f, %.2f, %.2f);\ncam.up = vec3(%.2f, %.2f, %.2f);",
-				 cam->pos.x, cam->pos.y, cam->pos.z,
-				 cam->forward.x, cam->forward.y, cam->forward.z,
-				 cam->up.x, cam->up.y, cam->up.z)] = '\0';
-	return buf;
-}
-
-static string get_fps_str(void *ptr)
-{
-	static char buf[10];
-	buf[snprintf(buf, sizeof(buf) - 1, "%f", 1.0f / ftgr_delta_time((t_ftgr_ctx *)ptr))] = '\0';
-	return buf;
-}
-#pragma endregion

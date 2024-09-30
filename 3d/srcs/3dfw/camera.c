@@ -6,11 +6,11 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/12 01:00:56 by reclaire          #+#    #+#             */
-/*   Updated: 2024/09/23 17:16:59 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/09/30 12:17:57 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "./3d.h"
+#include "3dfw/3dfw.h"
 #include <stdlib.h>
 
 bool cam_init_depth_buffer(struct s_camera *cam)

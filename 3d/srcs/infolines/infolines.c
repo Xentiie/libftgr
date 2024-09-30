@@ -6,14 +6,15 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/12 01:07:27 by reclaire          #+#    #+#             */
-/*   Updated: 2024/09/23 17:17:26 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/09/30 12:18:46 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "libftgr.h"
+#include "libft/lists.h"
+
 #include <stdio.h>
 #include <stdlib.h>
-#include "./3d.h"
-#include "libft/lists.h"
 
 struct s_info_line
 {

@@ -1,27 +1,24 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   utils.c                                            :+:      :+:    :+:   */
+/*   infolines_getters.h                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/09/12 01:05:42 by reclaire          #+#    #+#             */
-/*   Updated: 2024/09/30 12:32:48 by reclaire         ###   ########.fr       */
+/*   Created: 2024/09/30 12:22:12 by reclaire          #+#    #+#             */
+/*   Updated: 2024/09/30 12:22:44 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft/maths.h"
-#include <stdio.h>
+#ifndef INFOLINES_GETTERS_H
+#define INFOLINES_GETTERS_H
 
-void print_mat(string name, t_mat4x4 mat)
-{
-	printf("%s {\n", name);
-    for (int i = 0; i < 4; i++)
-    {
-		printf("\t");
-        for (int j = 0; j < 4; j++)
-            printf("% 7f, ", *ft_mat4x4_get(&mat, i, j));
-        printf("\n");
-    }
-	printf("}\n");
-}
+#include "libft/types.h"
+
+string get_float_str(void *ptr);
+string get_cube_str(void *ptr);
+string get_cam_str(void *ptr);
+string dump_cam_str(void *ptr);
+string get_fps_str(void *ptr);
+
+#endif

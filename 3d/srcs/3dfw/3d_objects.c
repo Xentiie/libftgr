@@ -6,11 +6,11 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/13 18:17:18 by reclaire          #+#    #+#             */
-/*   Updated: 2024/09/23 17:19:17 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/09/30 12:17:13 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "3d.h"
+#include "3dfw/3dfw.h"
 
 t_mat4x4 object_get_model_to_world(struct s_object obj)
 {

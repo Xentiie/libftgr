@@ -1,24 +1,21 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   grid.c                                             :+:      :+:    :+:   */
+/*   infolines.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/09/12 01:04:23 by reclaire          #+#    #+#             */
-/*   Updated: 2024/09/22 22:56:16 by reclaire         ###   ########.fr       */
+/*   Created: 2024/09/30 12:19:58 by reclaire          #+#    #+#             */
+/*   Updated: 2024/09/30 12:20:44 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "./3d.h"
+#ifndef INFOLINES_H
+#define INFOLINES_H
 
-void draw_grid(struct s_camera cam, t_v3 grid_pos, t_v3 grid_up)
-{
-	t_v3 near[4];
-	t_v3 far[4];
+#include "libftgr.h"
+#include "libft/lists.h"
 
-	cam_get_frustum(cam, near, far);
-	
-	(void)grid_pos;
-	(void)grid_up;
-}
+t_widget *new_info_line(t_list **lines, t_bitmap *bitmap, string label, string (*get_value_str)(void *), string (*dump_value_str)(void *), void *ptr);
+
+#endif

@@ -6,12 +6,11 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/24 00:07:37 by reclaire          #+#    #+#             */
-/*   Updated: 2024/09/30 09:15:34 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/09/30 12:17:38 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "3d.h"
-#include "../../3d.h"
+#include "3dfw/3dfw.h"
 #include "gpu/rasterizer/rasterizer.h"
 #include "gpu/clc/clc.h"
 
