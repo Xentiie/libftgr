@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/24 00:07:55 by reclaire          #+#    #+#             */
-/*   Updated: 2024/09/30 09:15:40 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/09/30 14:39:25 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,10 +25,10 @@ pour le moment je passe le cache des lib en arguments, faudra changer
 ProgramBuilder vertex_shader_begin(cl_context ctx, cl_device_id device, LibraryCache cache);
 cl_kernel vertex_shader_end(ProgramBuilder builder, cl_program *out_program);
 
-void ft3d_draw_lines(
+void render_mesh_gpu(
 	cl_kernel vertex_shader,
 	cl_context ctx, cl_command_queue queue,
-	t_v3 *points, U64 points_cnt, t_iv2 *indices, U64 indices_cnt,
+	struct s_object object,
 	struct s_camera cam);
 
 #endif

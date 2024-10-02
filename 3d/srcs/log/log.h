@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/26 23:07:32 by reclaire          #+#    #+#             */
-/*   Updated: 2024/09/27 18:26:58 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/10/02 16:05:02 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,9 +32,9 @@ extern bool log_timestamps;
 #define log_warn(tag, ...) (log_warn)(__FILE__, __LINE__, tag, __VA_ARGS__)
 #define log_error(tag, ...) (log_error)(__FILE__, __LINE__, tag, __VA_ARGS__)
 
-void (log_debug)(string file, S32 line, string tag, string fmt, ...);
-void (log_info)(string file, S32 line, string tag, string fmt, ...);
-void (log_warn)(string file, S32 line, string tag, string fmt, ...);
-void (log_error)(string file, S32 line, string tag, string fmt, ...);
+void (log_debug)(const_string file, S32 line, string tag, string fmt, ...);
+void (log_info)(const_string file, S32 line, string tag, string fmt, ...);
+void (log_warn)(const_string file, S32 line, string tag, string fmt, ...);
+void (log_error)(const_string file, S32 line, string tag, string fmt, ...);
 
 #endif

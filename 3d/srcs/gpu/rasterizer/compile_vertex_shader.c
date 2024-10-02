@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 08:35:33 by reclaire          #+#    #+#             */
-/*   Updated: 2024/09/30 09:19:43 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/09/30 21:53:16 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ ProgramBuilder vertex_shader_begin(cl_context ctx, cl_device_id device, LibraryC
 	if (UNLIKELY(clc_ingest_library(builder, cache, "maths.cl.h") == FALSE))
 		goto quit_error;
 	
-	if (UNLIKELY(clc_ingest_file(builder, "srcs/gpu/rasterizer/lines_setup.cl.c") == FALSE))
+	if (UNLIKELY(clc_ingest_file(builder, "srcs/gpu/rasterizer/tris_setup.cl.c") == FALSE))
 		goto quit_error;
 	return builder;
 

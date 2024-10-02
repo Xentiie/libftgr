@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/12 01:02:07 by reclaire          #+#    #+#             */
-/*   Updated: 2024/09/30 12:20:16 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/09/30 14:47:39 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,8 @@
 #include "libft/lists.h"
 #include "global.h"
 
-struct s_object {
+struct s_object
+{
 	t_v3 pos;
 	t_v3 rot;
 	t_v3 scl;
@@ -32,7 +33,8 @@ struct s_object {
 	t_color col;
 };
 
-struct s_camera {
+struct s_camera
+{
 	t_v3 pos;
 	t_v3 forward;
 	t_v3 up;
@@ -71,7 +73,5 @@ bool clip_line_with_plane(t_v3 plane_n, t_v3 plane_pos, t_v3 p1, t_v3 p2, t_v3 *
 bool clip_line_with_cam(struct s_camera cam, t_v3 *p1, t_v3 *p2);
 
 t_widget *new_info_line(t_list **lines, t_bitmap *bitmap, string label, string (*get_value_str)(void *), string (*dump_value_str)(void *), void *ptr);
-
-void print_mat(string name, t_mat4x4 mat);
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/13 01:25:15 by reclaire          #+#    #+#             */
-/*   Updated: 2024/09/30 12:54:55 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/09/30 16:27:36 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -144,6 +144,9 @@ void render_model(struct s_camera cam, struct s_object obj)
 				t_v3 center = vec3_scl(vec3_add(vec3_add(p1, p2), p3), 1.0f / 3.0f);
 				draw_3d_line(cam, center, vec3_add(center, vec3_scl(normal, 0.2f)), COL_GREEN, TRUE);
 			}
+
+			if (ft_dot3(normal, vec3_sub(p1, cam.pos)) > 0)
+				continue;
 
 			draw_3d_line(cam, p1, p2, COL_WHITE, TRUE);
 			draw_3d_line(cam, p2, p3, COL_WHITE, TRUE);

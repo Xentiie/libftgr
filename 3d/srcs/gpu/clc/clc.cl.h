@@ -1,22 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   debug.c                                            :+:      :+:    :+:   */
+/*   clc.cl.h                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/09/29 00:01:42 by reclaire          #+#    #+#             */
-/*   Updated: 2024/10/02 16:04:15 by reclaire         ###   ########.fr       */
+/*   Created: 2024/09/30 14:29:58 by reclaire          #+#    #+#             */
+/*   Updated: 2024/09/30 14:31:52 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "clc_private.h"
-#include "utils.h"
-#include "libft/maths.h"
-#include "libft/limits.h"
-#include <stdio.h>
+#ifndef CLC_CL_H
+#define CLC_CL_H
 
-void print_cl_prog(string txt, cl_program prog)
-{
-	printf("%s: %s%p\n" FT_CRESET, txt, get_unique_col((U64)prog), prog);
-}
+#ifndef __OPENCL_VERSION__
+#define global
+#define local
+#define private
+#define constant
+#endif
+
+#define uniform(x) constant x
+
+#endif

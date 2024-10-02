@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/06 02:27:08 by reclaire          #+#    #+#             */
-/*   Updated: 2024/09/30 13:32:53 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/10/02 19:04:24 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,49 +25,13 @@
 #include "gpu/cl_init/cl_init.h"
 #include "gpu/rasterizer/rasterizer.h"
 
+#include "gpu/clfw/clfw_private.h"
+
 #include "infolines_getters.h"
 
 void camera_move(t_ftgr_ctx *ctx, struct s_camera *cam);
 
-const t_v3 cube_verts[] = {
-	{-1.0f, -1.0f, -1.0f},
-	{1.0f, -1.0f, -1.0f},
-	{1.0f, 1.0f, -1.0f},
-	{-1.0f, 1.0f, -1.0f},
-	{-1.0f, -1.0f, 1.0f},
-	{1.0f, -1.0f, 1.0f},
-	{1.0f, 1.0f, 1.0f},
-	{-1.0f, 1.0f, 1.0f}};
-
-const t_iv3 cube_tris[] = {
-	// Front face
-	{0, 1, 2},
-	{2, 3, 0},
-	// Back face
-	{4, 5, 6},
-	{6, 7, 4},
-	// Left face
-	{0, 3, 7},
-	{7, 4, 0},
-	// Right face
-	{1, 5, 6},
-	{6, 2, 1},
-	// Top face
-	{3, 2, 6},
-	{6, 7, 3},
-	// Bottom face
-	{0, 1, 5},
-	{5, 4, 0}};
-
-struct s_object cube = {
-	.col = COL_GRAY,
-	.verts = (t_v3 *)cube_verts,
-	.verts_cnt = array_len(cube_verts),
-	.tris = (t_iv3 *)cube_tris,
-	.tris_cnt = array_len(cube_tris),
-
-	.wireframe = TRUE,
-	.render = FALSE};
+extern struct s_object cube;
 
 t_ftgr_ctx *ctx;
 t_ftgr_win *win;
@@ -131,6 +95,21 @@ int main()
 	t_ftgr_img *bitmap_img; /* image for default bitmap */
 	struct s_camera cam;	/* main camera */
 
+	U64 platforms_cnt;
+	ClPlatform *platforms;
+	platforms = clfw_query_platforms_devices(&platforms_cnt);
+	if (platforms == NULL)
+	{
+		printf("error: %s\n", clfw_get_last_error_title());
+		return 0;
+	}
+
+	file fd = ft_fopen("./platforms.json", "w+");
+	clfw_dump_platforms_json(fd, platforms, platforms_cnt);
+	ft_fclose(fd);
+
+	log_level = LOG_DEBUG;
+
 	{ /* general init */
 		ctx = ftgr_create_ctx();
 		win = ftgr_new_window(ctx, ivec2(1024, 512), "3D");
@@ -141,9 +120,10 @@ int main()
 		}
 
 		{ /* cam init */
-			cam.pos = vec3(12.86, 3.31, 7.14);
-			cam.forward = vec3(-0.92, -0.14, -0.37);
+			cam.pos = vec3(-0.96, 0.87, -2.24);
+			cam.forward = vec3(-0.97, -0.09, 0.22);
 			cam.up = vec3(-0.12, 0.99, -0.09);
+
 			cam.near = .1f;
 			cam.far = 90.0f;
 			cam.fov = 70.0f;
@@ -153,8 +133,8 @@ int main()
 		}
 
 		{ /* cube init */
-			cube.rot = vec3(0, 37, 0);
-			cube.scl = vec3(0.5, 0.5, 0.5);
+			cube.rot = vec3(0, 0, 0);
+			cube.scl = vec3(1, 1, 1);
 		}
 
 		{ /* info lines */
@@ -192,18 +172,14 @@ int main()
 	cl_kernel vertex_shader;
 	{
 		ProgramBuilder vertex_builder = vertex_shader_begin(cl_ctx, device, libcache);
+		if (!vertex_builder)
+			return 1;
 		if (!clc_ingest_file(vertex_builder, "srcs/simple_vertex_shader.cl.c"))
 			return 1;
 		vertex_shader = vertex_shader_end(vertex_builder, NULL);
+		if (!vertex_shader)
+			return 1;
 	}
-
-	t_v3 points[] = {
-		{0, 0, 0},
-		{10, 0, 0},
-		{10, 10, 0}};
-	t_iv2 indices[] = {
-		{0, 1},
-		{1, 2}};
 
 	while (ftgr_poll(ctx))
 	{
@@ -220,11 +196,13 @@ int main()
 
 		camera_move(ctx, &cam);
 
-		ft3d_draw_lines(vertex_shader, cl_ctx, queue, points, array_len(points), indices, array_len(indices), cam);
+		//render_mesh_gpu(vertex_shader, cl_ctx, queue, cube, cam);
 		draw_debug_scene(cam);
 		ftgr_handle_widget_events(win, win->w_root);
 		ftgr_draw_widget_recursive(win->surface, win->w_root);
 		ftgr_swap_buffers(win);
 		ftgr_display_fps(win);
+
+		//while (ftgr_wait(ctx));
 	}
 }

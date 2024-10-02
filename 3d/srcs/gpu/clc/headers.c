@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/25 18:13:41 by reclaire          #+#    #+#             */
-/*   Updated: 2024/09/29 00:25:22 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/09/30 14:54:32 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,7 @@ S32 _clc_add_header(ProgramBuilder builder, const_string header_name, cl_program
 		cl_program *new_programs = NULL;
 		if (builder->headers_n >= builder->headers_alloc)
 		{
+			clc_debug("array growth: builder->headers_names/builder->headers_programs (%llu -> %llu)\n", (LU64)builder->headers_alloc, (LU64)(builder->headers_alloc * 2));
 			if (UNLIKELY(
 					(new_names = malloc(sizeof(string) * builder->headers_alloc * 2)) == NULL ||
 					(new_programs = malloc(sizeof(cl_program) * builder->headers_alloc * 2)) == NULL))
@@ -39,6 +40,11 @@ S32 _clc_add_header(ProgramBuilder builder, const_string header_name, cl_program
 			}
 			ft_memcpy(new_names, builder->headers_names, sizeof(string) * builder->headers_n);
 			ft_memcpy(new_programs, builder->headers_programs, sizeof(cl_program) * builder->headers_n);
+
+			free(builder->headers_names);
+			free(builder->headers_programs);
+			builder->headers_names = new_names;
+			builder->headers_programs = new_programs;
 		}
 	}
 

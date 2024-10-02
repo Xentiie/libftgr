@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/07 17:32:16 by reclaire          #+#    #+#             */
-/*   Updated: 2024/09/21 01:08:16 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/09/30 16:32:14 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -445,23 +445,15 @@ FUNCTION_HOT void ftgr_fill_triangle_e(t_ftgr_img *img, t_iv2 ip1, t_iv2 ip2, t_
 	bbox_min = vec2_int(ft_ceil2(ft_fmin2_3(p1, p2, p3)));
 	bbox_max = vec2_int(ft_ceil2(ft_fmax2_3(p1, p2, p3)));
 
-	x = bbox_min.x;
-	while (x < bbox_max.x && x < img->size.x)
-	{
-		if (x < 0)
-		{
-			x++;
-			continue;
-		}
+	bbox_min = ft_imax2(bbox_min, ivec2(0, 0));
+	bbox_max = ft_imin2(bbox_max, img->size);
 
+	x = bbox_min.x;
+	while (x < bbox_max.x)
+	{
 		y = bbox_min.y;
-		while (y < bbox_max.y && y < img->size.y && y >= 0)
+		while (y < bbox_max.y)
 		{
-			if (y < 0)
-			{
-				y++;
-				continue;
-			}
 
 			t_v2 _p2 = vec2(x + 0.5, y + 0.5);
 			t_v3 w = vec3(edgeFunction(p3, p1, _p2),

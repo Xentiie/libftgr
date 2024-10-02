@@ -6,12 +6,14 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 03:05:43 by reclaire          #+#    #+#             */
-/*   Updated: 2024/09/28 02:37:03 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/09/30 14:31:21 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef FTCL_MATHS_CL_H
 #define FTCL_MATHS_CL_H
+
+#include "clc.cl.h"
 
 #ifndef NULL
 #define NULL ((void *)0)
@@ -117,11 +119,6 @@ typedef F32 float2 __attribute__((vector_size(sizeof(F32) * 2)));
 typedef S32 int4 __attribute__((vector_size(sizeof(S32) * 4)));
 typedef S32 int3 __attribute__((vector_size(sizeof(S32) * 4)));
 typedef S32 int2 __attribute__((vector_size(sizeof(S32) * 2)));
-
-#define global
-#define local
-#define private
-#define constant
 
 #define vec2(x, y) (t_v2){x, y}
 #define vec3(x, y, z) (t_v3){x, y, z}
