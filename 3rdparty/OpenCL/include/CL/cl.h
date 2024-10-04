@@ -14,6 +14,12 @@
  * limitations under the License.
  ******************************************************************************/
 
+/*
+Catch all functions regex:
+extern[\r\s\S]*?; to match the whole function prototype
+extern .+?(?=[a-z]).+?(?= CL_API_CALL) CL_API_CALL\n.+?(?=\() to match function and parse arguments
+*/
+
 #ifndef __OPENCL_CL_H
 #define __OPENCL_CL_H
 

@@ -66,7 +66,7 @@ CC_WINDOWS=x86_64-w64-mingw32-gcc
 CC_LINUX=gcc
 
 RM="rm -rf"
-CFLAGS=
+CFLAGS="-Wall -Wextra -Wno-unknown-pragmas"
 INCLUDES=
 LIBS_PATHS=
 LIBS=

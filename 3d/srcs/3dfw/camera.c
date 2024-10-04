@@ -6,15 +6,34 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/12 01:00:56 by reclaire          #+#    #+#             */
-/*   Updated: 2024/09/19 16:46:13 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/09/30 12:17:57 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "./3d.h"
+#include "3dfw/3dfw.h"
+#include <stdlib.h>
+
+bool cam_init_depth_buffer(struct s_camera *cam)
+{
+	if ((cam->depth_buffer = malloc(sizeof(t_ftgr_img))) == NULL)
+		return FALSE;
+
+	cam->depth_buffer->bpp = sizeof(F32);
+	cam->depth_buffer->line_size = sizeof(F32) * cam->surface->size.x;
+	cam->depth_buffer->data_size = sizeof(F32) * cam->surface->size.x * cam->surface->size.y;
+	cam->depth_buffer->size = cam->surface->size;
+	if ((cam->depth_buffer->data = malloc(cam->depth_buffer->data_size)) == NULL)
+	{
+		free(cam->depth_buffer);
+		return FALSE;
+	}
+
+	return TRUE;
+}
 
 t_mat4x4 cam_get_cam_to_clip(struct s_camera cam)
 {
-	//return ft_mat4x4_perspective(cam.fov, cam.near, cam.far);
+	// return ft_mat4x4_perspective(cam.fov, cam.near, cam.far);
 	t_mat4x4 invert_y = (t_mat4x4){/* flip y */
 								   1.0f, 0.0f, 0.0f, 0.0f,
 								   0.0f, -1.0f, 0.0f, 0.0f,

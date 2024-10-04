@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/07 17:32:16 by reclaire          #+#    #+#             */
-/*   Updated: 2024/09/18 17:52:10 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/09/30 16:32:14 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -281,7 +281,7 @@ void ftgr_draw_line_vertical(t_ftgr_img *img, t_iv2 p1, S32 y2, t_color col)
 
 	p1.y = ft_clamp(0, img->size.y - 1, p1.y);
 	y2 = ft_clamp(0, img->size.y - 1, y2);
-	for (U64 y = p1.y; y < y2; y++)
+	for (U64 y = p1.y; y < (U64)y2; y++)
 		ft_memcpy(ftgr_get_pixel_addr(img, p1.x, y), &col_i, img->bpp);
 }
 
@@ -432,7 +432,6 @@ void ftgr_draw_triangle_e(t_ftgr_img *img, t_iv2 p1, t_iv2 p2, t_iv2 p3, void (*
 
 FUNCTION_HOT void ftgr_fill_triangle_e(t_ftgr_img *img, t_iv2 ip1, t_iv2 ip2, t_iv2 ip3, void (*eval)(t_ftgr_img *img, t_iv2 xy, t_v3 w, void *data), void *data)
 {
-	U32 col_i;
 	t_v2 p1, p2, p3;
 	F32 area;
 	t_iv2 bbox_min, bbox_max;
@@ -446,23 +445,15 @@ FUNCTION_HOT void ftgr_fill_triangle_e(t_ftgr_img *img, t_iv2 ip1, t_iv2 ip2, t_
 	bbox_min = vec2_int(ft_ceil2(ft_fmin2_3(p1, p2, p3)));
 	bbox_max = vec2_int(ft_ceil2(ft_fmax2_3(p1, p2, p3)));
 
-	x = bbox_min.x;
-	while (x < bbox_max.x && x < img->size.x)
-	{
-		if (x < 0)
-		{
-			x++;
-			continue;
-		}
+	bbox_min = ft_imax2(bbox_min, ivec2(0, 0));
+	bbox_max = ft_imin2(bbox_max, img->size);
 
+	x = bbox_min.x;
+	while (x < bbox_max.x)
+	{
 		y = bbox_min.y;
-		while (y < bbox_max.y && y < img->size.y && y >= 0)
+		while (y < bbox_max.y)
 		{
-			if (y < 0)
-			{
-				y++;
-				continue;
-			}
 
 			t_v2 _p2 = vec2(x + 0.5, y + 0.5);
 			t_v3 w = vec3(edgeFunction(p3, p1, _p2),

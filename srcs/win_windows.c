@@ -21,8 +21,6 @@ static inline ATOM _init_main_window_class(HINSTANCE hInstance);
 static inline HWND _create_window(const_string title, t_iv2 size, HINSTANCE hInstance);
 static inline bool _init_buffer(t_ftgr_img *buffer, t_iv2 size);
 
-static void send_events(t_ftgr_win *win, S32 event);
-
 #define RESIZE_TIMER_DELAY 300 // ms
 #define RESIZE_TIMER 1		   // For WM_TIMER
 LRESULT CALLBACK windowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -32,8 +30,6 @@ LRESULT CALLBACK windowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		return DefWindowProc(hwnd, msg, wParam, lParam);
 	t_ftgr_ctx *ctx = win->ctx;
 	t_ftgr_win_int *win_int = FTGR_WINDOW_INT(win);
-
-	U32 nHitTest = HTCLIENT;
 
 	switch (msg)
 	{
@@ -50,6 +46,7 @@ LRESULT CALLBACK windowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	case WM_SYSKEYDOWN:
 		if (!ctx->key_autorepeat && (lParam >> 30) & 1)
 			return 0;
+		/* fallthrough */
 	case WM_KEYUP:
 	case WM_SYSKEYUP:;
 		// FALSE: release, TRUE: pressed
@@ -60,7 +57,7 @@ LRESULT CALLBACK windowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 		U32 scan_code = (lParam >> 16) & 0xFF;
 		U32 k = MapVirtualKey(scan_code, MAPVK_VSC_TO_VK);
-		ToUnicode(k, scan_code, state, chars, sizeof(chars) / sizeof(WCHAR), 0);
+		ToUnicode(k, scan_code, (char *)state, chars, sizeof(chars) / sizeof(WCHAR), 0);
 		WideCharToMultiByte(CP_UTF8, 0, chars, 1,
 							buffer,
 							sizeof(buffer),
@@ -138,6 +135,8 @@ LRESULT CALLBACK windowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	default:
 		return DefWindowProc(hwnd, msg, wParam, lParam);
 	}
+
+	return DefWindowProc(hwnd, msg, wParam, lParam);
 }
 
 /*
@@ -288,6 +287,7 @@ void ftgr_free_window(t_ftgr_win *win)
 
 void ftgr_bring_top(t_ftgr_win *win)
 {
+	(void)win;
 	// ShowWindow(win->window_handle, SW_SHOWNA);
 	// BringWindowToTop(win->window_handle);
 	// SetForegroundWindow(win->window_handle);

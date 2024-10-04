@@ -42,7 +42,7 @@ bool ftgr_poll(t_ftgr_ctx *ctx)
 	_ftwin32_keys_cleanup(ctx);
 
 	MSG msg;
-	bool ret;
+	S8 ret;
 	while ((ret = PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE)) != 0)
 	{
 		if (ret == -1)
@@ -62,7 +62,7 @@ bool ftgr_wait(t_ftgr_ctx *ctx)
 	_ftwin32_keys_cleanup(ctx);
 
 	MSG msg;
-	bool ret = GetMessage(&msg, NULL, 0, 0);
+	S8 ret = GetMessage(&msg, NULL, 0, 0);
 	if (ret == -1)
 	{
 		_ftgr_error();

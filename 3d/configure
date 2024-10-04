@@ -66,12 +66,11 @@ CC_WINDOWS=x86_64-w64-mingw32-gcc
 CC_LINUX=gcc
 
 RM="rm -rf"
-CFLAGS=
-INCLUDES=
-LIBS_PATHS="-L../../libft -L../"
-#LIBS="-lftgr -lft -lX11 -lXext -lm"
-#windows:
-LIBS="-lftgr -lft -lgdi32 -lws2_32"
+CFLAGS="-Wall -Wextra"
+INCLUDES="-I../3rdparty/OpenCL/include"
+LIBS_PATHS="-L./ -L../ -L../../libft -L../3rdparty/OpenCL/bin"
+LIBS="-lftgr -lft -lOpenCL"
+#LIBS="-lftgr -lft -lOpenCL"
 
 if [[ "$COVERAGE" == "true" ]]; then
 	CFLAGS="$CFLAGS -fprofile-arcs -ftest-coverage -O0"
@@ -89,10 +88,12 @@ fi
 if [ "$TARGET" = "windows" ]; then
     CC=$CC_WINDOWS
     CFLAGS="-DFT_OS_WIN $CFLAGS"
+	LIBS="$LIBS -lgdi32 -lws2_32"
 
 elif [ "$TARGET" = "linux" ]; then
     CC=$CC_LINUX
     CFLAGS="-DFT_OS_LINUX $CFLAGS"
+	LIBS="$LIBS -lX11 -lXext -lm"
 
 else
     echo Not supported, defaulting to linux/glfw
@@ -105,7 +106,7 @@ fi
 SRCS=()
 OBJS=()
 
-SRCS+=($(find ./srcs -maxdepth 1 -type f -name "*.c"))
+SRCS+=($(find ./srcs -type f -not -name "*.cl.*" -name "*.c"))
 OBJS+=($(for i in "${!SRCS[@]}"; do printf "$OBJS_PATH/`basename ${SRCS[i]%.c}.o` "; done))
 
 echo -n > config.mk
