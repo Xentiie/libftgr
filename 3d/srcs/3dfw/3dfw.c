@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/13 01:25:15 by reclaire          #+#    #+#             */
-/*   Updated: 2024/09/30 16:27:36 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/10/04 08:47:51 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,7 +131,7 @@ void render_model(struct s_camera cam, struct s_object obj)
 				t_v4 p1_4 = ft_mat4x4_mult_v4(model_to_world, vec4(obj.verts[id.x].x, obj.verts[id.x].y, obj.verts[id.x].z, 1.f));
 				t_v4 p2_4 = ft_mat4x4_mult_v4(model_to_world, vec4(obj.verts[id.y].x, obj.verts[id.y].y, obj.verts[id.y].z, 1.f));
 				t_v4 p3_4 = ft_mat4x4_mult_v4(model_to_world, vec4(obj.verts[id.z].x, obj.verts[id.z].y, obj.verts[id.z].z, 1.f));
-			
+
 				p1 = vec3(p1_4.x, p1_4.y, p1_4.z);
 				p2 = vec3(p2_4.x, p2_4.y, p2_4.z);
 				p3 = vec3(p3_4.x, p3_4.y, p3_4.z);
@@ -147,6 +147,17 @@ void render_model(struct s_camera cam, struct s_object obj)
 
 			if (ft_dot3(normal, vec3_sub(p1, cam.pos)) > 0)
 				continue;
+
+			{
+				/* debug verts */
+				t_v4 pp1 = world_to_screen(cam, p1);
+				t_v4 pp2 = world_to_screen(cam, p2);
+				t_v4 pp3 = world_to_screen(cam, p3);
+
+				ftgr_draw_disc(cam.surface, ivec2(pp1.x, pp1.y), 2, COL_RED);
+				ftgr_draw_disc(cam.surface, ivec2(pp2.x, pp2.y), 2, COL_GREEN);
+				ftgr_draw_disc(cam.surface, ivec2(pp3.x, pp3.y), 2, COL_BLUE);
+			}
 
 			draw_3d_line(cam, p1, p2, COL_WHITE, TRUE);
 			draw_3d_line(cam, p2, p3, COL_WHITE, TRUE);
@@ -229,7 +240,6 @@ void draw_3d_line(struct s_camera cam, t_v3 lp1, t_v3 lp2, t_color col, bool dep
 			.p1 = p1,
 			.p2 = p2,
 			.col = col};
-		// printf("%p %p\n", cam.depth_buffer, data.depth_buffer);
 		ftgr_draw_line_e(cam.surface, ivec2(p1.x, p1.y), ivec2(p2.x, p2.y), _draw_3d_line, &data);
 	}
 	else

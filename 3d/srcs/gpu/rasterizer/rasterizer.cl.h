@@ -1,20 +1,18 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   make_maths_cl.h                                    :+:      :+:    :+:   */
+/*   rasterizer.cl.h                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/09/27 16:40:49 by reclaire          #+#    #+#             */
-/*   Updated: 2024/10/04 09:09:06 by reclaire         ###   ########.fr       */
+/*   Created: 2024/10/03 09:23:35 by reclaire          #+#    #+#             */
+/*   Updated: 2024/10/03 09:25:31 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef CL_MATHS_H
-#define CL_MATHS_H
+#ifndef RASTERIZER_CL_H
+#define RASTERIZER_CL_H
 
-#include "gpu/clc/clc.h"
-
-cl_program make_maths_cl(ClDevice *device, LibraryCache cache);
+#define uniform(location, type, name)
 
 #endif

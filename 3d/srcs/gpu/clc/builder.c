@@ -6,14 +6,14 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/25 18:13:18 by reclaire          #+#    #+#             */
-/*   Updated: 2024/09/30 14:53:32 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/10/04 09:08:36 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "clc_private.h"
 #include "utils.h"
 
-ProgramBuilder clc_builder_init(cl_context ctx, cl_device_id device)
+ProgramBuilder clc_builder_init(ClDevice *device)
 {
 	ProgramBuilder builder = malloc(sizeof(struct s_program_builder));
 	if (UNLIKELY(builder == NULL))
@@ -21,11 +21,11 @@ ProgramBuilder clc_builder_init(cl_context ctx, cl_device_id device)
 		clc_error("program builder: out of memory\n");
 		return NULL;
 	}
-	clc_debug("created builder: %s%p"FT_CRESET"\n", get_unique_col((U64)builder), builder);
+	clc_debug("created builder: %s%p" FT_CRESET "\n", get_unique_col((U64)builder), builder);
 	ft_memset(builder, 0, sizeof(struct s_program_builder));
 
-	builder->ctx = ctx;
-	builder->device = device;
+	builder->ctx = device->ctx;
+	builder->device = device->device_id;
 
 	builder->headers_n = 0;
 	builder->headers_alloc = 1;
@@ -38,7 +38,8 @@ ProgramBuilder clc_builder_init(cl_context ctx, cl_device_id device)
 		return NULL;
 	}
 
-	if (UNLIKELY(clc_include_header(builder, "srcs/gpu/clc/clc.cl.h") == FALSE))
+	if (UNLIKELY(clc_include_header(builder, "srcs/gpu/clfw.cl/clfw.cl.h") == FALSE) ||
+		UNLIKELY(clc_ingest_file(builder, "srcs/gpu/clfw.cl/clfw.cl.c") == FALSE))
 	{
 		clc_builder_destroy(builder);
 		return NULL;
@@ -49,11 +50,11 @@ ProgramBuilder clc_builder_init(cl_context ctx, cl_device_id device)
 
 bool clc_builder_destroy(ProgramBuilder builder)
 {
-	clc_debug("destroying builder: %s%p"FT_CRESET"\n", get_unique_col((U64)builder), builder);
+	clc_debug("destroying builder: %s%p" FT_CRESET "\n", get_unique_col((U64)builder), builder);
 	for (U64 i = 0; i < builder->headers_n; i++)
 	{
-		//TODO:
-		//free(builder->headers_names[i]);
+		// TODO:
+		// free(builder->headers_names[i]);
 		clReleaseProgram(builder->headers_programs[i]);
 	}
 	for (U64 i = 0; i < builder->programs_n; i++)

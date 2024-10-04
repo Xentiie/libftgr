@@ -6,10 +6,11 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:33:35 by reclaire          #+#    #+#             */
-/*   Updated: 2024/09/29 00:25:36 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/10/04 09:08:44 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "gpu/clfw/clfw.h"
 #include "make_maths_cl.h"
 #include "libft/path.h"
 #include "libft/strings.h"
@@ -22,12 +23,12 @@ static string mkfilename(string dirname, string filename)
 	return file_paths;
 }
 
-cl_program make_maths_cl(cl_device_id device, cl_context ctx, LibraryCache cache)
+cl_program make_maths_cl(ClDevice *device, LibraryCache cache)
 {
 	// TODO: pas ouf
 	string dirname = ft_path_dirname(__FILE__);
 
-	ProgramBuilder builder = clc_builder_init(ctx, device);
+	ProgramBuilder builder = clc_builder_init(device);
 	if (!clc_include_header(builder, mkfilename(dirname, "maths.cl.h")) ||
 		!clc_library_begin(builder) ||
 		!clc_ingest_file(builder, mkfilename(dirname, "lines.cl.c")) ||

@@ -1,25 +1,20 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   clc.cl.h                                           :+:      :+:    :+:   */
+/*   clfw.cl.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/09/30 14:29:58 by reclaire          #+#    #+#             */
-/*   Updated: 2024/09/30 14:31:52 by reclaire         ###   ########.fr       */
+/*   Created: 2024/10/03 10:52:53 by reclaire          #+#    #+#             */
+/*   Updated: 2024/10/03 10:57:15 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef CLC_CL_H
-#define CLC_CL_H
+#include "clfw.cl.h"
 
-#ifndef __OPENCL_VERSION__
-#define global
-#define local
-#define private
-#define constant
-#endif
-
-#define uniform(x) constant x
-
-#endif
+U64 clfw_get_clock()
+{
+	U64 clock_time;
+	asm volatile("mov.u64 %0, %%clock64;" : "=l"(clock_time));
+	return clock_time;
+}

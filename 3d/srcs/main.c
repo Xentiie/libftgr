@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/06 02:27:08 by reclaire          #+#    #+#             */
-/*   Updated: 2024/10/02 19:04:24 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/10/04 09:16:30 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,77 +36,28 @@ extern struct s_object cube;
 t_ftgr_ctx *ctx;
 t_ftgr_win *win;
 
-void draw_debug_scene(struct s_camera cam)
-{
-	F32 dtime = ftgr_delta_time(ctx);
-	(void)dtime;
-	struct s_camera cam2;
-	cam2.depth_buffer = cam.depth_buffer;
-	cam2.surface = cam.surface;
-	cam2.near = 1.f;
-	cam2.far = 10.f;
-	cam2.fov = 30.f;
-	cam2.pos = vec3(0, 0, 0);
-	cam2.up = vec3(0, 1, 0);
-	cam2.forward = vec3(-1, 0, 0);
-
-	cube.pos = vec3_add(cam2.pos, vec3_scl(cam2.forward, ft_lerp(cam2.near, cam2.far, 0.5f)));
-
-	bool cam2_view = ftgr_is_key_pressed(ctx, 'r');
-
-	if (!cam2_view)
-	{
-		draw_camera(cam, cam2);
-		t_v2 near_plane_size, far_plane_size;
-		t_v3 near_center, far_center;
-
-		F32 aspect_ratio = (F32)cam2.surface->size.x / (F32)cam2.surface->size.y;
-
-		near_plane_size.y = 2 * tanf(ft_radians(cam2.fov) / 2.0f) * cam2.near;
-		near_plane_size.x = near_plane_size.y * aspect_ratio;
-
-		far_plane_size.y = 2 * tanf(ft_radians(cam2.fov) / 2.0f) * cam2.far;
-		far_plane_size.x = far_plane_size.y * aspect_ratio;
-
-		near_center = vec3_add(cam2.pos, vec3_scl(ft_normalize3(cam2.forward), cam2.near));
-		far_center = vec3_add(cam2.pos, vec3_scl(ft_normalize3(cam2.forward), cam2.far));
-
-		t_v4 near_center_screen = world_to_screen(cam, near_center);
-		t_v4 far_center_screen = world_to_screen(cam, far_center);
-		ftgr_draw_disc(cam.surface, ivec2(near_center_screen.x, near_center_screen.y), 3, COL_GREEN);
-		ftgr_draw_disc(cam.surface, ivec2(far_center_screen.x, far_center_screen.y), 3, COL_GREEN);
-
-		{ /* mouse dir */
-			t_iv2 mouse_pos = ftgr_mouse_get_pos(ctx, win);
-			t_v3 p = screen_to_world(cam2, ivec2_flt(mouse_pos));
-			t_v3 p_dir = ft_normalize3(vec3_sub(p, cam2.pos));
-			t_v4 p2 = world_to_screen(cam, p);
-			ftgr_draw_disc(cam.surface, ivec2(p2.x, p2.y), 5, COL_BLUE);
-			draw_3d_line(cam, cam2.pos, vec3_add(cam2.pos, vec3_scl(p_dir, 5)), COL_LIGHT_GREEN, TRUE);
-		}
-	}
-	render_model(cam2_view ? cam2 : cam, cube);
-}
-
 int main()
 {
 	t_list *info_lines;		/* info lines list */
 	t_bitmap bitmap;		/* default bitmap */
 	t_ftgr_img *bitmap_img; /* image for default bitmap */
 	struct s_camera cam;	/* main camera */
-
+	struct s_camera cam2;	/* debug camera */
 	U64 platforms_cnt;
 	ClPlatform *platforms;
-	platforms = clfw_query_platforms_devices(&platforms_cnt);
-	if (platforms == NULL)
-	{
-		printf("error: %s\n", clfw_get_last_error_title());
-		return 0;
-	}
+	ClDevice *device;
 
-	file fd = ft_fopen("./platforms.json", "w+");
-	clfw_dump_platforms_json(fd, platforms, platforms_cnt);
-	ft_fclose(fd);
+	{ /* OpenCL init */
+		platforms = clfw_query_platforms_devices(&platforms_cnt);
+		if (platforms == NULL)
+		{
+			printf("error: %s\n", clfw_get_last_error_title());
+			return 0;
+		}
+		device = &platforms[0].devices[0]; // Should be NVIDIA
+		clfw_init_device_ctx(device);
+		clfw_init_device_queue(device);
+	}
 
 	log_level = LOG_DEBUG;
 
@@ -132,9 +83,21 @@ int main()
 			cam_init_depth_buffer(&cam);
 		}
 
+		{ /* cam2 init */
+			cam2.depth_buffer = cam.depth_buffer;
+			cam2.surface = cam.surface;
+			cam2.near = 1.f;
+			cam2.far = 10.f;
+			cam2.fov = 30.f;
+			cam2.pos = vec3(0, 0, 0);
+			cam2.up = vec3(0, 1, 0);
+			cam2.forward = vec3(-1, 0, 0);
+		}
+
 		{ /* cube init */
+			cube.pos = vec3_add(cam2.pos, vec3_scl(cam2.forward, 5));
 			cube.rot = vec3(0, 0, 0);
-			cube.scl = vec3(1, 1, 1);
+			cube.scl = vec3(0.5f, 0.5f, 0.5f);
 		}
 
 		{ /* info lines */
@@ -155,23 +118,15 @@ int main()
 		}
 	}
 
-	cl_platform_id platform = NULL;
-	cl_device_id device = NULL;
-	cl_context cl_ctx = NULL;
-	cl_command_queue queue = NULL;
-
-	if (!cl_init(&platform, &device, &cl_ctx, &queue))
-		return 1;
-
 	LibraryCache libcache = clc_cache_init();
 	if (!libcache)
 		return 1;
-	if (!make_maths_cl(device, cl_ctx, libcache))
+	if (!make_maths_cl(device, libcache))
 		return 1;
 
 	cl_kernel vertex_shader;
 	{
-		ProgramBuilder vertex_builder = vertex_shader_begin(cl_ctx, device, libcache);
+		ProgramBuilder vertex_builder = vertex_shader_begin(device, libcache);
 		if (!vertex_builder)
 			return 1;
 		if (!clc_ingest_file(vertex_builder, "srcs/simple_vertex_shader.cl.c"))
@@ -195,14 +150,47 @@ int main()
 			*(F32 *)(cam.depth_buffer->data + i) = -cam.far;
 
 		camera_move(ctx, &cam);
+		// render_mesh_gpu(vertex_shader, cl_ctx, queue, cube, cam);
 
-		//render_mesh_gpu(vertex_shader, cl_ctx, queue, cube, cam);
-		draw_debug_scene(cam);
+		bool cam2_view = ftgr_is_key_pressed(ctx, 'r');
+		if (!cam2_view)
+		{
+			draw_camera(cam, cam2);
+			t_v2 near_plane_size, far_plane_size;
+			t_v3 near_center, far_center;
+
+			F32 aspect_ratio = (F32)cam2.surface->size.x / (F32)cam2.surface->size.y;
+
+			near_plane_size.y = 2 * tanf(ft_radians(cam2.fov) / 2.0f) * cam2.near;
+			near_plane_size.x = near_plane_size.y * aspect_ratio;
+
+			far_plane_size.y = 2 * tanf(ft_radians(cam2.fov) / 2.0f) * cam2.far;
+			far_plane_size.x = far_plane_size.y * aspect_ratio;
+
+			near_center = vec3_add(cam2.pos, vec3_scl(ft_normalize3(cam2.forward), cam2.near));
+			far_center = vec3_add(cam2.pos, vec3_scl(ft_normalize3(cam2.forward), cam2.far));
+
+			t_v4 near_center_screen = world_to_screen(cam, near_center);
+			t_v4 far_center_screen = world_to_screen(cam, far_center);
+			ftgr_draw_disc(cam.surface, ivec2(near_center_screen.x, near_center_screen.y), 3, COL_GREEN);
+			ftgr_draw_disc(cam.surface, ivec2(far_center_screen.x, far_center_screen.y), 3, COL_GREEN);
+
+			{ /* mouse dir */
+				t_iv2 mouse_pos = ftgr_mouse_get_pos(ctx, win);
+				t_v3 p = screen_to_world(cam2, ivec2_flt(mouse_pos));
+				t_v3 p_dir = ft_normalize3(vec3_sub(p, cam2.pos));
+				t_v4 p2 = world_to_screen(cam, p);
+				ftgr_draw_disc(cam.surface, ivec2(p2.x, p2.y), 5, COL_BLUE);
+				draw_3d_line(cam, cam2.pos, vec3_add(cam2.pos, vec3_scl(p_dir, 5)), COL_LIGHT_GREEN, TRUE);
+			}
+		}
+
+		//render_model(cam2_view ? cam2 : cam, cube);
+		render_mesh_gpu(vertex_shader, device, cube, cam2_view ? cam2 : cam);
+
 		ftgr_handle_widget_events(win, win->w_root);
 		ftgr_draw_widget_recursive(win->surface, win->w_root);
 		ftgr_swap_buffers(win);
 		ftgr_display_fps(win);
-
-		//while (ftgr_wait(ctx));
 	}
 }

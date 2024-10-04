@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 13:33:52 by reclaire          #+#    #+#             */
-/*   Updated: 2024/10/01 14:45:05 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/10/04 08:46:37 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,4 +87,4 @@ struct s_object cube = {
 	//.tris_cnt = 1,
 
 	.wireframe = TRUE,
-	.render = TRUE};
+	.render = FALSE};

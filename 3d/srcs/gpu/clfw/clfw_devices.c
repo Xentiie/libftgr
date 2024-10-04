@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/01 00:40:48 by reclaire          #+#    #+#             */
-/*   Updated: 2024/10/02 19:07:44 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/10/04 09:17:37 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -199,11 +199,6 @@ static void *get_device_param(cl_device_info *last_info, cl_device_id device, cl
 	return ptr;
 }
 
-/*
-Returns NULL, with clfw_last_error != 0 if a opencl error occured
-Returns NULL, with clfw_last_error == 0 and with ft_errno != 0 if an error occured
-Returns NULL, with clfw_last_error == 0 if their is no available platforms
-*/
 ClPlatform *clfw_query_platforms_devices(U64 *platforms_cnt)
 {
 	ClPlatform *platforms;
@@ -276,6 +271,7 @@ ClPlatform *clfw_query_platforms_devices(U64 *platforms_cnt)
 		for (U64 j = 0; j < num_devices; j++)
 		{
 			ClDevice *dev = &(platforms[i].devices[j]);
+			ft_bzero(dev, sizeof(ClDevice));
 			dev->device_id = devices_cl[j];
 			if (
 				get_device_param(&last_param, dev->device_id, CL_DEVICE_TYPE, &dev->type, sizeof(dev->type)) == NULL ||
@@ -316,6 +312,7 @@ ClPlatform *clfw_query_platforms_devices(U64 *platforms_cnt)
 			// get_device_param(&last_param, dev->device_id, CL_DEVICE_ATOMIC_MEMORY_CAPABILITIES, &dev->atm_capabilities, sizeof(dev->atm_capabilities)) == NULL ||
 			// get_device_param(&last_param, dev->device_id, CL_DEVICE_GENERIC_ADDRESS_SPACE_SUPPORT, &dev->supports_generic_addr_space, sizeof(dev->supports_generic_addr_space)) == NULL)
 			{
+				// TODO: ca devrait pas etre grave de crash ici, et un crash ne devrait pas empecher de recup le reste des données
 				printf("get_device_param failed at %#x:%s\n", last_param, device_params_names[last_param - 0x1000]);
 				exit(1);
 			}
@@ -343,150 +340,44 @@ return_err:
 	return NULL;
 }
 
-#ifdef FT_OS_WIN
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wformat"
-#pragma GCC diagnostic ignored "-Wformat-extra-args"
-#define _U64_fmt "%llu"
-#define _S64_fmt "%lls"
-#else
-#define _U64_fmt "%lu"
-#define _S64_fmt "%ls"
-#endif
-#define json_begin_obj(...) ft_dprintf(fd, __VA_OPT__(__VA_ARGS__ ":") "{")
-#define json_end_obj() ft_dprintf(fd, "}")
-#define json_sep() ft_dprintf(fd, ",")
-#define json_begin_array(...) ft_dprintf(fd, __VA_OPT__("\"" __VA_ARGS__ "\":")"[")
-#define json_end_array() ft_dprintf(fd, "]")
-#define dump_json_val(p, v)                                                                                                                                                                                         \
-	{                                                                                                                                                                                                               \
-		ft_dprintf(fd, "\"" #v "\":");                                                                                                                                                                              \
-		ft_dprintf(fd, _Generic((p->v), U64: _U64_fmt, U32: "%u", U16: "%u", U8: "%s", S64: _S64_fmt, S32: "%d", S16: "%d", S8: "%d", string: "\"%s\""), _Generic((p->v), U8: (p->v ? "true" : "false"), default: p->v)); \
-	}
-
-void clfw_dump_device_json(file fd, ClDevice *device)
+bool clfw_init_device_ctx(ClDevice *device)
 {
-	json_begin_obj();
-	dump_json_val(device, type);
-	json_sep();
-	dump_json_val(device, compute_units);
-	json_sep();
-	json_begin_array("max_work_item_size");
-	ft_dprintf(fd, _U64_fmt","_U64_fmt","_U64_fmt, device->max_work_item_size[0], device->max_work_item_size[1], device->max_work_item_size[2]);
-	json_end_array();
-	json_sep();
-	dump_json_val(device, max_work_group_size);
-	json_sep();
-	dump_json_val(device, clock_freq);
-	json_sep();
-	dump_json_val(device, address_bits);
-	json_sep();
-	dump_json_val(device, max_mem_alloc);
-	json_sep();
-	dump_json_val(device, il_version);
-	json_sep();
-	dump_json_val(device, max_param_size);
-	json_sep();
-	dump_json_val(device, mem_cache_type);
-	json_sep();
-	dump_json_val(device, global_mem_cache_line_size);
-	json_sep();
-	dump_json_val(device, global_mem_cache_size);
-	json_sep();
-	dump_json_val(device, global_mem_size);
-	json_sep();
-	dump_json_val(device, max_constant_buffer_size);
-	json_sep();
-	dump_json_val(device, max_constant);
-	json_sep();
-	dump_json_val(device, max_global_variable_size);
-	json_sep();
-	dump_json_val(device, global_variable_prefered_total_size);
-	json_sep();
-	dump_json_val(device, local_mem_type);
-	json_sep();
-	dump_json_val(device, local_mem_size);
-	json_sep();
-	dump_json_val(device, mem_error_correction);
-	json_sep();
-	dump_json_val(device, unified_memory);
-	json_sep();
-	dump_json_val(device, endian);
-	json_sep();
-	dump_json_val(device, available);
-	json_sep();
-	//dump_json_val(device, builtin_kernels);
-	//json_sep();
-	dump_json_val(device, name);
-	json_sep();
-	dump_json_val(device, vendor);
-	json_sep();
-	dump_json_val(device, driver_version);
-	json_sep();
-	dump_json_val(device, version);
-	json_sep();
-	dump_json_val(device, c_version);
-	json_sep();
-	dump_json_val(device, extensions);
-	json_sep();
-	dump_json_val(device, printf_buf_size);
-	json_sep();
-	dump_json_val(device, svm_capabilities);
-	json_sep();
-	dump_json_val(device, prefered_platform_atm_alignement);
-	json_sep();
-	dump_json_val(device, prefered_global_atm_alignement);
-	json_sep();
-	dump_json_val(device, prefered_local_atm_alignement);
-	json_sep();
-	dump_json_val(device, atm_capabilities);
-	json_sep();
-	dump_json_val(device, supports_generic_addr_space);
-
-	json_end_obj();
+	if (UNLIKELY(device->ctx != NULL))
+		return TRUE;
+	return (device->ctx = clfw_create_context(NULL, 1, &device->device_id, NULL, NULL)) == NULL;
 }
 
-void clfw_dump_platform_json(file fd, ClPlatform *platform)
+bool clfw_init_device_queue(ClDevice *device)
 {
-	json_begin_obj();
+	if (UNLIKELY(device->queue != NULL))
+		return TRUE;
+	return (device->queue = clfw_create_command_queue(device->ctx, device->device_id, 0)) == NULL;
+}
 
-	dump_json_val(platform, name);
-	json_sep();
-	dump_json_val(platform, vendor);
-	json_sep();
-	dump_json_val(platform, version);
-	json_sep();
-	dump_json_val(platform, extensions);
-	json_sep();
-	dump_json_val(platform, embedded);
-	json_sep();
-	dump_json_val(platform, devices_cnt);
-	json_sep();
+void clfw_free_platform(ClPlatform *platform)
+{
+	free(platform->extensions);
+	free(platform->name);
+	free(platform->vendor);
+	free(platform->version);
 
-	json_begin_array("devices");
 	for (U64 i = 0; i < platform->devices_cnt; i++)
-	{
-		clfw_dump_device_json(fd, &platform->devices[i]);
-		if (i != platform->devices_cnt - 1)
-			json_sep();
-	}
-	json_end_array();
-
-	json_end_obj();
+		clfw_free_device(&platform->devices[i]);
+	free(platform->devices);
 }
 
-void clfw_dump_platforms_json(file fd, ClPlatform *platforms, U64 platforms_count)
+void clfw_free_device(ClDevice *device)
 {
-	json_begin_array();
-	for (U64 i = 0; i < platforms_count; i++)
-	{
-		clfw_dump_platform_json(fd, &platforms[i]);
-		if (i != platforms_count - 1)
-			json_sep();
-	}
-	json_end_array();
-}
+	if (device->ctx)
+		clReleaseContext(device->ctx);
+	if (device->device_id)
+		clReleaseDevice(device->device_id);
 
-#ifdef FT_OS_WIN
-#pragma GCC diagnostic pop
-#endif
+	free(device->builtin_kernels);
+	free(device->name);
+	free(device->vendor);
+	free(device->driver_version);
+	free(device->version);
+	free(device->c_version);
+	free(device->extensions);
+}

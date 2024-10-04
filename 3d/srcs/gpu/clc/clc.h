@@ -6,15 +6,14 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/26 22:35:18 by reclaire          #+#    #+#             */
-/*   Updated: 2024/09/30 22:03:21 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/10/04 09:08:20 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef CLC_H
 #define CLC_H
 
-#define CL_TARGET_OPENCL_VERSION 300
-#include "CL/cl.h"
+#include "gpu/clfw/clfw.h"
 #include "libft/types.h"
 #include "libft/std.h"
 
@@ -23,7 +22,7 @@ typedef struct s_program_builder *ProgramBuilder;
 /* caching mechanism for libraries */
 typedef struct s_library_cache *LibraryCache;
 
-ProgramBuilder clc_builder_init(cl_context ctx, cl_device_id device);
+ProgramBuilder clc_builder_init(ClDevice *device);
 bool clc_builder_destroy(ProgramBuilder builder);
 
 bool clc_include_header(ProgramBuilder builder, const_string file_path);

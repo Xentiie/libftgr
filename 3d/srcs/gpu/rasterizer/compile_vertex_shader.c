@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 08:35:33 by reclaire          #+#    #+#             */
-/*   Updated: 2024/09/30 21:53:16 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/10/04 09:09:40 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,9 @@
 #include "gpu/cl_errors/cl_errors.h"
 #include "log/log.h"
 
-ProgramBuilder vertex_shader_begin(cl_context ctx, cl_device_id device, LibraryCache cache)
+ProgramBuilder vertex_shader_begin(ClDevice *device, LibraryCache cache)
 {
-	ProgramBuilder builder = clc_builder_init(ctx, device);
+	ProgramBuilder builder = clc_builder_init(device);
 	if (UNLIKELY(builder == NULL))
 		return NULL;
 

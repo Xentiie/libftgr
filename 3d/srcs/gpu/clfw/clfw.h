@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 23:42:30 by reclaire          #+#    #+#             */
-/*   Updated: 2024/10/02 18:28:57 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/10/04 08:49:22 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,9 +17,13 @@
 
 #define CL_TARGET_OPENCL_VERSION 300
 #include "CL/cl.h"
+#include "clfw_wrapper_generated.h"
 
 typedef struct s_cl_device {
 	cl_device_id device_id;
+	cl_context ctx;
+	cl_command_queue queue;
+
 	cl_device_type type; //CL_DEVICE_TYPE
 	U32 compute_units; //CL_DEVICE_MAX_COMPUTE_UNITS
 	U64 max_work_item_size[3]; //CL_DEVICE_MAX_WORK_ITEM_SIZES
@@ -84,7 +88,6 @@ typedef struct s_cl_platform
 	bool embedded; /* CL_PLATFORM_PROFILE  */
 } ClPlatform;
 
-
 typedef struct s_cl_kernel
 {
 	cl_kernel kernel;
@@ -105,11 +108,42 @@ typedef struct s_cl_header
 
 } ClHeader;
 
+/*
+Returns a list of `*platforms_cnt` `ClPlatform` objects, and initializes each
+parameters in each platforms and in each `ClDevice` referenced in the platforms.
+`platforms_cnt` must be non-null. No checks are made to verify the validity of the pointer.
+### On error
+Set `*platforms_cnt` to 0
+Returns NULL, with `clfw_last_error != 0` if an error occured
+Returns NULL, with `clfw_last_error == 0` and with `ft_errno != 0` if an error occured
+Returns NULL, with `clfw_last_error == 0` if their is no available platforms
+*/
+ClPlatform *clfw_query_platforms_devices(U64 *platforms_cnt);
+void clfw_dump_platforms_json(file fd, ClPlatform *platforms, U64 platforms_count);
+void clfw_dump_platform_json(file fd, ClPlatform *platform);
+void clfw_dump_device_json(file fd, ClDevice *device);
+
+/*
+Creates a OpenCL context for a device. If the device's context is non-null, do nothing and return TRUE
+### On error
+Returns FALSE. `device->ctx` is set to NULL
+*/
+bool clfw_init_device_ctx(ClDevice *device);
+/*
+Creates a OpenCL command queue for a device. If the device's command queue is non-null, do nothing and return TRUE
+### On error
+Returns FALSE. `device->queue` is set to NULL
+*/
+bool clfw_init_device_queue(ClDevice *device);
+
+/* Free platform content, including all the attached devices */
+void clfw_free_platform(ClPlatform *platform);
+/* Free device content. */
+void clfw_free_device(ClDevice *device);
+
 ClKernel *clfw_get_kernel(ClProgram *program, U64 index);
 ClKernel *clfw_get_kernel_by_name(ClProgram *program, string name);
 string clfw_get_kernel_name(ClKernel *kernel);
-
-ClPlatform *clfw_query_platforms_devices(U64 *platforms_cnt);
 
 void *_clfw_get_cl_kernel(ClKernel *kernel);
 void *_clfw_get_cl_program(ClProgram *program);
@@ -121,8 +155,5 @@ const_string clfw_get_call_title(S32 call);
 const_string clfw_get_last_error_title();
 const_string clfw_get_last_call_title();
 
-void clfw_dump_platforms_json(file fd, ClPlatform *platforms, U64 platforms_count);
-void clfw_dump_platform_json(file fd, ClPlatform *platform);
-void clfw_dump_device_json(file fd, ClDevice *device);
 
 #endif
