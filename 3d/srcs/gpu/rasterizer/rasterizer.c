@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/24 00:07:37 by reclaire          #+#    #+#             */
-/*   Updated: 2024/10/04 09:27:20 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/10/04 10:13:08 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,8 +60,10 @@ static t_v4 *launch_tris_setup(ClDevice *device, cl_kernel vertex_shader, struct
 		exit(1);
 	}
 
-	if (!clfw_finish(device->queue))
+	S32 err;
+	if ((err = clFinish(device->queue)) != 0)
 	{
+		printf("%d\n", err);
 		printf("clFinish didn't work\n");
 		exit(1);
 	}

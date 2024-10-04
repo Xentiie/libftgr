@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/06 02:27:08 by reclaire          #+#    #+#             */
-/*   Updated: 2024/10/04 09:16:30 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/10/04 10:01:40 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,7 @@ int main()
 			return 0;
 		}
 		device = &platforms[0].devices[0]; // Should be NVIDIA
+		printf("%s/%s\n", platforms[0].name, device->name);
 		clfw_init_device_ctx(device);
 		clfw_init_device_queue(device);
 	}

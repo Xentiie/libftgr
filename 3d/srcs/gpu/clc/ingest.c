@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/25 18:13:09 by reclaire          #+#    #+#             */
-/*   Updated: 2024/10/04 08:42:29 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/10/04 10:11:47 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 bool clc_ingest_program(ProgramBuilder builder, cl_program prog, bool compiled)
 {
 	clc_debug("ingest program at index %llu\n", (LU64)builder->programs_n);
-	array_grow(builder->programs, builder->programs_n, builder->programs_alloc, return FALSE,);
+	array_grow(builder->programs, builder->programs_n, builder->programs_alloc, return FALSE, );
 	builder->programs[builder->programs_n++] = (program){.prog = prog, .compiled = compiled};
 	return TRUE;
 }
@@ -98,7 +98,7 @@ bool clc_ingest_library(ProgramBuilder builder, LibraryCache lib_cache, string l
 
 	if (clc_get_lib(lib_cache, &hdr, &lib, &lib_name) == NULL)
 		return FALSE;
-	
+
 	if (_clc_add_header(builder, lib_name, hdr) == -1)
 		return FALSE;
 

@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 08:34:53 by reclaire          #+#    #+#             */
-/*   Updated: 2024/10/03 11:06:20 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/10/04 10:17:40 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,12 +28,12 @@ __kernel void vertex_main(
 	if (id >= tris_cnt)
 		return;
 
-	//t_iv3 tri = ivec3(
-	//	*(((U8 *)tris) + ((id * 3) + 1) * sizeof(S32)),
-	//	*(((U8 *)tris) + ((id * 3) + 2) * sizeof(S32)),
-	//	*(((U8 *)tris) + ((id * 3) + 3) * sizeof(S32)));
+	t_iv3 tri = ivec3(
+		*(((U8 *)tris) + ((id * 3) + 1) * sizeof(S32)),
+		*(((U8 *)tris) + ((id * 3) + 2) * sizeof(S32)),
+		*(((U8 *)tris) + ((id * 3) + 3) * sizeof(S32)));
 
-	t_iv3 tri = *(global t_iv3 *)(tris + (id * 3));
+	//t_iv3 tri = *(global t_iv3 *)(tris + (id * 3));
 	t_iv3 ofs = tri * (int3)(verts_stride);
 
 	t_v4 p1 = vertex_shader(verts + ofs.x, model_to_world, world_to_clip);
