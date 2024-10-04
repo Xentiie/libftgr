@@ -29,6 +29,26 @@ static void update_time(t_ftgr_ctx *ctx)
 	ctx->delta_time_clk = tmp;
 }
 
+static S32 get_key_mods(XKeyEvent xkey)
+{
+	const S32 ftgr_mods[][2] = {
+		{ShiftMask, FTGR_KEYMOD_SHIFT},
+		{ControlMask, FTGR_KEYMOD_CONTROL},
+		{LockMask, FTGR_KEYMOD_CAPSLOCK},
+		{Mod1Mask, FTGR_KEYMOD_ALT},
+		{Mod2Mask, FTGR_KEYMOD_NUMLOCK},
+		{Mod4Mask, FTGR_KEYMOD_SUPER},
+	};
+
+	S32 mods = 0;
+	for (S32 i = 0; i < (sizeof(ftgr_mods) / sizeof(ftgr_mods[0])); i++)
+	{
+		if (xkey.state & ftgr_mods[i][0])
+			mods |= ftgr_mods[i][1];
+	}
+	return mods;
+}
+
 bool ftgr_poll(t_ftgr_ctx *ctx)
 {
 	update_time(ctx);
@@ -52,20 +72,26 @@ bool ftgr_poll(t_ftgr_ctx *ctx)
 
 		KeySym keysym;
 		U32 key_uni;
+		/* key modifiers */
+		S32 mods;
 		switch (ev.type)
 		{
 		case KeyPress:
+		case KeyRelease:;
+			S32 mods = get_key_mods(ev.xkey);
 			XLookupString(&ev.xkey, NULL, 0, &keysym, NULL);
 			key_uni = _ftgr_keysym2uni(keysym);
-			_ftx11_register_key_down(ctx, key_uni);
-			//printf("Pressed key: %lc\n", key_uni);
-			break;
 
-		case KeyRelease:
-			XLookupString(&ev.xkey, NULL, 0, &keysym, NULL);
-			key_uni = _ftgr_keysym2uni(keysym);
-			_ftx11_register_key_up(ctx, key_uni);
-			//printf("Released key: %lc\n", key_uni);
+			if (ev.type == KeyPress)
+			{
+				_ftx11_register_key_down(ctx, key_uni);
+				printf("Pressed key: %lc\n", key_uni);
+			}
+			else
+			{
+				_ftx11_register_key_up(ctx, key_uni);
+				printf("Released key: %lc\n", key_uni);
+			}
 			break;
 
 		case ButtonPress:;

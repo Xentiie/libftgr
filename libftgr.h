@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/13 01:58:46 by reclaire          #+#    #+#             */
-/*   Updated: 2024/09/18 17:30:08 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/09/20 01:43:33 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,19 @@
 #define MOUSE_LEFT 0
 #define MOUSE_MIDDLE 1
 #define MOUSE_RIGHT 2
+
+/* any shift key */
+#define FTGR_KEYMOD_SHIFT (1 << 1)
+/* any control key */
+#define FTGR_KEYMOD_CONTROL (1 << 2)
+/* any alt key */
+#define FTGR_KEYMOD_ALT (1 << 3)
+/* windows key / 'command' mac key */
+#define FTGR_KEYMOD_SUPER (1 << 4)
+/* capslock on */
+#define FTGR_KEYMOD_CAPSLOCK (1 << 5)
+/* numlock on */
+#define FTGR_KEYMOD_NUMLOCK (1 << 6)
 
 #define FTGR_EX11 1000
 
