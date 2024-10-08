@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/26 23:07:32 by reclaire          #+#    #+#             */
-/*   Updated: 2024/10/02 16:05:02 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/10/08 03:35:55 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,5 +36,7 @@ void (log_debug)(const_string file, S32 line, string tag, string fmt, ...);
 void (log_info)(const_string file, S32 line, string tag, string fmt, ...);
 void (log_warn)(const_string file, S32 line, string tag, string fmt, ...);
 void (log_error)(const_string file, S32 line, string tag, string fmt, ...);
+
+#define ASSERT(cond, ret) if (UNLIKELY(!(cond))) { log_error("ASSERT", "assertion failed: (%s) is FALSE\n", #cond); return ret; }
 
 #endif

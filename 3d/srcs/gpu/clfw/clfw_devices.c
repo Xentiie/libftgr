@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/01 00:40:48 by reclaire          #+#    #+#             */
-/*   Updated: 2024/10/04 09:17:37 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/10/07 16:17:32 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -369,9 +369,9 @@ void clfw_free_platform(ClPlatform *platform)
 void clfw_free_device(ClDevice *device)
 {
 	if (device->ctx)
-		clReleaseContext(device->ctx);
+		clfw_release_context(device->ctx);
 	if (device->device_id)
-		clReleaseDevice(device->device_id);
+		clfw_release_device(device->device_id);
 
 	free(device->builtin_kernels);
 	free(device->name);

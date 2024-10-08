@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/25 18:12:12 by reclaire          #+#    #+#             */
-/*   Updated: 2024/09/27 16:08:33 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/10/08 03:57:57 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,15 +14,17 @@
 
 string retrieve_build_log(ProgramBuilder builder, cl_program prog)
 {
-	S32 err;		   /* error value for opencl functions */
+	ASSERT(builder != NULL, NULL)
+	ASSERT(builder->device != NULL, NULL)
+	//ASSERT(prog != NULL, NULL)
+
 	string build_log;  /* build log */
 	U64 build_log_len; /* build log length */
 
 	{ /* retrieve build log length */
-		err = clGetProgramBuildInfo(prog, builder->device, CL_PROGRAM_BUILD_LOG, 0, NULL, &build_log_len);
-		if (err != 0)
+		if (!clfw_get_program_build_info(prog, builder->device->device_id, CL_PROGRAM_BUILD_LOG, 0, NULL, &build_log_len))
 		{
-			clc_warn("couldn't retrieve build log: clGetProgramBuildInfo (1st invocation) returned %s(%d)\n", cl_error_lookup_table[-err], err);
+			clc_warn("couldn't retrieve build log\n");
 			return NULL;
 		}
 	}
@@ -37,11 +39,10 @@ string retrieve_build_log(ProgramBuilder builder, cl_program prog)
 	}
 
 	{ /* retrieve build log */
-		err = clGetProgramBuildInfo(prog, builder->device, CL_PROGRAM_BUILD_LOG, build_log_len, build_log, NULL);
-		if (err != 0)
+		if (!clfw_get_program_build_info(prog, builder->device->device_id, CL_PROGRAM_BUILD_LOG, build_log_len, build_log, NULL))
 		{
 			free(build_log);
-			clc_warn("couldn't retrieve build log: clGetProgramBuildInfo (2nd invocation)returned %s(%d)\n", cl_error_lookup_table[-err], err);
+			clc_warn("couldn't retrieve build log\n");
 			return NULL;
 		}
 		build_log[build_log_len] = '\0';

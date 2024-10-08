@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:33:35 by reclaire          #+#    #+#             */
-/*   Updated: 2024/10/04 09:08:44 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/10/07 16:17:46 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,7 @@ cl_program make_maths_cl(ClDevice *device, LibraryCache cache)
 	cl_program lib = clc_end(builder);
 	if (!clc_cache_lib(cache, builder, "maths.cl.h", lib))
 	{
-		clReleaseProgram(lib);
+		clfw_release_program(lib);
 		lib = NULL;
 	}
 	clc_builder_destroy(builder);

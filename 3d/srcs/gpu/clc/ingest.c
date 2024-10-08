@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/25 18:13:09 by reclaire          #+#    #+#             */
-/*   Updated: 2024/10/04 10:11:47 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/10/08 03:31:22 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,13 +78,11 @@ bool clc_ingest_file(ProgramBuilder builder, const_string path)
 
 bool clc_ingest_str(ProgramBuilder builder, const_string src)
 {
-	S32 err;
-
 	U64 len = ft_strlen(src);
-	cl_program p = clCreateProgramWithSource(builder->ctx, 1, &src, &len, &err);
-	if (err != 0)
+	cl_program p = clfw_create_program_with_source(builder->device->ctx, 1, &src, &len);
+	if (p == NULL)
 	{
-		clc_error("couldn't build source: clCreateProgramWithSource returned %s(%d)\n", cl_error_lookup_table[-err], err);
+		clc_error("couldn't build source\n");
 		return FALSE;
 	}
 

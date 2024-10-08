@@ -5,42 +5,51 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/09/24 00:07:55 by reclaire          #+#    #+#             */
-/*   Updated: 2024/10/04 09:16:03 by reclaire         ###   ########.fr       */
+/*   Created: 2024/09/27 15:59:03 by reclaire          #+#    #+#             */
+/*   Updated: 2024/10/08 03:34:21 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef CL_RASTERIZER_H
-#define CL_RASTERIZER_H
+#ifndef PIPELINE_H
+#define PIPELINE_H
 
+#define CL_TARGET_OPENCL_VERSION 300
+#define CL_NO_PROTOTYPES
+#include "CL/cl.h"
 #include "gpu/clc/clc.h"
-#include "gpu/cl_errors/cl_errors.h"
+#include "3dfw/3dfw.h"
+
+typedef struct s_pipeline *Pipeline;
+
+/* initializes a new pipeline */
+Pipeline pipeline_init(ClDevice *device);
+void pipeline_free(Pipeline pipe);
 /*
-//TODO:
-faut faire un truc propre ici, parce que mes shaders ont besoin de la lib maths cl
-donc faudra trouver un moyen de passer ca proprement, mais j'aimerais bien eviter de
-refaire une grosse structure qui garde tout en mémoire
-pour le moment je passe le cache des lib en arguments, faudra changer
+Begins a ProgramBuilder, which already includes the maths.cl library, and the tris_setup kernel.
+`cache` should contain the maths.cl library.
+User should not call clc_executable_begin/clc_end
+User should provide source code for a `vertex_shader` function prototyped like so:
+t_v4 vertex_shader(global U8 *p, t_mat4x4 model_to_world, t_mat4x4 world_to_clip);
 */
-ProgramBuilder vertex_shader_begin(ClDevice *device, LibraryCache cache);
-cl_kernel vertex_shader_end(ProgramBuilder builder, cl_program *out_program);
+ProgramBuilder pipeline_shader_builder(Pipeline pipe, LibraryCache cache);
+/*
+Link both vertex and fragment shaders
+*/
+bool pipeline_link_shader(Pipeline pipe, ProgramBuilder builder);
 
-struct s_3d_object {
-	struct s_object obj;
-	void *vertex_buffer;
-	cl_mem *cl_vertex_buffer;
-	U8 vbo_stride;
-};
+/*
+Initializes internal buffers. `tris_count_hint` is an optional hint of the max amount of triangles rendered. If 0, a default
+value of 2000 is set.
+*/
+bool pipeline_buffers_init(Pipeline pipe, U64 tris_count_hint);
+void pipeline_set_vertex_stride(Pipeline pipe, U32 stride);
+bool pipeline_fill_verts(Pipeline pipe, void *buffer, U32 count);
+/* Should be an array of t_iv3 */
+bool pipeline_fill_tris(Pipeline pipe, void *buffer, U32 count);
 
-struct s_vertex_shader {
-	cl_kernel shader;
-	cl_mem atm_subtris;
-};
+bool pipeline_set_arg(Pipeline pipe);
+bool pipeline_prepare(Pipeline pipe);
 
-void render_mesh_gpu(
-	cl_kernel vertex_shader,
-	ClDevice *device,
-	struct s_object object,
-	struct s_camera cam);
+void pipeline_execute(Pipeline pipe, struct s_object object, struct s_camera cam);
 
 #endif

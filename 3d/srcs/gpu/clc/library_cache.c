@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:07:18 by reclaire          #+#    #+#             */
-/*   Updated: 2024/09/29 00:25:31 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/10/07 16:15:29 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,8 +46,8 @@ bool clc_cache_lib(LibraryCache cache, ProgramBuilder builder, string header_nam
 	if (header_prog == NULL)
 		return FALSE;
 
-	clRetainProgram(header_prog);
-	clRetainProgram(lib);
+	clfw_retain_program(header_prog);
+	clfw_retain_program(lib);
 
 	cache->libraries[cache->libraries_n++] = (t_library){
 		.header = header_prog,

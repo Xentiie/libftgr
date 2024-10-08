@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/25 18:13:41 by reclaire          #+#    #+#             */
-/*   Updated: 2024/09/30 14:54:32 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/10/08 03:37:19 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,11 @@
 
 S32 _clc_add_header(ProgramBuilder builder, const_string header_name, cl_program header_prog)
 {
+	ASSERT(builder != NULL, -1);
+	ASSERT(builder->headers_names != NULL, -1);
+	ASSERT(header_name != NULL, -1);
+	ASSERT(header_prog != NULL, -1);
+
 	for (U64 i = 0; i < builder->headers_n; i++)
 	{
 		if (!ft_strcmp(builder->headers_names[i], header_name))
@@ -57,11 +62,14 @@ S32 _clc_add_header(ProgramBuilder builder, const_string header_name, cl_program
 
 bool clc_include_header(ProgramBuilder builder, const_string path)
 {
-	S32 err; /* error value for opencl functions */
 	S64 ret;
 	char st_buffer[16384];
 	string str;
 	U64 rd;
+
+	ASSERT(builder != NULL, FALSE)
+	ASSERT(builder->device != NULL, FALSE);
+	ASSERT(path != NULL, FALSE)
 
 	clc_debug("read header %s\n", path);
 	{ /* read file */
@@ -111,15 +119,16 @@ bool clc_include_header(ProgramBuilder builder, const_string path)
 		}
 	}
 
-	cl_program header_prog = clCreateProgramWithSource(builder->ctx, 1, (const_string *)&str, &rd, &err);
+	cl_program header_prog = clfw_create_program_with_source(builder->device->ctx, 1, (const_string *)&str, &rd);
 
 	if (str != st_buffer)
 		free(str);
+
 	string header_name = ft_path_filename(path);
-	if (err != 0 || header_name == NULL)
+	if (header_prog == NULL || header_name == NULL)
 	{
 		free(header_name);
-		clc_error("couldn't include header '%s': clCreateProgramWithSource returned %s(%d)\n", path, cl_error_lookup_table[-err], err);
+		clc_error("couldn't include header '%s'\n", path);
 		return FALSE;
 	}
 
@@ -127,7 +136,7 @@ bool clc_include_header(ProgramBuilder builder, const_string path)
 	if (ret < 1)
 	{
 		free(header_name);
-		clReleaseProgram(header_prog);
+		clfw_release_program(header_prog);
 		if (ret == -1)
 			return FALSE;
 	}

@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/12 01:00:56 by reclaire          #+#    #+#             */
-/*   Updated: 2024/09/30 12:17:57 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/10/07 15:04:53 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,12 +47,6 @@ t_mat4x4 cam_get_cam_to_clip(struct s_camera cam)
 
 t_mat4x4 cam_get_orientation(struct s_camera cam)
 {
-	/*
-	//TODO: utiliser moteur pour visualiser des operations (genre cross())
-	a1 = -norm(camera.forward) (arriere)
-	a2 = norm(cross(camera.up, a1)) (droite/gauche)
-	a3 = norm(cross(a1, a2)) (down je pense)
-	*/
 	t_v3 a1 = vec3_mul(ft_normalize3(cam.forward), vec3(-1.0f, -1.0f, -1.0f));
 	t_v3 a2 = ft_normalize3(ft_cross3(cam.up, a1));
 	t_v3 a3 = ft_normalize3(ft_cross3(a1, a2));

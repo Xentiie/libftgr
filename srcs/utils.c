@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/04 16:45:09 by reclaire          #+#    #+#             */
-/*   Updated: 2024/09/18 17:41:48 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/10/07 15:14:17 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,6 @@ U32 ftgr_color_to_int(t_color col)
 
 t_color ftgr_int_to_color(U32 v)
 {
-	//TODO: different image type
 	return (t_color){
 		.a = (v >> 24),
 		.r = (v >> 16) & 0xFF,

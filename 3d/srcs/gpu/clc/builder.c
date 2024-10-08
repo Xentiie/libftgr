@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/25 18:13:18 by reclaire          #+#    #+#             */
-/*   Updated: 2024/10/04 09:08:36 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/10/08 03:31:22 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,17 +15,21 @@
 
 ProgramBuilder clc_builder_init(ClDevice *device)
 {
-	ProgramBuilder builder = malloc(sizeof(struct s_program_builder));
-	if (UNLIKELY(builder == NULL))
+	ProgramBuilder builder;
+
+	ASSERT(device != NULL, NULL)
+	ASSERT(device->ctx != NULL, NULL)
+	ASSERT(device->device_id != NULL, NULL)
+
+	if (UNLIKELY((builder = malloc(sizeof(struct s_program_builder))) == NULL))
 	{
 		clc_error("program builder: out of memory\n");
 		return NULL;
 	}
+	ft_bzero(builder, sizeof(struct s_program_builder));
 	clc_debug("created builder: %s%p" FT_CRESET "\n", get_unique_col((U64)builder), builder);
-	ft_memset(builder, 0, sizeof(struct s_program_builder));
 
-	builder->ctx = device->ctx;
-	builder->device = device->device_id;
+	builder->device = device;
 
 	builder->headers_n = 0;
 	builder->headers_alloc = 1;
@@ -33,7 +37,7 @@ ProgramBuilder clc_builder_init(ClDevice *device)
 	builder->headers_programs = malloc(sizeof(cl_program *) * builder->headers_alloc);
 	if (UNLIKELY(builder->headers_names == NULL || builder->headers_programs == NULL))
 	{
-		log_error(NULL, "out of memory: can't init headers array \n");
+		clc_error("program builder: out of memory\n");
 		clc_builder_destroy(builder);
 		return NULL;
 	}
@@ -50,15 +54,17 @@ ProgramBuilder clc_builder_init(ClDevice *device)
 
 bool clc_builder_destroy(ProgramBuilder builder)
 {
+	ASSERT(builder != NULL, FALSE);
+
 	clc_debug("destroying builder: %s%p" FT_CRESET "\n", get_unique_col((U64)builder), builder);
 	for (U64 i = 0; i < builder->headers_n; i++)
 	{
 		// TODO:
 		// free(builder->headers_names[i]);
-		clReleaseProgram(builder->headers_programs[i]);
+		clfw_release_program(builder->headers_programs[i]);
 	}
 	for (U64 i = 0; i < builder->programs_n; i++)
-		clReleaseProgram(builder->programs[i].prog);
+		clfw_release_program(builder->programs[i].prog);
 
 	free(builder->headers_names);
 	free(builder->headers_programs);

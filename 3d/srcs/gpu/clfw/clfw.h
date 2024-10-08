@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 23:42:30 by reclaire          #+#    #+#             */
-/*   Updated: 2024/10/04 08:49:22 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/10/07 15:04:33 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -141,12 +141,19 @@ void clfw_free_platform(ClPlatform *platform);
 /* Free device content. */
 void clfw_free_device(ClDevice *device);
 
+
+/* //TODO: */
 ClKernel *clfw_get_kernel(ClProgram *program, U64 index);
+/* //TODO: */
 ClKernel *clfw_get_kernel_by_name(ClProgram *program, string name);
+/* //TODO: */
 string clfw_get_kernel_name(ClKernel *kernel);
 
+/* //TODO: */
 void *_clfw_get_cl_kernel(ClKernel *kernel);
+/* //TODO: */
 void *_clfw_get_cl_program(ClProgram *program);
+
 
 S32 clfw_get_last_error();
 S32 clfw_get_last_call();

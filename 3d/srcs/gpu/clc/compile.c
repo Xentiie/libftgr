@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/25 05:03:35 by reclaire          #+#    #+#             */
-/*   Updated: 2024/09/30 21:53:06 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/10/08 03:37:47 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,9 @@
 
 static bool clc_begin(ProgramBuilder builder, program_type type)
 {
+	ASSERT(builder != NULL, FALSE)
+	ASSERT(type == EXE || type == LIB, FALSE)
+
 	builder->programs_n = 0;
 	array_init(builder->programs, builder->programs_n, builder->programs_alloc,
 			   return FALSE);
@@ -35,10 +38,14 @@ bool clc_library_begin(ProgramBuilder builder)
 
 cl_program clc_end(ProgramBuilder builder)
 {
-	S32 err;
 	U64 progs_compiled_cnt;
 	string build_log;
 	cl_program out;
+
+	ASSERT(builder != NULL, NULL)
+	ASSERT(builder->programs_n != 0, NULL)
+	ASSERT(builder->programs != NULL, NULL)
+	ASSERT(builder->device != NULL, NULL)
 
 	clc_info("begining compile and link sequence (%llu headers)\n", (LU64)builder->headers_n);
 	{ /* compiling */
@@ -49,19 +56,20 @@ cl_program clc_end(ProgramBuilder builder)
 				/* program already compiled */
 				continue;
 
-			err = clCompileProgram(builder->programs[p].prog, 1, &builder->device, "-Werror",
-								   builder->headers_n, builder->headers_programs, (const_string *)builder->headers_names, NULL, NULL);
-			if (err != 0)
+			if (!clfw_compile_program(builder->programs[p].prog, 1, &builder->device->device_id, "-Werror",
+									  builder->headers_n, builder->headers_programs, (const_string *)builder->headers_names, NULL, NULL))
 			{
-				clc_error("compilation failed: clCompileProgram returned %s(%d)\n", cl_error_lookup_table[-err], err);
+				clc_error("compilation failed\n");
 
 				build_log = retrieve_build_log(builder, builder->programs[p].prog);
-				if (build_log == NULL)
-					clc_error("couldn't retrieve build log\n");
-				else if (*build_log != '\0')
-					clc_info("build log:\n%s\n", build_log);
-				else
-					clc_warn("no build log available\n");
+				if (build_log != NULL)
+				{
+					if (*build_log != '\0')
+						clc_info("build log:\n%s\n", build_log);
+					else
+						clc_warn("no build log available\n");
+				}
+				free(build_log);
 				return NULL;
 			}
 
@@ -72,28 +80,29 @@ cl_program clc_end(ProgramBuilder builder)
 		clc_info("compiled %llu programs\n", (LU64)progs_compiled_cnt);
 	}
 
-	{ /* linking */
-
+	{						 /* linking */
 		cl_program *to_link; /* buffer of programs to link */
 
-		{																/* programs to link buffer init */
-			to_link = malloc(sizeof(cl_program) * builder->programs_n); // TODO: check ret
+		{ /* programs to link buffer init */
+			if (UNLIKELY((to_link = malloc(sizeof(cl_program) * builder->programs_n)) == NULL))
+				return NULL;
 			for (U64 p = 0; p < builder->programs_n; p++)
 				to_link[p] = builder->programs[p].prog;
 		}
 
-		out = clLinkProgram(builder->ctx, 1, &builder->device, builder->current_type == LIB ? "-create-library -Werror" : " -Werror", builder->programs_n, to_link, NULL, NULL, &err);
-		if (err != 0)
+		if ((out = clfw_link_program(builder->device->ctx, 1, &builder->device->device_id, builder->current_type == LIB ? "-create-library -Werror" : " -Werror", builder->programs_n, to_link, NULL, NULL)) == NULL)
 		{
-			clc_error("linking failed: clLinkProgram returned %s(%d)\n", cl_error_lookup_table[-err], err);
+			clc_error("linking failed\n");
 
 			build_log = retrieve_build_log(builder, out);
-			if (build_log == NULL)
-				clc_error("couldn't retrieve build log\n");
-			else if (*build_log != '\0')
-				clc_info("build log:\n%s\n", build_log);
-			else
-				clc_warn("no build log available\n");
+			if (build_log != NULL)
+			{
+				if (*build_log != '\0')
+					clc_info("build log:\n%s\n", build_log);
+				else
+					clc_warn("no build log available\n");
+			}
+			free(build_log);
 		}
 		else
 			clc_info("linking successful\n");
@@ -101,7 +110,7 @@ cl_program clc_end(ProgramBuilder builder)
 	}
 
 	for (U64 i = 0; i < builder->programs_n; i++)
-		clReleaseProgram(builder->programs[i].prog);
+		clfw_release_program(builder->programs[i].prog);
 	free(builder->programs);
 	builder->programs = NULL;
 	builder->programs_alloc = 0;

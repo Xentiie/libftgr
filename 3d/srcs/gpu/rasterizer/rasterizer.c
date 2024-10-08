@@ -6,12 +6,12 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/24 00:07:37 by reclaire          #+#    #+#             */
-/*   Updated: 2024/10/04 10:13:08 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/10/08 04:00:24 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "rasterizer_private.h"
 #include "3dfw/3dfw.h"
-#include "gpu/rasterizer/rasterizer.h"
 #include "gpu/clc/clc.h"
 #include "gpu/clfw/clfw.h"
 
@@ -19,34 +19,19 @@
 
 #include <stdio.h>
 
-static t_v4 *launch_tris_setup(ClDevice *device, cl_kernel vertex_shader, struct s_object object, struct s_camera cam)
+static t_v4 *launch_tris_setup(Pipeline pipe, struct s_object object, struct s_camera cam)
 {
-	t_mat4x4 world_to_clip = cam_get_world_to_clip(cam);
+	t_mat4x4 world_to_clip;
+	t_mat4x4 model_to_world;
 
-	t_v4 *verts_4 = malloc(sizeof(t_v4) * object.verts_cnt);
-	for (U64 i = 0; i < object.verts_cnt; i++)
-		verts_4[i] = vec4(object.verts[i].x, object.verts[i].y, object.verts[i].z, 0.0f);
-	S32 sublines_st = 0;
+	world_to_clip = cam_get_world_to_clip(cam);
+	model_to_world = object_get_model_to_world(object);
 
-	cl_mem verts_buf = clfw_create_buffer(device->ctx, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(t_v4) * object.verts_cnt, verts_4);
-	cl_mem tris_buf = clfw_create_buffer(device->ctx, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(t_iv3) * object.tris_cnt, object.tris);
-	cl_mem atm_sublines = clfw_create_buffer(device->ctx, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, sizeof(S32), &sublines_st);
-	cl_mem out_buf = clfw_create_buffer(device->ctx, CL_MEM_READ_WRITE, sizeof(t_v4) * object.verts_cnt, NULL);
-
-	t_mat4x4 model_to_world = object_get_model_to_world(object);
-	U64 i = 0;
+	U64 i = 7;
 	if (
-		!clfw_set_kernel_arg(vertex_shader, i++, sizeof(cl_mem), &verts_buf) ||
-		!clfw_set_kernel_arg(vertex_shader, i++, sizeof(U32), &(U32){sizeof(t_v4)}) ||
-		!clfw_set_kernel_arg(vertex_shader, i++, sizeof(cl_mem), &tris_buf) ||
-		!clfw_set_kernel_arg(vertex_shader, i++, sizeof(U32), &object.tris_cnt) ||
-		!clfw_set_kernel_arg(vertex_shader, i++, sizeof(cl_mem), &out_buf) ||
-		!clfw_set_kernel_arg(vertex_shader, i++, sizeof(U32), &(U32){sizeof(t_v4) * object.verts_cnt}) ||
-		!clfw_set_kernel_arg(vertex_shader, i++, sizeof(cl_mem), &atm_sublines) ||
-		!clfw_set_kernel_arg(vertex_shader, i++, sizeof(t_iv4), (&(t_iv4){cam.pos.x, cam.pos.y, cam.pos.z, 0.0f})) ||
-		!clfw_set_kernel_arg(vertex_shader, i++, sizeof(t_mat4x4), &model_to_world) ||
-		!clfw_set_kernel_arg(vertex_shader, i++, sizeof(t_mat4x4), &world_to_clip)
-	)
+		!clfw_set_kernel_arg(pipe->vert_shdr, 7, sizeof(t_iv4), (&(t_iv4){cam.pos.x, cam.pos.y, cam.pos.z, 0.0f})) ||
+		!clfw_set_kernel_arg(pipe->vert_shdr, 8, sizeof(t_mat4x4), &model_to_world) ||
+		!clfw_set_kernel_arg(pipe->vert_shdr, 9, sizeof(t_mat4x4), &world_to_clip))
 	{
 		printf("couldn't set kernel arg\n");
 		exit(1);
@@ -54,39 +39,30 @@ static t_v4 *launch_tris_setup(ClDevice *device, cl_kernel vertex_shader, struct
 
 	U64 local_work_size = 8;
 	U64 global_work_size = object.tris_cnt + (local_work_size - object.tris_cnt % local_work_size);
-	if (!clfw_enqueue_nd_range_kernel(device->queue, vertex_shader, 1, &(U64){0}, &global_work_size, &local_work_size, 0, NULL, NULL))
+	if (!clfw_enqueue_nd_range_kernel(pipe->device->queue, pipe->vert_shdr, 1, &(U64){0}, &global_work_size, &local_work_size, 0, NULL, NULL))
 	{
 		printf("couldn't exec kernel\n");
 		exit(1);
 	}
 
-	S32 err;
-	if ((err = clFinish(device->queue)) != 0)
-	{
-		printf("%d\n", err);
-		printf("clFinish didn't work\n");
+	if (!clfw_finish(pipe->device->queue))
 		exit(1);
-	}
 
-	clfw_enqueue_read_buffer(device->queue, atm_sublines, TRUE, 0, sizeof(S32), &sublines_st, 0, NULL, NULL);
-	clfw_enqueue_read_buffer(device->queue, out_buf, TRUE, 0, sizeof(t_v4) * object.verts_cnt, verts_4, 0, NULL, NULL);
+	U32 subtris;
+	t_v4 *interphase_out = malloc(pipe->interphase_buffer_alloc);
+	clfw_enqueue_read_buffer(pipe->device->queue, pipe->atm_subtris, TRUE, 0, sizeof(subtris), &subtris, 0, NULL, NULL);
+	clfw_enqueue_read_buffer(pipe->device->queue, pipe->interphase_buffer, TRUE, 0, sizeof(t_v4) * object.verts_cnt, interphase_out, 0, NULL, NULL);
 
-	clfw_release_mem_object(verts_buf);
-	clfw_release_mem_object(tris_buf);
-	clfw_release_mem_object(atm_sublines);
-	clfw_release_mem_object(out_buf);
-
-	printf("atomic: %d\n", sublines_st);
-	return verts_4;
+	printf("atomic: %u\n", subtris);
+	return interphase_out;
 }
 
-void render_mesh_gpu(
-	cl_kernel vertex_shader,
-	ClDevice *device,
-	struct s_object object,
-	struct s_camera cam)
+void pipeline_execute(Pipeline pipe, struct s_object object, struct s_camera cam)
 {
-	t_v4 *verts_4 = launch_tris_setup(device, vertex_shader, object, cam);
+	if (!pipeline_prepare(pipe))
+		return;
+
+	t_v4 *verts_4 = launch_tris_setup(pipe, object, cam);
 	if (!verts_4)
 		return;
 

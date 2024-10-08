@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/13 01:58:46 by reclaire          #+#    #+#             */
-/*   Updated: 2024/09/20 01:43:33 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/10/07 15:25:27 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,51 +104,75 @@ struct s_color
 #define COL_DARK_GRAY ((t_color){63, 63, 63, 255})
 
 t_ftgr_ctx *ftgr_create_ctx();
+void ftgr_free(t_ftgr_ctx *ctx);
+
+/*
+Wait for an event to happen, then process it and return TRUE. The application will hang while waiting.
+Returns FALSE if the application should quit.
+*/
 bool ftgr_wait(t_ftgr_ctx *ctx);
+/*
+Process all events currently queued, then return TRUE.
+Returns FALSE if the application should quit.
+*/
 bool ftgr_poll(t_ftgr_ctx *ctx);
 
 t_ftgr_win *ftgr_new_window(t_ftgr_ctx *ctx, t_iv2 size, const_string title);
 void ftgr_free_window(t_ftgr_win *win);
+void ftgr_bring_top(t_ftgr_win *win);
 void ftgr_set_win_name(t_ftgr_win *win, string name);
+/* Copies the string `infos` after the window's name */
 void ftgr_set_win_name_infos(t_ftgr_win *win, string infos);
 void ftgr_move_window(t_ftgr_win *win, t_iv2 pos);
+/* Swaps the front and back buffer of the window, copying the previous back buffer to the window */
 void ftgr_swap_buffers(t_ftgr_win *win);
-
-void ftgr_free(t_ftgr_ctx *ctx);
-
-void ftgr_bring_top(t_ftgr_win *win);
 
 void ftgr_mouse_move(t_ftgr_ctx *ctx, t_ftgr_win *win, t_iv2 pos);
 void ftgr_mouse_hide(t_ftgr_ctx *ctx, t_ftgr_win *win);
 void ftgr_mouse_show(t_ftgr_ctx *ctx, t_ftgr_win *win);
 /* `win` can be NULL to retrieve the absolute mouse position */
 t_iv2 ftgr_mouse_get_pos(t_ftgr_ctx *ctx, t_ftgr_win *win);
+/* Returns TRUE if the specified mouse button is currently pressed */
 bool ftgr_mouse_pressed(t_ftgr_ctx *ctx, S32 button);
+/* Returns TRUE if the specified mouse button has been pressed this frame */
 bool ftgr_mouse_down(t_ftgr_ctx *ctx, S32 button);
 bool ftgr_mouse_released(t_ftgr_ctx *ctx, S32 button);
 
+/* Returns TRUE if the specified key is currently pressed */
 bool ftgr_is_key_pressed(t_ftgr_ctx *ctx, U8 key);
+/* Returns TRUE if the specified key has been pressed this frame */
 bool ftgr_is_key_down(t_ftgr_ctx *ctx, U8 key);
 bool ftgr_is_key_up(t_ftgr_ctx *ctx, U8 key);
 void ftgr_key_autorepeat(t_ftgr_ctx *ctx, bool active);
 
+/* Not used */
 void ftgr_set_error_callback(t_ftgr_ctx *ctx, void (*callback)());
 
+/* Returns the time since application start */
 float ftgr_time(t_ftgr_ctx *ctx);
+/* Returns the time elapsed for last frame */
 float ftgr_delta_time(t_ftgr_ctx *ctx);
 
+/* Creates a new RGBA image */
 t_ftgr_img *ftgr_new_img(t_ftgr_ctx *ctx, t_iv2 size);
 void ftgr_free_img(t_ftgr_img *img);
+/* Copies the image `img` to the window's back buffer */
 void ftgr_display_image(t_ftgr_img *img, t_ftgr_win *win, t_iv2 pos);
 
+/* Returns a random color from `seed` */
 t_color ftgr_rand_color(U32 seed);
+/* Blends 2 colors using the alpha channel */
 t_color ftgr_alpha_blend(t_color under, t_color over);
 
+/* Displays the FPS in the window's info */
 void ftgr_display_fps(t_ftgr_win *win);
+/* Encodes a color into a U32 */
 U32 ftgr_color_to_int(t_color col);
+/* Decodes a U32 to a color */
 t_color ftgr_int_to_color(U32 v);
 
-#define ftgr_get_pixel_addr(img, x, y) (img->data + ((y) * img->line_size + (x) * img->bpp))
+/* Returns the address of a specific pixel in an image. `img` should be of type `t_ftgr_img`, and `x` and `y` should be any non-float scalar */
+#define ftgr_get_pixel_addr(img, x, y) ((img)->data + ((y) * (img)->line_size + (x) * (img)->bpp))
 t_color ftgr_get_pixel(t_ftgr_img *img, t_iv2 p);
 void ftgr_set_pixel(t_ftgr_img *img, t_iv2 p, t_color col);
 void ftgr_draw_line(t_ftgr_img *img, t_iv2 p1, t_iv2 p2, t_color col);
@@ -174,6 +198,7 @@ void ftgr_cpy_img(t_ftgr_img *dst, t_iv2 dst_pos, t_ftgr_img *src, t_iv4 src_rec
 void *ftgr_load_font(file fd, t_ftgr_img *img);
 t_ftgr_img *ftgr_load_png(t_ftgr_ctx *ctx, const_string path);
 
+/* 32 bytes of user-data for a t_widget */
 union u_widget_data
 {
 	U8 u8[32];
