@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:03:40 by reclaire          #+#    #+#             */
-/*   Updated: 2024/10/08 04:16:05 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/10/09 15:19:51 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@ bool pipeline_link_shader(Pipeline pipe, ProgramBuilder builder)
 	if (pipe->shader_prog == NULL)
 		return FALSE;
 
-	pipe->vert_shdr = clfw_create_kernel(pipe->shader_prog, "vertex_main");
+	pipe->vert_shdr = clfw_create_kernel(pipe->shader_prog, "tris_setup");
 	//pipe->frgm_shdr = clfw_create_kernel(pipe->shader_prog, "fragment_main");
 	pipe->dirty = TRUE;
 	return TRUE;
@@ -87,8 +87,7 @@ bool pipeline_buffers_init(Pipeline pipe, U64 tris_count_hint)
 	pipe->tris_buffer_alloc = sizeof(S32) * tris_count_hint;
 	pipe->tris_buffer = clfw_create_buffer(pipe->device->ctx, CL_MEM_READ_ONLY, pipe->tris_buffer_alloc, NULL);
 
-	//pipe->interphase_buffer_alloc = sizeof(t_v4) * tris_count_hint * 3;
-	pipe->interphase_buffer_alloc = 1000000;
+	pipe->interphase_buffer_alloc = sizeof(t_v4) * tris_count_hint * 3;
 	pipe->interphase_buffer = clfw_create_buffer(pipe->device->ctx, CL_MEM_READ_WRITE, pipe->interphase_buffer_alloc, NULL);
 
 	pipe->atm_subtris = clfw_create_buffer(pipe->device->ctx, CL_MEM_READ_WRITE, sizeof(U32), NULL);
@@ -147,16 +146,13 @@ bool pipeline_set_arg(Pipeline pipe)
 
 	i = 0;
 	if (
-		!clfw_set_kernel_arg(pipe->vert_shdr, 0, sizeof(cl_mem), &pipe->verts_buffer) ||
-		!clfw_set_kernel_arg(pipe->vert_shdr, 1, sizeof(U32), &pipe->vert_stride) ||
-		!clfw_set_kernel_arg(pipe->vert_shdr, 2, sizeof(cl_mem), &pipe->tris_buffer) ||
-		!clfw_set_kernel_arg(pipe->vert_shdr, 3, sizeof(U32), &pipe->tris_cnt) ||
-		!clfw_set_kernel_arg(pipe->vert_shdr, 4, sizeof(cl_mem), &pipe->interphase_buffer) ||
-		!clfw_set_kernel_arg(pipe->vert_shdr, 5, sizeof(U32), &pipe->interphase_buffer_alloc) ||
-		!clfw_set_kernel_arg(pipe->vert_shdr, 6, sizeof(cl_mem), &pipe->atm_subtris)
-		//!clfw_set_kernel_arg(pipe->vert_shdr, i++, sizeof(t_iv4), (&(t_iv4){cam.pos.x, cam.pos.y, cam.pos.z, 0.0f})) ||
-		//!clfw_set_kernel_arg(pipe->vert_shdr, i++, sizeof(t_mat4x4), &model_to_world) ||
-		//!clfw_set_kernel_arg(pipe->vert_shdr, i++, sizeof(t_mat4x4), &world_to_clip)
+		!clfw_set_kernel_arg(pipe->vert_shdr, i++, sizeof(cl_mem), &pipe->verts_buffer) ||
+		!clfw_set_kernel_arg(pipe->vert_shdr, i++, sizeof(U32), &pipe->vert_stride) ||
+		!clfw_set_kernel_arg(pipe->vert_shdr, i++, sizeof(cl_mem), &pipe->tris_buffer) ||
+		!clfw_set_kernel_arg(pipe->vert_shdr, i++, sizeof(U32), &pipe->tris_cnt) ||
+		!clfw_set_kernel_arg(pipe->vert_shdr, i++, sizeof(cl_mem), &pipe->interphase_buffer) ||
+		!clfw_set_kernel_arg(pipe->vert_shdr, i++, sizeof(U32), &pipe->interphase_buffer_alloc) ||
+		!clfw_set_kernel_arg(pipe->vert_shdr, i++, sizeof(cl_mem), &pipe->atm_subtris)
 	)
 	{
 		rast_error("couldn't set vertex shader args\n");
@@ -169,13 +165,13 @@ bool pipeline_set_arg(Pipeline pipe)
 
 bool pipeline_prepare(Pipeline pipe)
 {
-	S32 zero = 10;
+	S32 zero = 0;
 
-	//if (pipe->dirty)
-	//{
+	if (pipe->dirty)
+	{
 		if (!pipeline_set_arg(pipe))
 			return FALSE;
-	//}
+	}
 
 	if (!clfw_enqueue_write_buffer(pipe->device->queue, pipe->atm_subtris, TRUE, 0, sizeof(U32), &zero, 0, NULL, NULL))
 		return FALSE;

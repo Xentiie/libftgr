@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/06 02:27:08 by reclaire          #+#    #+#             */
-/*   Updated: 2024/10/08 04:13:48 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/10/09 23:42:18 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,6 +129,8 @@ int main()
 	if ((pipe = pipeline_init(device)) == NULL)
 		return 1;
 
+	device->compute_units
+
 	ProgramBuilder builder = pipeline_shader_builder(pipe, libcache);
 	if (!clc_ingest_file(builder, "srcs/simple_vertex_shader.cl.c"))
 		return 1;
@@ -138,27 +140,6 @@ int main()
 	pipeline_buffers_init(pipe, 0);
 	pipeline_fill_verts(pipe, cube.verts, cube.verts_cnt);
 	pipeline_fill_tris(pipe, cube.tris, cube.tris_cnt);
-
-
-
-/*
-	builder = clc_builder_init(device);
-	clc_executable_begin(builder);
-	clc_ingest_str(builder, "#include \"clfw.cl.h\"\n__kernel void test(global U8 *tmp) { *tmp = 10; }");
-	cl_program pr = clc_end(builder);
-
-	cl_kernel kn = clfw_create_kernel(pr, "test");
-	clfw_set_kernel_arg(kn, 0, sizeof(void*), &pipe->atm_subtris);
-	clfw_finish(device->queue);
-	clfw_enqueue_nd_range_kernel(device->queue, kn, 1, &(U64){0}, &(U64){1}, &(U64){1}, 0, NULL, NULL);
-	U8 val = 10;
-	clfw_enqueue_read_buffer(device->queue, pipe->atm_subtris, TRUE, 0, sizeof(U8), &val, 0, NULL, NULL);
-	printf("U8: %u\n", val);
-
-	return 0;
-*/
-
-
 
 	while (ftgr_poll(ctx))
 	{
