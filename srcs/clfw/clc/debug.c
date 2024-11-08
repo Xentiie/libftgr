@@ -1,20 +1,28 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   make_maths_cl.h                                    :+:      :+:    :+:   */
+/*   debug.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/09/27 16:40:49 by reclaire          #+#    #+#             */
-/*   Updated: 2024/10/04 09:09:06 by reclaire         ###   ########.fr       */
+/*   Created: 2024/10/11 00:31:39 by reclaire          #+#    #+#             */
+/*   Updated: 2024/10/11 00:33:26 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef CL_MATHS_H
-#define CL_MATHS_H
+#include "clc_private.h"
+#include "libft/limits.h"
+#include "libft/maths.h"
+#include "libft/ansi.h"
 
-#include "gpu/clc/clc.h"
+string get_unique_col(U64 v)
+{
+	static char buf[100] = {0};
+	v %= S32_MAX;
+	F32 f1 = ft_frand((S32)(v));
+	F32 f2 = ft_frand((S32)(v + 1));
+	F32 f3 = ft_frand((S32)(v + 2));
 
-cl_program make_maths_cl(ClDevice *device, LibraryCache cache);
-
-#endif
+	snprintf(buf, sizeof(buf) - 1, FT_FOREGROUND_COLOR(%d, %d, %d), (S32)(f1*255), (S32)(f2*255), (S32)(f3*255));
+	return buf;
+}

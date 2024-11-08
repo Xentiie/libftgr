@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/25 05:03:35 by reclaire          #+#    #+#             */
-/*   Updated: 2024/10/08 03:37:47 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/10/11 03:27:36 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 #include "libft/strings.h"
 #include "libft/path.h"
 
-static bool clc_begin(ProgramBuilder builder, program_type type)
+static bool clc_begin(ProgramBuilder builder, enum e_program_type type)
 {
 	ASSERT(builder != NULL, FALSE)
 	ASSERT(type == EXE || type == LIB, FALSE)

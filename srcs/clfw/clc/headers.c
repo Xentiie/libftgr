@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/25 18:13:41 by reclaire          #+#    #+#             */
-/*   Updated: 2024/10/08 03:37:19 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/10/11 05:17:54 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,18 +15,14 @@
 #include "libft/path.h"
 #include "libft/io.h"
 
-S32 _clc_add_header(ProgramBuilder builder, const_string header_name, cl_program header_prog)
+bool _clc_add_header(ProgramBuilder builder, const_string header_name, cl_program header_prog)
 {
 	ASSERT(builder != NULL, -1);
 	ASSERT(builder->headers_names != NULL, -1);
 	ASSERT(header_name != NULL, -1);
 	ASSERT(header_prog != NULL, -1);
 
-	for (U64 i = 0; i < builder->headers_n; i++)
-	{
-		if (!ft_strcmp(builder->headers_names[i], header_name))
-			return 0;
-	}
+	clc_debug("adding header '%s'\n", header_name);
 
 	{ /* grow headers array */
 		string *new_names = NULL;
@@ -41,7 +37,7 @@ S32 _clc_add_header(ProgramBuilder builder, const_string header_name, cl_program
 				free(new_names);
 				free(new_programs);
 				clc_error("couldn't grow headers array: out of memory\n");
-				return -1;
+				return FALSE;
 			}
 			ft_memcpy(new_names, builder->headers_names, sizeof(string) * builder->headers_n);
 			ft_memcpy(new_programs, builder->headers_programs, sizeof(cl_program) * builder->headers_n);
@@ -53,13 +49,30 @@ S32 _clc_add_header(ProgramBuilder builder, const_string header_name, cl_program
 		}
 	}
 
+	clfw_retain_program(header_prog);
 	builder->headers_programs[builder->headers_n] = header_prog;
 	builder->headers_names[builder->headers_n] = (string)header_name;
 	builder->headers_n++;
 
-	return 1;
+	return TRUE;
 }
 
+bool _clc_include_header_src(ProgramBuilder builder, const_string header_name, const_string src, U64 len)
+{
+	cl_program header_prog;
+
+	if (UNLIKELY((header_prog = clfw_create_program_with_source(builder->device->ctx, 1, &src, &len)) == NULL))
+		return FALSE;
+
+	if (!_clc_add_header(builder, header_name, header_prog))
+	{
+		return FALSE;
+		clfw_release_program(header_prog);
+	}
+	return TRUE;
+}
+
+#if 0
 bool clc_include_header(ProgramBuilder builder, const_string path)
 {
 	S64 ret;
@@ -141,5 +154,92 @@ bool clc_include_header(ProgramBuilder builder, const_string path)
 			return FALSE;
 	}
 
+	return TRUE;
+}
+#endif
+
+bool clc_has_header(ProgramBuilder builder, const_string header_name)
+{
+	for (U64 i = 0; i < builder->headers_n; i++)
+	{
+		if (!ft_strcmp(builder->headers_names[i], header_name))
+			return TRUE;
+	}
+	return FALSE;
+}
+
+cl_program clc_header_get(ProgramBuilder builder, const_string header_name)
+{
+	for (U64 i = 0; i < builder->headers_n; i++)
+	{
+		if (!ft_strcmp(header_name, builder->headers_names[i]))
+			return builder->headers_programs[i];
+	}
+	return NULL;
+}
+
+bool clc_include_header(ProgramBuilder builder, const_string path)
+{
+	string str;
+	U64 len;
+
+	ASSERT(builder != NULL, FALSE)
+	ASSERT(builder->device != NULL, FALSE);
+	ASSERT(path != NULL, FALSE)
+
+	string header_name = ft_path_filename(path);
+	if (header_name == NULL)
+	{
+		clc_error("couldn't include header '%s': out of memory\n", path);
+		return FALSE;
+	}
+
+	if (clc_has_header(builder, header_name))
+		return TRUE;
+
+	clc_debug("read header %s\n", path);
+	{ /* read file */
+		file fd;
+
+		if (UNLIKELY((fd = ft_fopen(path, "r")) == (file)-1))
+		{
+			clc_error("couldn't ingest source file '%s': %s\n", path, ft_strerror2(ft_errno));
+			return FALSE;
+		}
+
+		if (UNLIKELY((str = (string)ft_readfile(fd, &len)) == NULL))
+		{
+			clc_error("couldn't ingest source file '%s': %s\n", path, ft_strerror2(ft_errno));
+			return FALSE;
+		}
+
+		ft_fclose(fd);
+	}
+
+	return _clc_include_header_src(builder, header_name, str, len);
+}
+
+bool clc_include_header_src(ProgramBuilder builder, const_string header_name, const_string src)
+{
+	S32 ret;
+	cl_program header_prog;
+	const_string ptr;
+	U64 len;
+
+	if (UNLIKELY((ptr = ft_strdup_l(header_name, &len)) == NULL))
+		return FALSE;
+	if (UNLIKELY((header_prog = clfw_create_program_with_source(builder->device->ctx, 1, &src, &len)) == NULL))
+	{
+		free((void *)ptr);
+		return FALSE;
+	}
+
+	ret = _clc_add_header(builder, ptr, header_prog);
+	if (ret < 1)
+	{
+		clfw_release_program(header_prog);
+		if (ret == -1)
+			return FALSE;
+	}
 	return TRUE;
 }

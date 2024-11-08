@@ -2,7 +2,7 @@
 Auto generated OpenCL wrapper from 'auto_gen_wrapper.py'
 */
 
-#include "clfw_wrapper_generated.h"
+#include "clfw_private.h"
 
 #pragma GCC diagnostics push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"

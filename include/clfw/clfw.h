@@ -6,14 +6,14 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 23:42:30 by reclaire          #+#    #+#             */
-/*   Updated: 2024/10/07 15:04:33 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/10/11 01:17:09 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef CLFW_H
 #define CLFW_H
 
-#include "libft/types.h"
+#include "libft/std.h"
 
 #define CL_TARGET_OPENCL_VERSION 300
 #include "CL/cl.h"

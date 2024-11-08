@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/25 18:13:09 by reclaire          #+#    #+#             */
-/*   Updated: 2024/10/08 03:31:22 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/10/11 04:03:39 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,8 +17,23 @@
 bool clc_ingest_program(ProgramBuilder builder, cl_program prog, bool compiled)
 {
 	clc_debug("ingest program at index %llu\n", (LU64)builder->programs_n);
-	array_grow(builder->programs, builder->programs_n, builder->programs_alloc, return FALSE, );
-	builder->programs[builder->programs_n++] = (program){.prog = prog, .compiled = compiled};
+
+	if (builder->programs_n >= builder->programs_alloc)
+	{
+		t_program *new = malloc(sizeof(t_program) * builder->programs_alloc * 2);
+		if (UNLIKELY(new == NULL))
+		{
+			clc_error("ingest program: out of memory\n");
+			return FALSE;
+		}
+		ft_memcpy(new, builder->programs, sizeof(t_program) * builder->programs_n);
+		free(builder->programs);
+		builder->programs = new;
+		builder->programs_alloc *= 2;
+	}
+
+	builder->programs[builder->programs_n] = (t_program){.prog = prog, .compiled = compiled};
+	builder->programs_n++;
 	return TRUE;
 }
 
@@ -89,18 +104,27 @@ bool clc_ingest_str(ProgramBuilder builder, const_string src)
 	return clc_ingest_program(builder, p, FALSE);
 }
 
-bool clc_ingest_library(ProgramBuilder builder, LibraryCache lib_cache, string lib_name)
+bool clc_ingest_std_libs(ProgramBuilder builder)
 {
-	cl_program lib = NULL;
-	cl_program hdr = NULL;
+	Library *lib;
 
-	if (clc_get_lib(lib_cache, &hdr, &lib, &lib_name) == NULL)
+	if (UNLIKELY((lib = clc_get_cached_lib(builder, "clfw")) == NULL))
 		return FALSE;
+	return clc_ingest_library(builder, lib);
+}
 
-	if (_clc_add_header(builder, lib_name, hdr) == -1)
-		return FALSE;
+bool clc_ingest_library(ProgramBuilder builder, Library *library)
+{
+	ASSERT(builder != NULL, FALSE);
+	ASSERT(library != NULL, FALSE);
 
-	if (!clc_ingest_program(builder, lib, TRUE))
+	if (!clc_has_header(builder, library->header_name))
+	{
+		if (!_clc_add_header(builder, library->header_name, library->header))
+			return FALSE;
+	}
+
+	if (!clc_ingest_program(builder, library->lib, TRUE))
 		return FALSE;
 	return TRUE;
 }

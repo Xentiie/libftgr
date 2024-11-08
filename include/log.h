@@ -6,14 +6,14 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/26 23:07:32 by reclaire          #+#    #+#             */
-/*   Updated: 2024/10/08 03:35:55 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/10/11 01:17:07 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef LOG_H
 #define LOG_H
 
-#include "libft/types.h"
+#include "libft/std.h"
 #include "libft/io.h"
 
 enum e_log_level

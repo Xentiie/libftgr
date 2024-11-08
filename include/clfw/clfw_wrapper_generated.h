@@ -5,8 +5,7 @@ Auto generated OpenCL wrapper from 'auto_gen_wrapper.py'
 #define CL_USE_DEPRECATED_OPENCL_1_0_APIS
 #define CL_TARGET_OPENCL_VERSION 300
 #include "CL/cl.h"
-#include "log/log.h"
-#include "clfw_private.h"
+#include "log.h"
 #include "libft/std.h"
 
 #define CLFW_DEBUG
@@ -177,18 +176,18 @@ cl_program (clfw_create_program_with_source)(CLFW_DEBUG_ARGS(cl_context context,
 cl_program (clfw_create_program_with_binary)(CLFW_DEBUG_ARGS(cl_context context, U32 num_devices, const cl_device_id *device_list, const U64 *lengths, const unsigned char ** binaries, S32 *binary_status));
 cl_program (clfw_create_program_with_built_in_kernels)(CLFW_DEBUG_ARGS(cl_context context, U32 num_devices, const cl_device_id *device_list, const char *kernel_names));
 cl_program (clfw_create_program_with_il)(CLFW_DEBUG_ARGS(cl_context context, const void* il, U64 length));
-bool (clfw_retain_program)(CLFW_DEBUG_ARGS(cl_program program));
-bool (clfw_release_program)(CLFW_DEBUG_ARGS(cl_program program));
-bool (clfw_build_program)(CLFW_DEBUG_ARGS(cl_program program, U32 num_devices, const cl_device_id *device_list, const char *options, void (*pfn_notify)(cl_program program, void * user_data), void *user_data));
-bool (clfw_compile_program)(CLFW_DEBUG_ARGS(cl_program program, U32 num_devices, const cl_device_id *device_list, const char *options, U32 num_input_headers, const cl_program *input_headers, const char ** header_include_names, void (*pfn_notify)(cl_program program, void * user_data), void *user_data));
+bool (clfw_retain_program)(CLFW_DEBUG_ARGS(cl_program t_program));
+bool (clfw_release_program)(CLFW_DEBUG_ARGS(cl_program t_program));
+bool (clfw_build_program)(CLFW_DEBUG_ARGS(cl_program t_program, U32 num_devices, const cl_device_id *device_list, const char *options, void (*pfn_notify)(cl_program program, void * user_data), void *user_data));
+bool (clfw_compile_program)(CLFW_DEBUG_ARGS(cl_program t_program, U32 num_devices, const cl_device_id *device_list, const char *options, U32 num_input_headers, const cl_program *input_headers, const char ** header_include_names, void (*pfn_notify)(cl_program program, void * user_data), void *user_data));
 cl_program (clfw_link_program)(CLFW_DEBUG_ARGS(cl_context context, U32 num_devices, const cl_device_id *device_list, const char *options, U32 num_input_programs, const cl_program *input_programs, void (*pfn_notify)(cl_program program, void * user_data), void *user_data));
-bool (clfw_set_program_release_callback)(CLFW_DEBUG_ARGS(cl_program program, void (*pfn_notify)(cl_program program, void * user_data), void *user_data));
-bool (clfw_set_program_specialization_constant)(CLFW_DEBUG_ARGS(cl_program program, U32 spec_id, U64 spec_size, const void* spec_value));
+bool (clfw_set_program_release_callback)(CLFW_DEBUG_ARGS(cl_program t_program, void (*pfn_notify)(cl_program program, void * user_data), void *user_data));
+bool (clfw_set_program_specialization_constant)(CLFW_DEBUG_ARGS(cl_program t_program, U32 spec_id, U64 spec_size, const void* spec_value));
 bool (clfw_unload_platform_compiler)(CLFW_DEBUG_ARGS(cl_platform_id platform));
-bool (clfw_get_program_info)(CLFW_DEBUG_ARGS(cl_program program, cl_program_info param_name, U64 param_value_size, void *param_value, U64 *param_value_size_ret));
-bool (clfw_get_program_build_info)(CLFW_DEBUG_ARGS(cl_program program, cl_device_id device, cl_program_build_info param_name, U64 param_value_size, void *param_value, U64 *param_value_size_ret));
-cl_kernel (clfw_create_kernel)(CLFW_DEBUG_ARGS(cl_program program, const char *kernel_name));
-bool (clfw_create_kernels_in_program)(CLFW_DEBUG_ARGS(cl_program program, U32 num_kernels, cl_kernel *kernels, U32 *num_kernels_ret));
+bool (clfw_get_program_info)(CLFW_DEBUG_ARGS(cl_program t_program, cl_program_info param_name, U64 param_value_size, void *param_value, U64 *param_value_size_ret));
+bool (clfw_get_program_build_info)(CLFW_DEBUG_ARGS(cl_program t_program, cl_device_id device, cl_program_build_info param_name, U64 param_value_size, void *param_value, U64 *param_value_size_ret));
+cl_kernel (clfw_create_kernel)(CLFW_DEBUG_ARGS(cl_program t_program, const char *kernel_name));
+bool (clfw_create_kernels_in_program)(CLFW_DEBUG_ARGS(cl_program t_program, U32 num_kernels, cl_kernel *kernels, U32 *num_kernels_ret));
 cl_kernel (clfw_clone_kernel)(CLFW_DEBUG_ARGS(cl_kernel source_kernel));
 bool (clfw_retain_kernel)(CLFW_DEBUG_ARGS(cl_kernel kernel));
 bool (clfw_release_kernel)(CLFW_DEBUG_ARGS(cl_kernel kernel));

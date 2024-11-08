@@ -6,17 +6,15 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 15:59:03 by reclaire          #+#    #+#             */
-/*   Updated: 2024/10/08 03:34:21 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/10/11 05:12:49 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef PIPELINE_H
 #define PIPELINE_H
 
-#define CL_TARGET_OPENCL_VERSION 300
 #define CL_NO_PROTOTYPES
-#include "CL/cl.h"
-#include "gpu/clc/clc.h"
+#include "clfw/clc.h"
 #include "3dfw/3dfw.h"
 
 typedef struct s_pipeline *Pipeline;
@@ -31,7 +29,7 @@ User should not call clc_executable_begin/clc_end
 User should provide source code for a `vertex_shader` function prototyped like so:
 t_v4 vertex_shader(global U8 *p, t_mat4x4 model_to_world, t_mat4x4 world_to_clip);
 */
-ProgramBuilder pipeline_shader_builder(Pipeline pipe, LibraryCache cache);
+ProgramBuilder pipeline_shader_builder(Pipeline pipe, ProgramBuilder builder);
 /*
 Link both vertex and fragment shaders
 */

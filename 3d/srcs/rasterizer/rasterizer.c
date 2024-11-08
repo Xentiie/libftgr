@@ -6,14 +6,13 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/24 00:07:37 by reclaire          #+#    #+#             */
-/*   Updated: 2024/10/09 15:19:06 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/10/11 05:16:32 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "rasterizer_private.h"
 #include "3dfw/3dfw.h"
-#include "gpu/clc/clc.h"
-#include "gpu/clfw/clfw.h"
+#include "clfw/clc.h"
 
 #include "libft/io.h"
 
@@ -60,7 +59,7 @@ static void draw_bins(t_ftgr_img *img, t_v4 *tris, U32 tris_cnt, t_iv2 tile_size
 	}
 }
 
-static t_v4 *launch_tris_setup(Pipeline pipe, struct s_object object, struct s_camera cam)
+static bool launch_tris_setup(Pipeline pipe, struct s_object object, struct s_camera cam)
 {
 	t_mat4x4 world_to_clip;
 	t_mat4x4 model_to_world;

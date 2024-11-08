@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/06 02:27:08 by reclaire          #+#    #+#             */
-/*   Updated: 2024/10/09 23:42:18 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/10/11 05:15:25 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,11 +20,9 @@
 
 #include "3dfw/3dfw.h"
 #include "infolines/infolines.h"
-#include "gpu/clc/clc.h"
-#include "gpu/maths.cl/make_maths_cl.h"
-#include "gpu/rasterizer/rasterizer_private.h"
-
-#include "gpu/clfw/clfw_private.h"
+#include "clfw/clfw.h"
+#include "clfw/clc.h"
+#include "rasterizer/rasterizer_private.h"
 
 #include "infolines_getters.h"
 
@@ -46,7 +44,7 @@ int main()
 	U64 platforms_cnt;
 	ClPlatform *platforms;
 	ClDevice *device;
-	LibraryCache libcache;
+	ProgramBuilder libcache;
 
 	log_level = LOG_DEBUG;
 
@@ -120,18 +118,15 @@ int main()
 		clfw_init_device_queue(device);
 	}
 
-	if ((libcache = clc_cache_init()) == NULL)
-		return 1;
-	if (!make_maths_cl(device, libcache))
+	if ((libcache = clc_builder_init(device)) == NULL)
 		return 1;
 
 	Pipeline pipe;
 	if ((pipe = pipeline_init(device)) == NULL)
 		return 1;
 
-	device->compute_units
-
-	ProgramBuilder builder = pipeline_shader_builder(pipe, libcache);
+	ProgramBuilder builder = clc_builder_init_from(libcache);
+	pipeline_shader_builder(pipe, builder);
 	if (!clc_ingest_file(builder, "srcs/simple_vertex_shader.cl.c"))
 		return 1;
 	if (!pipeline_link_shader(pipe, builder))

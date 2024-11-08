@@ -6,11 +6,11 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/03 15:43:38 by reclaire          #+#    #+#             */
-/*   Updated: 2024/07/03 16:21:27 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/10/11 00:35:38 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../libftgr.h"
+#include "libftgr.h"
 #include "libft/images.h"
 #include "libft/io.h"
 

@@ -6,12 +6,13 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/01 00:40:48 by reclaire          #+#    #+#             */
-/*   Updated: 2024/10/07 16:17:32 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/10/11 00:34:25 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "clfw_private.h"
 #include "libft/strings.h"
+#include "libft/io.h"
 
 static const_string device_params_names[] = {
 	"CL_DEVICE_TYPE",									 /* 0x1000 */
@@ -313,7 +314,7 @@ ClPlatform *clfw_query_platforms_devices(U64 *platforms_cnt)
 			// get_device_param(&last_param, dev->device_id, CL_DEVICE_GENERIC_ADDRESS_SPACE_SUPPORT, &dev->supports_generic_addr_space, sizeof(dev->supports_generic_addr_space)) == NULL)
 			{
 				// TODO: ca devrait pas etre grave de crash ici, et un crash ne devrait pas empecher de recup le reste des données
-				printf("get_device_param failed at %#x:%s\n", last_param, device_params_names[last_param - 0x1000]);
+				ft_printf("get_device_param failed at %#x:%s\n", last_param, device_params_names[last_param - 0x1000]);
 				exit(1);
 			}
 		}

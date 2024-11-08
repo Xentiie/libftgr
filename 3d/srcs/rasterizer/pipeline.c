@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:03:40 by reclaire          #+#    #+#             */
-/*   Updated: 2024/10/09 15:19:51 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/10/11 05:15:41 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,17 +35,16 @@ void pipeline_free(Pipeline pipe)
 	free(pipe);
 }
 
-ProgramBuilder pipeline_shader_builder(Pipeline pipe, LibraryCache cache)
-{
-	ProgramBuilder builder;
-	
-	if (UNLIKELY((builder = clc_builder_init(pipe->device)) == NULL))
+ProgramBuilder pipeline_shader_builder(Pipeline pipe, ProgramBuilder builder)
+{	
+	if (!clc_get_cached_lib(builder, "clfw") ||!clc_get_cached_lib(builder, "maths"))
 		return NULL;
 	if (!clc_executable_begin(builder))
 		goto exit_err;
-	if (!clc_ingest_library(builder, cache, "maths.cl.h"))
+	if (!clc_ingest_library(builder, clc_get_cached_lib(builder, "clfw")))
 		goto exit_err;
-
+	if (!clc_ingest_library(builder, clc_get_cached_lib(builder, "maths")))
+		goto exit_err;
 
 	if (UNLIKELY(!clc_ingest_file(builder, "srcs/gpu/rasterizer/tris_setup.cl.c")))
 		goto exit_err;
@@ -54,7 +53,6 @@ ProgramBuilder pipeline_shader_builder(Pipeline pipe, LibraryCache cache)
 
 	return builder;
 exit_err:
-	clc_builder_destroy(builder);
 	return NULL;
 }
 

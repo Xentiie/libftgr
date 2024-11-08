@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/12 01:02:07 by reclaire          #+#    #+#             */
-/*   Updated: 2024/09/30 14:47:39 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/10/11 00:36:52 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,6 @@
 
 #include "libftgr.h"
 #include "libft/lists.h"
-#include "global.h"
 
 struct s_object
 {

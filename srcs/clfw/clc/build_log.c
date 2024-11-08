@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/25 18:12:12 by reclaire          #+#    #+#             */
-/*   Updated: 2024/10/08 03:57:57 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/10/11 02:11:35 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,6 @@ string retrieve_build_log(ProgramBuilder builder, cl_program prog)
 {
 	ASSERT(builder != NULL, NULL)
 	ASSERT(builder->device != NULL, NULL)
-	//ASSERT(prog != NULL, NULL)
 
 	string build_log;  /* build log */
 	U64 build_log_len; /* build log length */
