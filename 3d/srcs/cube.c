@@ -6,11 +6,12 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 13:33:52 by reclaire          #+#    #+#             */
-/*   Updated: 2024/10/04 08:46:37 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/11/08 04:25:10 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "3dfw/3dfw.h"
+#include "utils.h"
 
 const t_v3 cube_verts[] = {
 	{-1.0f, -1.0f, -1.0f},
