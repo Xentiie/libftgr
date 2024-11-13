@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/25 18:07:19 by reclaire          #+#    #+#             */
-/*   Updated: 2024/10/11 05:21:38 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/11/12 03:49:58 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,8 @@ typedef struct s_program
 
 typedef struct s_program_builder
 {
-	ClDevice *device;
+	U32 ref;
+	ClDevice device;
 
 	enum e_program_type current_type;
 
@@ -76,5 +77,6 @@ typedef struct s_program_builder
 string retrieve_build_log(ProgramBuilder builder, cl_program prog);
 bool _clc_add_header(ProgramBuilder builder, const_string header_name, cl_program header_prog);
 string get_unique_col(U64 v);
+string clean_cl_file(const_string file, U64 len);
 
 #endif

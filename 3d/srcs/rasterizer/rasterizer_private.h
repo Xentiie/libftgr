@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 15:59:21 by reclaire          #+#    #+#             */
-/*   Updated: 2024/10/08 03:29:20 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/11/12 03:54:23 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@
 #define rast_error(...) log_error(rast_tag, __VA_ARGS__)
 
 typedef struct s_pipeline {
-	ClDevice *device;
+	ClDevice device;
 
 	cl_program shader_prog;
 	cl_kernel vert_shdr;

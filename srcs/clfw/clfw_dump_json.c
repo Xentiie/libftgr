@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/03 21:15:48 by reclaire          #+#    #+#             */
-/*   Updated: 2024/10/03 21:16:21 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/11/12 03:52:41 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,18 +22,18 @@
 #define _U64_fmt "%lu"
 #define _S64_fmt "%ls"
 #endif
-#define json_begin_obj(...) ft_dprintf(fd, __VA_OPT__(__VA_ARGS__ ":") "{")
-#define json_end_obj() ft_dprintf(fd, "}")
-#define json_sep() ft_dprintf(fd, ",")
-#define json_begin_array(...) ft_dprintf(fd, __VA_OPT__("\"" __VA_ARGS__ "\":")"[")
-#define json_end_array() ft_dprintf(fd, "]")
+#define json_begin_obj(...) ft_fprintf(file, __VA_OPT__(__VA_ARGS__ ":") "{")
+#define json_end_obj() ft_fprintf(file, "}")
+#define json_sep() ft_fprintf(file, ",")
+#define json_begin_array(...) ft_fprintf(file, __VA_OPT__("\"" __VA_ARGS__ "\":")"[")
+#define json_end_array() ft_fprintf(file, "]")
 #define dump_json_val(p, v)                                                                                                                                                                                         \
 	{                                                                                                                                                                                                               \
-		ft_dprintf(fd, "\"" #v "\":");                                                                                                                                                                              \
-		ft_dprintf(fd, _Generic((p->v), U64: _U64_fmt, U32: "%u", U16: "%u", U8: "%s", S64: _S64_fmt, S32: "%d", S16: "%d", S8: "%d", string: "\"%s\""), _Generic((p->v), U8: (p->v ? "true" : "false"), default: p->v)); \
+		ft_fprintf(file, "\"" #v "\":");                                                                                                                                                                              \
+		ft_fprintf(file, _Generic((p->v), U64: _U64_fmt, U32: "%u", U16: "%u", U8: "%s", S64: _S64_fmt, S32: "%d", S16: "%d", S8: "%d", string: "\"%s\""), _Generic((p->v), U8: (p->v ? "true" : "false"), default: p->v)); \
 	}
 
-void clfw_dump_device_json(file fd, ClDevice *device)
+void clfw_dump_device_json(t_file *file, ClDevice device)
 {
 	json_begin_obj();
 	dump_json_val(device, type);
@@ -41,7 +41,7 @@ void clfw_dump_device_json(file fd, ClDevice *device)
 	dump_json_val(device, compute_units);
 	json_sep();
 	json_begin_array("max_work_item_size");
-	ft_dprintf(fd, _U64_fmt","_U64_fmt","_U64_fmt, device->max_work_item_size[0], device->max_work_item_size[1], device->max_work_item_size[2]);
+	ft_fprintf(file, _U64_fmt","_U64_fmt","_U64_fmt, device->max_work_item_size[0], device->max_work_item_size[1], device->max_work_item_size[2]);
 	json_end_array();
 	json_sep();
 	dump_json_val(device, max_work_group_size);
@@ -115,7 +115,7 @@ void clfw_dump_device_json(file fd, ClDevice *device)
 	json_end_obj();
 }
 
-void clfw_dump_platform_json(file fd, ClPlatform *platform)
+void clfw_dump_platform_json(t_file *file, ClPlatform platform)
 {
 	json_begin_obj();
 
@@ -135,7 +135,7 @@ void clfw_dump_platform_json(file fd, ClPlatform *platform)
 	json_begin_array("devices");
 	for (U64 i = 0; i < platform->devices_cnt; i++)
 	{
-		clfw_dump_device_json(fd, &platform->devices[i]);
+		clfw_dump_device_json(file, platform->devices[i]);
 		if (i != platform->devices_cnt - 1)
 			json_sep();
 	}
@@ -144,12 +144,12 @@ void clfw_dump_platform_json(file fd, ClPlatform *platform)
 	json_end_obj();
 }
 
-void clfw_dump_platforms_json(file fd, ClPlatform *platforms, U64 platforms_count)
+void clfw_dump_platforms_json(t_file *file, ClPlatform *platforms, U64 platforms_count)
 {
 	json_begin_array();
 	for (U64 i = 0; i < platforms_count; i++)
 	{
-		clfw_dump_platform_json(fd, &platforms[i]);
+		clfw_dump_platform_json(file, platforms[i]);
 		if (i != platforms_count - 1)
 			json_sep();
 	}

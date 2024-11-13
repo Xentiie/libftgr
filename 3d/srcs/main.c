@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/06 02:27:08 by reclaire          #+#    #+#             */
-/*   Updated: 2024/11/08 15:09:04 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/11/12 15:04:15 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ int main()
 
 	U64 platforms_cnt;
 	ClPlatform *platforms;
-	ClDevice *device;
+	ClDevice device;
 	ProgramBuilder libcache;
 
 	log_level = LOG_DEBUG;
@@ -112,8 +112,8 @@ int main()
 			printf("error: %s\n", clfw_get_last_error_title());
 			return 0;
 		}
-		device = &platforms[0].devices[0]; // Should be NVIDIA
-		printf("%s/%s\n", platforms[0].name, device->name);
+		device = platforms[0]->devices[0]; // Should be NVIDIA
+		printf("%s/%s\n", platforms[0]->name, device->name);
 		clfw_init_device_ctx(device);
 		clfw_init_device_queue(device);
 	}
@@ -125,6 +125,7 @@ int main()
 	if ((pipe = pipeline_init(device)) == NULL)
 		return 1;
 
+/*
 	ProgramBuilder builder = clc_builder_init_from(libcache);
 	pipeline_shader_builder(pipe, builder);
 	if (!clc_ingest_file(builder, "srcs/simple_vertex_shader.cl.c"))
@@ -135,6 +136,7 @@ int main()
 	pipeline_buffers_init(pipe, 0);
 	pipeline_fill_verts(pipe, cube.verts, cube.verts_cnt);
 	pipeline_fill_tris(pipe, cube.tris, cube.tris_cnt);
+*/
 
 	while (ftgr_poll(ctx))
 	{
@@ -186,7 +188,7 @@ int main()
 		}
 
 		//render_model(cam2_view ? cam2 : cam, cube);
-		pipeline_execute(pipe, cube, cam2_view ? cam2 : cam);
+		//pipeline_execute(pipe, cube, cam2_view ? cam2 : cam);
 
 		ftgr_handle_widget_events(win, win->w_root);
 		ftgr_draw_widget_recursive(win->surface, win->w_root);

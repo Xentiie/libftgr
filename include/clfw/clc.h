@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/26 22:35:18 by reclaire          #+#    #+#             */
-/*   Updated: 2024/10/11 04:18:20 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/11/12 03:46:52 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ typedef struct s_library
 	string lib_name;
 }	Library;
 
-ProgramBuilder clc_builder_init(ClDevice *device);
+ProgramBuilder clc_builder_init(ClDevice device);
 /* Duplicates builder `pb`, useful to avoid rebuilding the standard libraries */
 ProgramBuilder clc_builder_init_from(ProgramBuilder pb);
 bool clc_builder_destroy(ProgramBuilder builder);

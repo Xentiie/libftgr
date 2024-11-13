@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/13 01:58:46 by reclaire          #+#    #+#             */
-/*   Updated: 2024/10/07 15:25:27 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/11/08 04:09:13 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,10 @@
 #include "libft/std.h"
 #include "libft/strings.h"
 #include "libft/maths.h"
-#include "srcs/libftgr_constants.h"
+
+# define FTGR_CURSOR_NORMAL (0)
+# define FTGR_CURSOR_LOCKED (1 << 0)
+# define FTGR_CURSOR_HIDDEN (1 << 1)
 
 #define MOUSE_LEFT 0
 #define MOUSE_MIDDLE 1
@@ -195,7 +198,7 @@ void ftgr_stretch_img(t_ftgr_img *dst, t_iv4 dst_rect, t_ftgr_img *src, t_iv4 sr
 void ftgr_stretch_img2(t_ftgr_img *dst, t_iv4 dst_rect, t_ftgr_img *src, t_iv4 src_rect, t_color col);
 void ftgr_cpy_img(t_ftgr_img *dst, t_iv2 dst_pos, t_ftgr_img *src, t_iv4 src_rect);
 
-void *ftgr_load_font(file fd, t_ftgr_img *img);
+void *ftgr_load_font(filedesc fd, t_ftgr_img *img);
 t_ftgr_img *ftgr_load_png(t_ftgr_ctx *ctx, const_string path);
 
 /* 32 bytes of user-data for a t_widget */

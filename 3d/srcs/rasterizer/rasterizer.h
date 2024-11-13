@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 15:59:03 by reclaire          #+#    #+#             */
-/*   Updated: 2024/10/11 05:12:49 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/11/12 03:54:47 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@
 typedef struct s_pipeline *Pipeline;
 
 /* initializes a new pipeline */
-Pipeline pipeline_init(ClDevice *device);
+Pipeline pipeline_init(ClDevice device);
 void pipeline_free(Pipeline pipe);
 /*
 Begins a ProgramBuilder, which already includes the maths.cl library, and the tris_setup kernel.

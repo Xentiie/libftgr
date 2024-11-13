@@ -1,4 +1,5 @@
 #!/bin/bash
+VER=1.0.0
 set -e
 cd "$(dirname "$0")"
 
@@ -300,7 +301,7 @@ cf_end_rule() {
 	RULE_NAME=""
 	INDENT=$((INDENT-1))
 	if [ -n "$1" ]; then
-		cf_append "PHONY: %s\n" "$rule_name"
+		cf_append ".PHONY: %s\n" "$rule_name"
 	fi
 	cf_append "\n"
 }
@@ -339,6 +340,7 @@ cf_end_target() {
 
 		cf_begin_rule "all" \
 			--prereq "objs" \
+			--prereq "packages" \
 			--prereq '$(NAME)'
 		cf_end_rule phony
 
@@ -494,8 +496,10 @@ configure() {
 		cf_add_cflag "-Wall"
 		cf_add_cflag "-Wextra"
 		cf_add_cflag "-Wno-unknown-pragmas"
+		cf_add_cflag "-g"
+		cf_add_cflag "-O3"
 
-		cf_add_pkg ".."
+		cf_add_pkg "../../libftgr"
 
 		cf_add_raw_lib_path "../3rdparty/OpenCL/bin"
 		cf_add_include "../3rdparty/OpenCL/include"

@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/24 00:07:37 by reclaire          #+#    #+#             */
-/*   Updated: 2024/10/11 05:16:32 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/11/12 03:57:17 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@ static void draw_bins(t_ftgr_img *img, t_v4 *tris, U32 tris_cnt, t_iv2 tile_size
 				t_iv2 end = ft_imin2(ivec2(begin.x + tile_size.x, begin.y + tile_size.y), img->size);
 				for (S32 _x = begin.x; _x < end.x; _x++)
 					for (S32 _y = begin.y; _y < end.y; _y++)
-						*ftgr_get_pixel_addr(img, _x, _y) = 0x646464;
+						*(U32 *)ftgr_get_pixel_addr(img, _x, _y) = (U32)0x646464;
 			}
 		}
 	}
@@ -98,7 +98,7 @@ static bool launch_tris_setup(Pipeline pipe, struct s_object object, struct s_ca
 
 void launch_bin_raster(Pipeline pipe)
 {
-	
+	(void)pipe;
 }
 
 void pipeline_execute(Pipeline pipe, struct s_object object, struct s_camera cam)
@@ -107,6 +107,6 @@ void pipeline_execute(Pipeline pipe, struct s_object object, struct s_camera cam
 		return;
 
 	if (!launch_tris_setup(pipe, object, cam))
-		return FALSE;
+		return;
 	launch_bin_raster(pipe);
 }

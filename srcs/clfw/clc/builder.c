@@ -6,14 +6,15 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/25 18:13:18 by reclaire          #+#    #+#             */
-/*   Updated: 2024/10/11 05:36:46 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/11/12 14:58:35 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "clc_private.h"
+#include "libft/strings.h"
 #include "libft/ansi.h"
 
-ProgramBuilder clc_builder_init(ClDevice *device)
+ProgramBuilder clc_builder_init(ClDevice device)
 {
 	ProgramBuilder builder;
 
@@ -29,7 +30,9 @@ ProgramBuilder clc_builder_init(ClDevice *device)
 	ft_bzero(builder, sizeof(struct s_program_builder));
 	clc_debug("created builder: %s%p" FT_CRESET "\n", get_unique_col((U64)builder), builder);
 
+	builder->ref = 1;
 	builder->device = device;
+	clfw_ref_device(device);
 
 	builder->headers_n = 0;
 	builder->headers_alloc = 2;
@@ -64,7 +67,6 @@ ProgramBuilder clc_builder_init(ClDevice *device)
 			if (UNLIKELY(!clc_library_begin(builder)))
 				goto exit_err;
 
-			printf("%p\n", header_src(clfw));
 			if (UNLIKELY(clc_include_header_src(builder, "clfw.cl.h", header_src(clfw)) == FALSE) ||
 				UNLIKELY(clc_ingest_str(builder, file_src(clfw)) == FALSE))
 				goto exit_err;
@@ -113,31 +115,31 @@ ProgramBuilder clc_builder_init_from(ProgramBuilder pb)
 
 	ASSERT(pb != NULL, NULL);
 
+	builder = NULL;
 	if (UNLIKELY((builder = malloc(sizeof(struct s_program_builder))) == NULL))
 		goto exit_omem;
 	clc_debug("created builder: %s%p" FT_CRESET "\n", get_unique_col((U64)builder), builder);
 
-	ft_memcpy(builder, pb, sizeof(struct s_program_builder));
+	ft_bzero(builder, sizeof(struct s_program_builder));
 
-	builder->headers_names = NULL;
-	builder->headers_programs = NULL;
-	builder->libraries = NULL;
-	builder->programs = NULL;
+	builder->device = pb->device;
+	builder->current_type = pb->current_type;
+	builder->libraries_alloc = pb->libraries_alloc;
+	builder->programs_alloc = pb->programs_alloc;
+	builder->headers_alloc = pb->headers_alloc;
+
 	if (UNLIKELY((builder->headers_names = malloc(sizeof(string) * builder->headers_alloc)) == NULL) ||
 		UNLIKELY((builder->headers_programs = malloc(sizeof(cl_program) * builder->headers_alloc)) == NULL) ||
 		UNLIKELY((builder->libraries = malloc(sizeof(Library) * builder->libraries_alloc)) == NULL) ||
 		UNLIKELY((builder->programs = malloc(sizeof(t_program) * builder->programs_alloc)) == NULL))
-	{
-		free(builder->headers_names);
-		free(builder->headers_programs);
-		free(builder->libraries);
-		free(builder->programs);
 		goto exit_omem;
-	}
-
 
 	for (U32 i = 0; i < builder->headers_n; i++)
+	{
+		builder->headers_names[i] = ft_strdup(pb->headers_names[i]);
+		printf("%p\n", builder->headers_programs[i]);
 		clfw_retain_program(builder->headers_programs[i]);
+	}
 	for (U32 i = 0; i < builder->libraries_n; i++)
 	{
 		clfw_retain_program(builder->libraries[i].header);
@@ -150,6 +152,15 @@ ProgramBuilder clc_builder_init_from(ProgramBuilder pb)
 
 exit_omem:
 	clc_error("program builder: out of memory\n");
+
+	if (builder)
+	{
+		free(builder->headers_names);
+		free(builder->headers_programs);
+		free(builder->libraries);
+		free(builder->programs);
+	}
+
 	return NULL;
 }
 
@@ -175,7 +186,7 @@ bool clc_builder_destroy(ProgramBuilder builder)
 
 	free(builder->headers_names);
 	free(builder->headers_programs);
-	free(builder->programs);
+	//free(builder->programs);
 	free(builder->libraries);
 	free(builder);
 	return TRUE;

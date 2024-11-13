@@ -6,13 +6,13 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:03:40 by reclaire          #+#    #+#             */
-/*   Updated: 2024/10/11 05:15:41 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/11/12 03:55:33 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "rasterizer_private.h"
 
-Pipeline pipeline_init(ClDevice *device)
+Pipeline pipeline_init(ClDevice device)
 {
 	Pipeline pipe;
 	
@@ -36,7 +36,9 @@ void pipeline_free(Pipeline pipe)
 }
 
 ProgramBuilder pipeline_shader_builder(Pipeline pipe, ProgramBuilder builder)
-{	
+{
+	(void)pipe;
+
 	if (!clc_get_cached_lib(builder, "clfw") ||!clc_get_cached_lib(builder, "maths"))
 		return NULL;
 	if (!clc_executable_begin(builder))

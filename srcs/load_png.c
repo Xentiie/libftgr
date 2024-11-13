@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/03 15:43:38 by reclaire          #+#    #+#             */
-/*   Updated: 2024/10/11 00:35:38 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/11/08 04:14:25 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,9 +16,9 @@
 
 t_ftgr_img	*ftgr_load_png(t_ftgr_ctx *ctx, const_string path)
 {
-	file fd = ft_fopen((string)path, "r");
+	filedesc fd = ft_open((string)path, "r");
 	t_png_img *png = ft_load_png(fd, TRUE);
-	ft_fclose(fd);
+	ft_close(fd);
 
 	if (UNLIKELY(png == NULL) || (png->color_type != 0 && png->color_type != 2 && png->color_type != 4 && png->color_type != 6) )
 		return FALSE;

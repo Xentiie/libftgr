@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 23:42:30 by reclaire          #+#    #+#             */
-/*   Updated: 2024/10/11 01:17:09 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/11/12 03:52:56 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 #include "clfw_wrapper_generated.h"
 
 typedef struct s_cl_device {
+	U32 ref;
 	cl_device_id device_id;
 	cl_context ctx;
 	cl_command_queue queue;
@@ -74,10 +75,11 @@ typedef struct s_cl_device {
 	cl_device_atomic_capabilities atm_capabilities; //CL_DEVICE_ATOMIC_MEMORY_CAPABILITIES
 
 	bool supports_generic_addr_space; //CL_DEVICE_GENERIC_ADDRESS_SPACE_SUPPORT	
-} ClDevice;
+} *ClDevice;
 
 typedef struct s_cl_platform
 {
+	U32 ref;
 	cl_platform_id platform_id;
 	ClDevice *devices;
 	U32 devices_cnt;
@@ -86,27 +88,7 @@ typedef struct s_cl_platform
 	string version;
 	string extensions;
 	bool embedded; /* CL_PLATFORM_PROFILE  */
-} ClPlatform;
-
-typedef struct s_cl_kernel
-{
-	cl_kernel kernel;
-	string kernel_name;
-} ClKernel;
-
-typedef struct s_cl_program
-{
-	/* can be NULL */
-	string program_source;
-	ClKernel *kernels;
-	U64 kernels_cnt;
-	cl_program prog;
-} ClProgram;
-
-typedef struct s_cl_header
-{
-
-} ClHeader;
+} *ClPlatform;
 
 /*
 Returns a list of `*platforms_cnt` `ClPlatform` objects, and initializes each
@@ -119,41 +101,29 @@ Returns NULL, with `clfw_last_error == 0` and with `ft_errno != 0` if an error o
 Returns NULL, with `clfw_last_error == 0` if their is no available platforms
 */
 ClPlatform *clfw_query_platforms_devices(U64 *platforms_cnt);
-void clfw_dump_platforms_json(file fd, ClPlatform *platforms, U64 platforms_count);
-void clfw_dump_platform_json(file fd, ClPlatform *platform);
-void clfw_dump_device_json(file fd, ClDevice *device);
+void clfw_dump_platforms_json(t_file *file, ClPlatform *platforms, U64 platforms_count);
+void clfw_dump_platform_json(t_file *file, ClPlatform platform);
+void clfw_dump_device_json(t_file *file, ClDevice device);
 
 /*
 Creates a OpenCL context for a device. If the device's context is non-null, do nothing and return TRUE
 ### On error
 Returns FALSE. `device->ctx` is set to NULL
 */
-bool clfw_init_device_ctx(ClDevice *device);
+bool clfw_init_device_ctx(ClDevice device);
 /*
 Creates a OpenCL command queue for a device. If the device's command queue is non-null, do nothing and return TRUE
 ### On error
 Returns FALSE. `device->queue` is set to NULL
 */
-bool clfw_init_device_queue(ClDevice *device);
+bool clfw_init_device_queue(ClDevice device);
 
-/* Free platform content, including all the attached devices */
-void clfw_free_platform(ClPlatform *platform);
-/* Free device content. */
-void clfw_free_device(ClDevice *device);
-
-
-/* //TODO: */
-ClKernel *clfw_get_kernel(ClProgram *program, U64 index);
-/* //TODO: */
-ClKernel *clfw_get_kernel_by_name(ClProgram *program, string name);
-/* //TODO: */
-string clfw_get_kernel_name(ClKernel *kernel);
-
-/* //TODO: */
-void *_clfw_get_cl_kernel(ClKernel *kernel);
-/* //TODO: */
-void *_clfw_get_cl_program(ClProgram *program);
-
+void clfw_ref_platform(ClPlatform platform);
+void clfw_deref_platform(ClPlatform platform);
+void clfw_free_platform(ClPlatform platform);
+void clfw_ref_device(ClDevice device);
+void clfw_deref_device(ClDevice device);
+void clfw_free_device(ClDevice device);
 
 S32 clfw_get_last_error();
 S32 clfw_get_last_call();

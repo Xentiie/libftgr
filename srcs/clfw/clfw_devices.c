@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/01 00:40:48 by reclaire          #+#    #+#             */
-/*   Updated: 2024/10/11 00:34:25 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/11/12 14:56:34 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -132,8 +132,7 @@ static const_string device_params_names[] = {
 	"CL_DEVICE_LATEST_CONFORMANCE_VERSION_PASSED",		 /* 0x1072 */
 };
 
-static string
-get_platform_param(cl_platform_id platform, cl_platform_info param)
+static string get_platform_param(cl_platform_id platform, cl_platform_info param)
 {
 	string ptr;
 	U64 size;
@@ -205,6 +204,7 @@ ClPlatform *clfw_query_platforms_devices(U64 *platforms_cnt)
 	ClPlatform *platforms;
 	cl_platform_id *platforms_cl;
 	U32 num_platforms;
+	U64 i;
 
 	platforms = NULL;
 	platforms_cl = NULL;
@@ -219,60 +219,67 @@ ClPlatform *clfw_query_platforms_devices(U64 *platforms_cnt)
 		return NULL;
 	}
 
-	if (UNLIKELY((platforms = malloc(sizeof(ClPlatform) * num_platforms)) == NULL) ||
+	if (UNLIKELY((platforms = malloc(sizeof(struct s_cl_platform) * num_platforms)) == NULL) ||
 		UNLIKELY((platforms_cl = malloc(sizeof(cl_platform_id) * num_platforms)) == NULL))
 	{
 		clfw_last_error = 0;
 		ft_errno = FT_EOMEM;
-		goto return_err;
+		goto exit_err;
 	}
 
 	if (!clfw_get_platform_ids(num_platforms, platforms_cl, NULL))
-		goto return_err;
+		goto exit_err;
 
-	ft_bzero(platforms, sizeof(ClPlatform) * num_platforms);
-	for (U64 i = 0; i < num_platforms; i++)
+	ft_bzero(platforms, sizeof(struct s_cl_platform) * num_platforms);
+	for (i = 0; i < num_platforms; i++)
 	{
-		platforms[i].platform_id = platforms_cl[i];
+		if (UNLIKELY((platforms[i] = malloc(sizeof(struct s_cl_platform))) == NULL))
+			goto exit_err;
+		platforms[i]->ref = 1;
+		platforms[i]->platform_id = platforms_cl[i];
 
 		/* get version */
-		if (UNLIKELY((platforms[i].version = get_platform_param(platforms[i].platform_id, CL_PLATFORM_VERSION)) == NULL))
-			goto return_err;
+		if (UNLIKELY((platforms[i]->version = get_platform_param(platforms[i]->platform_id, CL_PLATFORM_VERSION)) == NULL))
+			goto exit_err;
 
 		/* get name */
-		if (UNLIKELY((platforms[i].name = get_platform_param(platforms[i].platform_id, CL_PLATFORM_NAME)) == NULL))
-			goto return_err;
+		if (UNLIKELY((platforms[i]->name = get_platform_param(platforms[i]->platform_id, CL_PLATFORM_NAME)) == NULL))
+			goto exit_err;
 
 		/* get vendor */
-		if (UNLIKELY((platforms[i].vendor = get_platform_param(platforms[i].platform_id, CL_PLATFORM_VENDOR)) == NULL))
-			goto return_err;
+		if (UNLIKELY((platforms[i]->vendor = get_platform_param(platforms[i]->platform_id, CL_PLATFORM_VENDOR)) == NULL))
+			goto exit_err;
 
 		/* get extensions */
-		if (UNLIKELY((platforms[i].extensions = get_platform_param(platforms[i].platform_id, CL_PLATFORM_EXTENSIONS)) == NULL))
-			goto return_err;
+		if (UNLIKELY((platforms[i]->extensions = get_platform_param(platforms[i]->platform_id, CL_PLATFORM_EXTENSIONS)) == NULL))
+			goto exit_err;
 
 		// TODO: ici les crashs n'ont pas a etre fatals. pour le moment je fais ca comme ca prcque ca va vite, mais faudra changer
 		cl_device_id *devices_cl;
 		U32 num_devices;
-		if (!clfw_get_device_ids(platforms[i].platform_id, CL_DEVICE_TYPE_ALL, 0, NULL, &num_devices))
-			goto return_err;
+		if (!clfw_get_device_ids(platforms[i]->platform_id, CL_DEVICE_TYPE_ALL, 0, NULL, &num_devices))
+			goto exit_err;
 		if (num_devices == 0)
 			continue;
-		if (UNLIKELY((platforms[i].devices = malloc(sizeof(ClDevice) * num_devices)) == NULL) ||
+		if (UNLIKELY((platforms[i]->devices = malloc(sizeof(struct s_cl_device) * num_devices)) == NULL) ||
 			UNLIKELY((devices_cl = malloc(sizeof(cl_device_id) * num_devices)) == NULL))
-			goto return_err;
+			goto exit_err;
 
-		if (!clfw_get_device_ids(platforms[i].platform_id, CL_DEVICE_TYPE_ALL, num_devices, devices_cl, NULL))
+		if (!clfw_get_device_ids(platforms[i]->platform_id, CL_DEVICE_TYPE_ALL, num_devices, devices_cl, NULL))
 		{
 			free(devices_cl);
-			goto return_err;
+			goto exit_err;
 		}
 
 		cl_device_info last_param;
 		for (U64 j = 0; j < num_devices; j++)
 		{
-			ClDevice *dev = &(platforms[i].devices[j]);
-			ft_bzero(dev, sizeof(ClDevice));
+			ClDevice dev;
+			
+			dev = malloc(sizeof(struct s_cl_device));
+			platforms[i]->devices[j] = dev;
+			ft_bzero(dev, sizeof(struct s_cl_device));
+			dev->ref = 1;
 			dev->device_id = devices_cl[j];
 			if (
 				get_device_param(&last_param, dev->device_id, CL_DEVICE_TYPE, &dev->type, sizeof(dev->type)) == NULL ||
@@ -319,7 +326,7 @@ ClPlatform *clfw_query_platforms_devices(U64 *platforms_cnt)
 			}
 		}
 		free(devices_cl);
-		platforms[i].devices_cnt = num_devices;
+		platforms[i]->devices_cnt = num_devices;
 	}
 
 	free(platforms_cl);
@@ -327,35 +334,49 @@ ClPlatform *clfw_query_platforms_devices(U64 *platforms_cnt)
 	*platforms_cnt = num_platforms;
 	return platforms;
 
-return_err:
+exit_err:
 	for (U64 i = 0; i < num_platforms; i++)
 	{
-		free(platforms[i].devices);
-		free(platforms[i].extensions);
-		free(platforms[i].name);
-		free(platforms[i].vendor);
-		free(platforms[i].version);
+		free(platforms[i]->devices);
+		free(platforms[i]->extensions);
+		free(platforms[i]->name);
+		free(platforms[i]->vendor);
+		free(platforms[i]->version);
 	}
 	free(platforms);
 	free(platforms_cl);
 	return NULL;
 }
 
-bool clfw_init_device_ctx(ClDevice *device)
+bool clfw_init_device_ctx(ClDevice device)
 {
 	if (UNLIKELY(device->ctx != NULL))
 		return TRUE;
 	return (device->ctx = clfw_create_context(NULL, 1, &device->device_id, NULL, NULL)) == NULL;
 }
 
-bool clfw_init_device_queue(ClDevice *device)
+bool clfw_init_device_queue(ClDevice device)
 {
 	if (UNLIKELY(device->queue != NULL))
 		return TRUE;
 	return (device->queue = clfw_create_command_queue(device->ctx, device->device_id, 0)) == NULL;
 }
 
-void clfw_free_platform(ClPlatform *platform)
+void clfw_ref_platform(ClPlatform platform)
+{
+	platform->ref++;
+}
+
+void clfw_deref_platform(ClPlatform platform)
+{
+	if (platform->ref == 0)
+		return;
+	platform->ref--;
+	if (platform->ref == 0)
+		clfw_free_platform(platform);
+}
+
+void clfw_free_platform(ClPlatform platform)
 {
 	free(platform->extensions);
 	free(platform->name);
@@ -363,11 +384,25 @@ void clfw_free_platform(ClPlatform *platform)
 	free(platform->version);
 
 	for (U64 i = 0; i < platform->devices_cnt; i++)
-		clfw_free_device(&platform->devices[i]);
+		clfw_deref_device(platform->devices[i]);
 	free(platform->devices);
 }
 
-void clfw_free_device(ClDevice *device)
+void clfw_ref_device(ClDevice device)
+{
+	device->ref++;
+}
+
+void clfw_deref_device(ClDevice device)
+{
+	if (device->ref == 0)
+		return;
+	device->ref--;
+	if (device->ref == 0)
+		clfw_free_device(device);
+}
+
+void clfw_free_device(ClDevice device)
 {
 	if (device->ctx)
 		clfw_release_context(device->ctx);

@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/25 18:13:41 by reclaire          #+#    #+#             */
-/*   Updated: 2024/10/11 05:17:54 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/11/12 02:29:06 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,8 +66,8 @@ bool _clc_include_header_src(ProgramBuilder builder, const_string header_name, c
 
 	if (!_clc_add_header(builder, header_name, header_prog))
 	{
-		return FALSE;
 		clfw_release_program(header_prog);
+		return FALSE;
 	}
 	return TRUE;
 }
@@ -199,21 +199,21 @@ bool clc_include_header(ProgramBuilder builder, const_string path)
 
 	clc_debug("read header %s\n", path);
 	{ /* read file */
-		file fd;
+		t_file *file;
 
-		if (UNLIKELY((fd = ft_fopen(path, "r")) == (file)-1))
+		if (UNLIKELY((file = ft_fopen(path, "r")) == NULL))
 		{
 			clc_error("couldn't ingest source file '%s': %s\n", path, ft_strerror2(ft_errno));
 			return FALSE;
 		}
 
-		if (UNLIKELY((str = (string)ft_readfile(fd, &len)) == NULL))
+		if (UNLIKELY((str = (string)ft_freadfile(file, &len)) == NULL))
 		{
 			clc_error("couldn't ingest source file '%s': %s\n", path, ft_strerror2(ft_errno));
 			return FALSE;
 		}
 
-		ft_fclose(fd);
+		ft_fclose(file);
 	}
 
 	return _clc_include_header_src(builder, header_name, str, len);
@@ -221,25 +221,36 @@ bool clc_include_header(ProgramBuilder builder, const_string path)
 
 bool clc_include_header_src(ProgramBuilder builder, const_string header_name, const_string src)
 {
-	S32 ret;
-	cl_program header_prog;
-	const_string ptr;
 	U64 len;
 
-	if (UNLIKELY((ptr = ft_strdup_l(header_name, &len)) == NULL))
-		return FALSE;
-	if (UNLIKELY((header_prog = clfw_create_program_with_source(builder->device->ctx, 1, &src, &len)) == NULL))
+	len = ft_strlen(src);
+	return _clc_include_header_src(builder, header_name, src, len);
+
+#if 0
+	cl_program header_prog;
+	const_string hdr_name_dup;
+	U64 src_len;
+
+	if (UNLIKELY((hdr_name_dup = ft_strdup(header_name)) == NULL))
 	{
-		free((void *)ptr);
+		clc_error("cannot duplicate header name: out of memory\n");
 		return FALSE;
 	}
 
-	ret = _clc_add_header(builder, ptr, header_prog);
-	if (ret < 1)
+	src_len = ft_strlen(src);
+	if (UNLIKELY((header_prog = clfw_create_program_with_source(builder->device->ctx, 1, &src, &src_len)) == NULL))
+	{
+		clc_error("cannot create header cl program\n");
+		free((void *)hdr_name_dup);
+		return FALSE;
+	}
+
+	if (UNLIKELY(_clc_add_header(builder, hdr_name_dup, header_prog) == FALSE))
 	{
 		clfw_release_program(header_prog);
-		if (ret == -1)
-			return FALSE;
+		free((void *)hdr_name_dup);
+		return FALSE;
 	}
 	return TRUE;
+#endif
 }

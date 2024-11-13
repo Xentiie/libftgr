@@ -6,12 +6,13 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/07 17:32:16 by reclaire          #+#    #+#             */
-/*   Updated: 2024/09/30 16:32:14 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/11/12 15:03:09 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libftgr.h"
 #include "libft/time.h"
+#include "libft/io.h"
 #include "libft/maths.h"
 #include <time.h>
 #include <stdlib.h>
@@ -249,6 +250,8 @@ FUNCTION_HOT void ftgr_draw_line_e(t_ftgr_img *img, t_iv2 p1, t_iv2 p2, void (*e
 
 void ftgr_draw_line_horizontal(t_ftgr_img *img, t_iv2 p1, S32 x2, t_color col)
 {
+	S32 st;
+	S32 nd;
 	U32 col_i = ftgr_color_to_int(col);
 
 	if (p1.y < 0 || p1.y >= img->size.y)
@@ -256,7 +259,11 @@ void ftgr_draw_line_horizontal(t_ftgr_img *img, t_iv2 p1, S32 x2, t_color col)
 
 	p1.x = ft_clamp(0, img->size.x - 1, p1.x);
 	x2 = ft_clamp(0, img->size.x - 1, x2);
-	ft_memrpt(ftgr_get_pixel_addr(img, ft_imin(p1.x, x2), p1.y), &col_i, img->bpp, img->bpp * ft_abs(p1.x - x2));
+
+	st = ft_imin(p1.x, x2);
+	nd = ft_imax(p1.x, x2);
+	for (S32 x = st; x < nd; x++)
+		*(U32 *)ftgr_get_pixel_addr(img, x, p1.y) = col_i;
 }
 
 void ftgr_draw_line_horizontal_e(t_ftgr_img *img, t_iv2 p1, S32 x2, void (*eval)(t_ftgr_img *img, t_iv2 xy, t_iv4 lp1lp2, void *data), void *data)
