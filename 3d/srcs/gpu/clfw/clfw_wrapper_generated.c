@@ -4,21 +4,18 @@ Auto generated OpenCL wrapper from 'auto_gen_wrapper.py'
 
 #include "clfw_wrapper_generated.h"
 
-#pragma GCC diagnostics push
+#pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-
-#ifdef CLFW_DEBUG
 
 #undef clfw_error
 #undef clfw_warn
 #undef clfw_info
 #undef clfw_debug
 
-#define clfw_error(...) (log_error)(_file, _line, clfw_tag, __VA_ARGS__)
-#define clfw_warn(...) (log_warn)(_file, _line, clfw_tag, __VA_ARGS__)
-#define clfw_info(...) (log_info)(_file, _line, clfw_tag, __VA_ARGS__)
-#define clfw_debug(...) (log_debug)(_file, _line, clfw_tag, __VA_ARGS__)
-#endif
+#define clfw_error(...) (log_error)(FT_IFDEBUG(_file, _line,) clfw_tag, __VA_ARGS__)
+#define clfw_warn(...) (log_warn)(FT_IFDEBUG(_file, _line,) clfw_tag, __VA_ARGS__)
+#define clfw_info(...) (log_info)(FT_IFDEBUG(_file, _line,) clfw_tag, __VA_ARGS__)
+#define clfw_debug(...) (log_debug)(FT_IFDEBUG(_file, _line,) clfw_tag, __VA_ARGS__)
 
 bool (clfw_get_platform_ids)(CLFW_DEBUG_ARGS(U32 num_entries, cl_platform_id *platforms, U32 *num_platforms))
 {
@@ -411,6 +408,7 @@ void * (clfw_svm_alloc)(CLFW_DEBUG_ARGS(cl_context context, cl_svm_mem_flags fla
 
 bool (clfw_svm_free)(CLFW_DEBUG_ARGS(cl_context context, void *svm_pointer))
 {
+	FT_IFDEBUG((void)_file; (void)_line);
 	clSVMFree(context, svm_pointer);	clfw_last_error = 0;
 	clfw_last_call = _CLFW_CALL_CLSVMFREE;
 	return TRUE;
@@ -1313,4 +1311,4 @@ bool (clfw_enqueue_task)(CLFW_DEBUG_ARGS(cl_command_queue command_queue, cl_kern
 }
 
 
-#pragma GCC diagnostics pop
+#pragma GCC diagnostic pop

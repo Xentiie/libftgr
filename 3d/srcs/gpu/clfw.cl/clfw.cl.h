@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/03 10:52:53 by reclaire          #+#    #+#             */
-/*   Updated: 2024/10/08 04:07:27 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/10/08 04:26:43 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 #define local
 #define private
 #define constant
+#define __kernel
 #endif
 
 #ifndef NULL

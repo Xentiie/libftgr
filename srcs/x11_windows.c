@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/16 22:36:34 by reclaire          #+#    #+#             */
-/*   Updated: 2024/09/11 16:44:14 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/12/03 02:18:30 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ static inline bool _init_buffer(t_ftgr_ctx *ctx, t_framebuffer_data *buffer, t_i
 	ft_memset(buffer->img.data, 255, buffer->img.data_size);
 
 	buffer->ximage = XCreateImage(ctx->display, ctx->visual, ctx->depth, ZPixmap, 0,
-								  buffer->img.data, size.x, size.y, 32, 0);
+								  (char *)buffer->img.data, size.x, size.y, 32, 0);
 	buffer->pixmap = XCreatePixmap(ctx->display, ctx->root, size.x, size.y, ctx->depth);
 	// TODO: check return code
 	buffer->format = ZPixmap;

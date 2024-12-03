@@ -6,13 +6,13 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/25 18:13:41 by reclaire          #+#    #+#             */
-/*   Updated: 2024/10/08 03:37:19 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/12/03 03:30:51 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "clc_private.h"
 #include "libft/strings.h"
-#include "libft/path.h"
+#include "libft/paths.h"
 #include "libft/io.h"
 
 S32 _clc_add_header(ProgramBuilder builder, const_string header_name, cl_program header_prog)
@@ -73,10 +73,10 @@ bool clc_include_header(ProgramBuilder builder, const_string path)
 
 	clc_debug("read header %s\n", path);
 	{ /* read file */
-		file fd;
+		t_file *f;
 		U64 alloc;
 
-		if (UNLIKELY((fd = ft_fopen(path, "r")) == (file)-1))
+		if (UNLIKELY((f = ft_fopen(path, "r")) == NULL))
 		{
 			clc_error("couldn't ingest source file '%s': %s\n", path, ft_strerror2(ft_errno));
 			return FALSE;
@@ -86,7 +86,7 @@ bool clc_include_header(ProgramBuilder builder, const_string path)
 		str = st_buffer;
 		alloc = sizeof(st_buffer);
 
-		while ((ret = ft_fread(fd, str + rd, (alloc - 1) - rd)) > 0)
+		while ((ret = ft_fread(f, str + rd, (alloc - 1) - rd)) > 0)
 		{
 			rd += ret;
 			if (rd == (alloc - 1)) /* grow buffer */
@@ -96,7 +96,7 @@ bool clc_include_header(ProgramBuilder builder, const_string path)
 				{
 					if (str != st_buffer)
 						free(str);
-					ft_fclose(fd);
+					ft_fclose(f);
 					clc_error("couldn't ingest source file '%s': out of memory\n", path);
 					return FALSE;
 				}
@@ -109,7 +109,7 @@ bool clc_include_header(ProgramBuilder builder, const_string path)
 		}
 		str[rd] = '\0';
 
-		ft_fclose(fd);
+		ft_fclose(f);
 		if (ret < 0)
 		{
 			if (str != st_buffer)

@@ -6,13 +6,13 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/25 05:03:35 by reclaire          #+#    #+#             */
-/*   Updated: 2024/10/08 03:37:47 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/12/03 03:30:56 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "clc_private.h"
 #include "libft/strings.h"
-#include "libft/path.h"
+#include "libft/paths.h"
 
 static bool clc_begin(ProgramBuilder builder, program_type type)
 {

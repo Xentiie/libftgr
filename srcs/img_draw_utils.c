@@ -6,13 +6,15 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/07 17:32:16 by reclaire          #+#    #+#             */
-/*   Updated: 2024/09/30 16:32:14 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/12/03 03:25:09 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libftgr.h"
 #include "libft/time.h"
 #include "libft/maths.h"
+#include "libft/debug.h"
+
 #include <time.h>
 #include <stdlib.h>
 
@@ -116,6 +118,11 @@ FUNCTION_HOT void ftgr_draw_line(t_ftgr_img *img, t_iv2 p1, t_iv2 p2, t_color co
 				intersection.y = p1.y + (p2.y - p1.y) * (0 - p1.x) / (p2.x - p1.x);
 				intersection.x = 0;
 			}
+			else
+			{
+				intersection = ivec2(0, 0);
+				ft_debug_break();
+			}
 
 			if (intersect_out == intersect1)
 			{
@@ -203,6 +210,11 @@ FUNCTION_HOT void ftgr_draw_line_e(t_ftgr_img *img, t_iv2 p1, t_iv2 p2, void (*e
 				intersection.y = p1.y + (p2.y - p1.y) * (0 - p1.x) / (p2.x - p1.x);
 				intersection.x = 0;
 			}
+			else
+			{
+				intersection = ivec2(0, 0);
+				ft_debug_break();
+			}
 
 			if (intersect_out == intersect1)
 			{
@@ -250,13 +262,18 @@ FUNCTION_HOT void ftgr_draw_line_e(t_ftgr_img *img, t_iv2 p1, t_iv2 p2, void (*e
 void ftgr_draw_line_horizontal(t_ftgr_img *img, t_iv2 p1, S32 x2, t_color col)
 {
 	U32 col_i = ftgr_color_to_int(col);
+	U32 *addr;
 
 	if (p1.y < 0 || p1.y >= img->size.y)
 		return;
 
+	//TODO: bpp
 	p1.x = ft_clamp(0, img->size.x - 1, p1.x);
 	x2 = ft_clamp(0, img->size.x - 1, x2);
-	ft_memrpt(ftgr_get_pixel_addr(img, ft_imin(p1.x, x2), p1.y), &col_i, img->bpp, img->bpp * ft_abs(p1.x - x2));
+
+	addr = (U32 *)ftgr_get_pixel_addr(img, ft_imin(p1.x, x2), p1.y);
+	for (S32 i = 0; i < ft_abs(p1.x - x2); i++)
+		addr[i] = col_i;
 }
 
 void ftgr_draw_line_horizontal_e(t_ftgr_img *img, t_iv2 p1, S32 x2, void (*eval)(t_ftgr_img *img, t_iv2 xy, t_iv4 lp1lp2, void *data), void *data)

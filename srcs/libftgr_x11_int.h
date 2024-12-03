@@ -13,6 +13,8 @@
 #ifndef LIBFTGR_X11_INT
 #define LIBFTGR_X11_INT
 
+#define _FT_RETURN TRUE
+
 #include "libft/std.h"
 
 #ifdef FT_OS_LINUX
@@ -21,6 +23,7 @@
 #include "libft/lists.h"
 #include "libft/strings.h"
 #include "libft/time.h"
+#include "libft/debug.h"
 
 #include "libftgr.h"
 
@@ -36,30 +39,6 @@
 #include <X11/Xutil.h>
 #include <X11/extensions/XShm.h>
 #include <X11/XKBlib.h>
-
-#define __FTRETURN_OK(ret) \
-	do                     \
-	{                      \
-		ft_errno = FT_OK;  \
-		return ret;        \
-	} while (0)
-
-#ifdef DEBUG
-#define __FTRETURN_ERR(ret, err) \
-	do                           \
-	{                            \
-		ft_errno = err;          \
-		ft_debug_break();        \
-		return ret;              \
-	} while (0)
-#else
-#define __FTRETURN_ERR(ret, err) \
-	do                           \
-	{                            \
-		ft_errno = err;          \
-		return ret;              \
-	} while (0)
-#endif
 
 typedef struct
 {

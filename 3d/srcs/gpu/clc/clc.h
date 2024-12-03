@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/26 22:35:18 by reclaire          #+#    #+#             */
-/*   Updated: 2024/10/04 09:08:20 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/12/03 03:30:26 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 #define CLC_H
 
 #include "gpu/clfw/clfw.h"
+
 #include "libft/types.h"
 #include "libft/std.h"
 

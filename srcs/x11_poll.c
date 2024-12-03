@@ -41,7 +41,7 @@ static S32 get_key_mods(XKeyEvent xkey)
 	};
 
 	S32 mods = 0;
-	for (S32 i = 0; i < (sizeof(ftgr_mods) / sizeof(ftgr_mods[0])); i++)
+	for (U64 i = 0; i < (sizeof(ftgr_mods) / sizeof(ftgr_mods[0])); i++)
 	{
 		if (xkey.state & ftgr_mods[i][0])
 			mods |= ftgr_mods[i][1];
@@ -74,11 +74,12 @@ bool ftgr_poll(t_ftgr_ctx *ctx)
 		U32 key_uni;
 		/* key modifiers */
 		S32 mods;
+		(void)mods;
 		switch (ev.type)
 		{
 		case KeyPress:
-		case KeyRelease:;
-			S32 mods = get_key_mods(ev.xkey);
+		case KeyRelease:
+			mods = get_key_mods(ev.xkey);
 			XLookupString(&ev.xkey, NULL, 0, &keysym, NULL);
 			key_uni = _ftgr_keysym2uni(keysym);
 

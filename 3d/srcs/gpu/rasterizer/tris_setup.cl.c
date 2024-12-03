@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 08:34:53 by reclaire          #+#    #+#             */
-/*   Updated: 2024/10/08 04:16:16 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/10/08 04:32:39 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,30 +24,27 @@ __kernel void vertex_main(
 	t_mat4x4 model_to_world,
 	t_mat4x4 world_to_clip)
 {
-
-
 	S32 id = get_global_id(0);
 	if (id >= tris_cnt)
 		return;
 
 	t_iv3 tri = ivec3(
+		*(((global U8 *)tris) + ((id * 3) + 0) * sizeof(S32)),
 		*(((global U8 *)tris) + ((id * 3) + 1) * sizeof(S32)),
-		*(((global U8 *)tris) + ((id * 3) + 2) * sizeof(S32)),
-		*(((global U8 *)tris) + ((id * 3) + 3) * sizeof(S32)));
+		*(((global U8 *)tris) + ((id * 3) + 2) * sizeof(S32)));
 
 	t_iv3 ofs = tri * (int3)(verts_stride);
 
 	t_v4 p1 = vertex_shader(verts + ofs.x, model_to_world, world_to_clip);
 	t_v4 p2 = vertex_shader(verts + ofs.y, model_to_world, world_to_clip);
 	t_v4 p3 = vertex_shader(verts + ofs.z, model_to_world, world_to_clip);
+	t_v4 normal = normalize(cross(p2 - p1, p3 - p1));
+	if (dot(normal.xyz, p1.xyz - convert_float3(cam_pos.xyz)) > 0)
+		return;
 
-//	t_v4 normal = normalize(cross(p2 - p1, p3 - p1));
-//	if (dot(normal.xyz, p1.xyz - convert_float3(cam_pos.xyz)) > 0)
-//		return;
-
-	S32 n_tris = 1; //Number of triangles generated
-	S32 i = atomic_add(atm_subtris, n_tris); //Allocate space in the output buffer
-	if (i >= out_stream_size) //No more space -> stop
+	S32 n_tris = 1;							 // Number of triangles generated
+	S32 i = atomic_add(atm_subtris, n_tris); // Allocate space in the output buffer
+	if (i >= out_stream_size)				 // No more space -> stop
 		return;
 
 	t_v3 rcpW = vec3(rcp(p1.w), rcp(p2.w), rcp(p3.w));
@@ -58,9 +55,8 @@ __kernel void vertex_main(
 	p2.w = rcpW.y;
 	p3.w = rcpW.z;
 
-	out_stream[i * 3 + 1] = p1;
-/*
-	out_stream[i * 3 + 2] = p2;
-	out_stream[i * 3 + 3] = p3;
-*/
+
+	out_stream[i * 3 + 0] = p1;
+	out_stream[i * 3 + 1] = p2;
+	out_stream[i * 3 + 2] = p3;
 }

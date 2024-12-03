@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/08 23:01:33 by reclaire          #+#    #+#             */
-/*   Updated: 2024/07/05 11:48:44 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/12/03 03:05:15 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ void draw_glyph(t_glyph glyph, t_ftgr_img *img, S32 xoffset)
 {
 	t_iv2 min = ivec2(S32_MAX, S32_MAX);
 	t_iv2 max = ivec2(S32_MIN, S32_MIN);
-	for (int i = 0; i < glyph.points_len; i++)
+	for (U64 i = 0; i < glyph.points_len; i++)
 	{
 		min.x = MIN(glyph.points[i].x, min.x);
 		min.y = MIN(glyph.points[i].y, min.y);
@@ -33,11 +33,12 @@ void draw_glyph(t_glyph glyph, t_ftgr_img *img, S32 xoffset)
 		max.y = MAX(glyph.points[i].y, max.y);
 	}
 
-	printf("%d %d\n%d %d\n", min.x, max.x, min.y, max.y);
+	ft_printf("%d %d\n%d %d\n", min.x, max.x, min.y, max.y);
 
 //#define conv(p) vec2_int(vec2_scl(ft_invlerp2_i(min, max, p), scale))
 #define conv(p) ivec2(p.x / 10 + xoffset, p.y / 10)
 	int scale = 300;
+	(void)scale;
 
 	int contourStartIndex = 0;
 
@@ -57,7 +58,7 @@ void draw_glyph(t_glyph glyph, t_ftgr_img *img, S32 xoffset)
 	}
 }
 
-void *ftgr_load_font(file fd, t_ftgr_img *img)
+void *ftgr_load_font(filedesc fd, t_ftgr_img *img)
 {
 	t_ftgr_truetype_loader *loader = malloc(sizeof(t_ftgr_truetype_loader));
 	if (!loader)

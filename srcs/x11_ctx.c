@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/09 16:46:04 by reclaire          #+#    #+#             */
-/*   Updated: 2024/09/11 18:10:43 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/12/03 03:01:39 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,10 +15,14 @@
 #ifdef FT_OS_LINUX
 #include "libft/time.h"
 #include "libft/io.h"
+
+#include "log/log.h"
+
 #include <X11/Xproto.h>
+
 #include <unistd.h>
 
-static void ftgr_init_shm(t_ftgr_ctx *ctx);
+static bool ftgr_init_shm(t_ftgr_ctx *ctx);
 // TODO: check return codes
 
 static int error_handler(Display *display, XErrorEvent *event)
@@ -166,6 +170,7 @@ static int error_handler(Display *display, XErrorEvent *event)
 		"BadLength",
 		"BadImplementation",
 	};
+	(void)display;
 
 	ft_dprintf(ft_stderr, "X11 ERROR: ");
 	if (event->error_code >= (sizeof(x_errors_str) / sizeof(x_errors_str[0])))
@@ -173,33 +178,33 @@ static int error_handler(Display *display, XErrorEvent *event)
 	else
 		ft_dprintf(ft_stderr, "code: %s(%d, minor code: %u) ", x_errors_str[event->error_code], event->error_code, event->minor_code);
 
-	if ((event->request_code - 1) >= (sizeof(x_requests_str) / sizeof(x_requests_str[0])))
+	if ((event->request_code - 1) >= (S64)(sizeof(x_requests_str) / sizeof(x_requests_str[0])))
 		ft_dprintf(ft_stderr, "req: %d(No request name available) ", event->request_code);
 	else
 		ft_dprintf(ft_stderr, "req: %s ", x_requests_str[event->request_code - 1]);
 
 	ft_dprintf(ft_stderr,
-		"resoureid:%ld serial:%lu type:%d\n",
-		event->resourceid,
-		event->serial,
-		event->type);
+			   "resoureid:%ld serial:%lu type:%d\n",
+			   event->resourceid,
+			   event->serial,
+			   event->type);
+
+	return 0;
 }
 
 t_ftgr_ctx *ftgr_create_ctx()
 {
 	t_ftgr_ctx *ctx;
+	XVisualInfo template;
+	XVisualInfo *vi;
+	S32 dummy;
 
-	ctx = malloc(sizeof(t_ftgr_ctx));
-	if (!ctx)
-		__FTRETURN_ERR(NULL, FT_EOMEM);
+	if (UNLIKELY((ctx = malloc(sizeof(t_ftgr_ctx))) == NULL))
+		FT_RET_ERR(NULL, FT_EOMEM);
 	ft_memset(ctx, 0, sizeof(t_ftgr_ctx));
 
-	ctx->display = XOpenDisplay("");
-	if (ctx->display == 0)
-	{
-		free(ctx);
-		__FTRETURN_ERR(NULL, FTGR_EX11);
-	}
+	if ((ctx->display = XOpenDisplay("")) == NULL)
+		goto exit_err;
 
 	XSetErrorHandler(error_handler);
 
@@ -211,17 +216,12 @@ t_ftgr_ctx *ftgr_create_ctx()
 	ctx->visual = DefaultVisual(ctx->display, ctx->screen);
 	if (ctx->visual->class != TrueColor)
 	{
-		S32 nb_item;
-		XVisualInfo template = (XVisualInfo){.class = TrueColor, .depth = ctx->depth};
+		template = (XVisualInfo){.class = TrueColor, .depth = ctx->depth};
 
-		XVisualInfo *vi = XGetVisualInfo(ctx->display, VisualDepthMask | VisualClassMask, &template, &nb_item);
-		if (!vi)
+		if ((vi = XGetVisualInfo(ctx->display, VisualDepthMask | VisualClassMask, &template, &dummy)) == NULL)
 		{
-			// TODO: CLEANUP
-			// No truecolor
 			XCloseDisplay(ctx->display);
-			free(ctx);
-			__FTRETURN_ERR(NULL, FTGR_EX11);
+			goto exit_err;
 		}
 
 		ctx->visual = vi->visual;
@@ -242,36 +242,47 @@ t_ftgr_ctx *ftgr_create_ctx()
 
 	ctx->keys = NULL;
 	return (ctx);
+
+exit_err:
+	free(ctx);
+	FT_RET_ERR(NULL, FT_ESYSCALL);
 }
 
-static void ftgr_init_shm(t_ftgr_ctx *ctx)
+static bool ftgr_init_shm(t_ftgr_ctx *ctx)
 {
-	S32 dummy;
-
 	S32 use_pshm;
+	S32 dummy;
 	char *dpy;
 	char hostname[33];
 
 	ctx->use_xshm = XShmQueryVersion(ctx->display, &dummy, &dummy, &use_pshm);
-
 	if (ctx->use_xshm && use_pshm)
-		ctx->pixmap_shm_format = XShmPixmapFormat(ctx->display);
-	else
-		ctx->pixmap_shm_format = -1;
-
-	gethostname(hostname, 32);
-
-	dpy = getenv("DISPLAY");
-	if (dpy && ft_strlen(dpy) && *dpy != ':' && ft_strncmp(dpy, hostname, ft_strlen(hostname)) &&
-		ft_strncmp(dpy, LOCALHOST, ft_strlen(LOCALHOST)))
 	{
+		ctx->pixmap_shm_format = XShmPixmapFormat(ctx->display);
+		return TRUE;
+	}
+
+	if (gethostname(hostname, sizeof(hostname) - 1) == -1)
+	{
+		log_error("ftgr", "gethostname: %s\n", ft_strerror2());
+		goto exit_err;
+	}
+
+	if ((dpy = getenv("DISPLAY")) != NULL								 /* DISPLAY exists in env */
+		&& ft_strlen(dpy)												 /* DISPLAY is set to something */
+		&& *dpy != ':' && ft_strncmp(dpy, hostname, ft_strlen(hostname)) /* DISPLAY n'est pas notre hostname */
+		&& ft_strncmp(dpy, LOCALHOST, ft_strlen(LOCALHOST)))			 /* DISPLAY n'est pas localhost */
+	{																	 /* -> pas de xshm */
 		ctx->pixmap_shm_format = -1;
 		ctx->use_xshm = FALSE;
 	}
 
-	ctx->windows = NULL;
 	if (!ctx->use_xshm)
-		fprintf(stderr, "Warning: not using shared memory\n");
+		log_warn("ftgr", "not using shared memory\n");
+exit_err:
+	ctx->pixmap_shm_format = -1;
+	ctx->use_xshm = FALSE;
+	return FALSE;
 }
 
 void ftgr_free(t_ftgr_ctx *ctx)

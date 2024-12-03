@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/06 02:27:08 by reclaire          #+#    #+#             */
-/*   Updated: 2024/10/08 04:13:48 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/12/03 03:39:12 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 #include "libft/io.h"
 #include "libft/ansi.h"
 #include "libft/limits.h"
-#include "libft/path.h"
+#include "libft/paths.h"
 
 #include "3dfw/3dfw.h"
 #include "infolines/infolines.h"

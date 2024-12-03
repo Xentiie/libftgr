@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/24 00:07:37 by reclaire          #+#    #+#             */
-/*   Updated: 2024/10/08 04:00:24 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/10/08 04:34:35 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,9 +49,9 @@ static t_v4 *launch_tris_setup(Pipeline pipe, struct s_object object, struct s_c
 		exit(1);
 
 	U32 subtris;
-	t_v4 *interphase_out = malloc(pipe->interphase_buffer_alloc);
 	clfw_enqueue_read_buffer(pipe->device->queue, pipe->atm_subtris, TRUE, 0, sizeof(subtris), &subtris, 0, NULL, NULL);
-	clfw_enqueue_read_buffer(pipe->device->queue, pipe->interphase_buffer, TRUE, 0, sizeof(t_v4) * object.verts_cnt, interphase_out, 0, NULL, NULL);
+	t_v4 *interphase_out = malloc(subtris * sizeof(t_v4));
+	clfw_enqueue_read_buffer(pipe->device->queue, pipe->interphase_buffer, TRUE, 0, subtris * sizeof(t_v4), interphase_out, 0, NULL, NULL);
 
 	printf("atomic: %u\n", subtris);
 	return interphase_out;

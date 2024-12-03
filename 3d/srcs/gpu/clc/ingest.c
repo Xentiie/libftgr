@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/25 18:13:09 by reclaire          #+#    #+#             */
-/*   Updated: 2024/10/08 03:31:22 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/12/03 03:29:57 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ bool clc_ingest_program(ProgramBuilder builder, cl_program prog, bool compiled)
 
 bool clc_ingest_file(ProgramBuilder builder, const_string path)
 {
-	file fd;
+	t_file *f;
 	S64 ret;
 	char st_buffer[16384];
 	string str = st_buffer;
@@ -32,13 +32,13 @@ bool clc_ingest_file(ProgramBuilder builder, const_string path)
 	U64 rd = 0;
 
 	clc_debug("ingest file %s\n", path);
-	if (UNLIKELY((fd = ft_fopen(path, "r")) == (file)-1))
+	if (UNLIKELY((f = ft_fopen(path, "r")) == NULL))
 	{
 		clc_error("couldn't ingest source file '%s': %s\n", path, ft_strerror2(ft_errno));
 		return FALSE;
 	}
 
-	while ((ret = ft_fread(fd, str + rd, (alloc - 1) - rd)) > 0)
+	while ((ret = ft_fread(f, str + rd, (alloc - 1) - rd)) > 0)
 	{
 		rd += ret;
 		if (rd == (alloc - 1))
@@ -48,7 +48,7 @@ bool clc_ingest_file(ProgramBuilder builder, const_string path)
 			{
 				if (str != st_buffer)
 					free(str);
-				ft_fclose(fd);
+				ft_fclose(f);
 				clc_error("couldn't ingest source file '%s': out of memory\n", path);
 				return FALSE;
 			}
@@ -61,7 +61,7 @@ bool clc_ingest_file(ProgramBuilder builder, const_string path)
 	}
 	str[rd] = '\0';
 
-	ft_fclose(fd);
+	ft_fclose(f);
 	if (ret < 0)
 	{
 		if (str != st_buffer)

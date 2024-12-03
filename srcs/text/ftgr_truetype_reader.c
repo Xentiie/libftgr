@@ -6,10 +6,11 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/09 04:11:20 by reclaire          #+#    #+#             */
-/*   Updated: 2024/06/11 03:43:00 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/12/03 03:17:54 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#define _FT_RETURN 1
 #include "ftgr_truetype.h"
 
 static U32 checksum(U32 *table, U32 numberOfBytesInTable)
@@ -25,107 +26,107 @@ static U32 checksum(U32 *table, U32 numberOfBytesInTable)
 #define reverse32(n) __builtin_bswap32(n)
 #define reverse64(n) __builtin_bswap64(n)
 
-void skip_bytes(file fd, S64 n)
+void skip_bytes(filedesc fd, S64 n)
 {
 	U8 data[256] = {0};
 	S64 skipped = 0;
 	while (skipped < n)
 	{
-		S64 out = ft_fread(fd, data, MAX(0, n - skipped));
+		S64 out = ft_read(fd, data, MAX(0, n - skipped));
 		if (out < 1)
 			break;
 		skipped += out;
 	}
 }
 
-U64 read_u64_litteendian(file fd)
+U64 read_u64_litteendian(filedesc fd)
 {
 	U64 n;
-	ft_fread(fd, (char *)&n, sizeof(U64));
+	ft_read(fd, (char *)&n, sizeof(U64));
 	return n;
 }
 
-U64 read_u64_bigendian(file fd)
+U64 read_u64_bigendian(filedesc fd)
 {
 	U64 n;
-	ft_fread(fd, (char *)&n, sizeof(U64));
+	ft_read(fd, (char *)&n, sizeof(U64));
 	return reverse64(n);
 }
 
-S64 read_s64_litteendian(file fd)
+S64 read_s64_litteendian(filedesc fd)
 {
 	S64 n;
-	ft_fread(fd, (char *)&n, sizeof(S64));
+	ft_read(fd, (char *)&n, sizeof(S64));
 	return n;
 }
 
-S64 read_s64_bigendian(file fd)
+S64 read_s64_bigendian(filedesc fd)
 {
 	S64 n;
-	ft_fread(fd, (char *)&n, sizeof(S64));
+	ft_read(fd, (char *)&n, sizeof(S64));
 	return reverse64(n);
 }
 
-U32 read_u32_litteendian(file fd)
+U32 read_u32_litteendian(filedesc fd)
 {
 	U32 n;
-	ft_fread(fd, (char *)&n, sizeof(U32));
+	ft_read(fd, (char *)&n, sizeof(U32));
 	return n;
 }
 
-U32 read_u32_bigendian(file fd)
+U32 read_u32_bigendian(filedesc fd)
 {
 	U32 n;
-	ft_fread(fd, (char *)&n, sizeof(U32));
+	ft_read(fd, (char *)&n, sizeof(U32));
 	return reverse32(n);
 }
 
-S32 read_s32_litteendian(file fd)
+S32 read_s32_litteendian(filedesc fd)
 {
 	S32 n;
-	ft_fread(fd, (char *)&n, sizeof(S32));
+	ft_read(fd, (char *)&n, sizeof(S32));
 	return n;
 }
 
-S32 read_s32_bigendian(file fd)
+S32 read_s32_bigendian(filedesc fd)
 {
 	S32 n;
-	ft_fread(fd, (char *)&n, sizeof(S32));
+	ft_read(fd, (char *)&n, sizeof(S32));
 	return reverse32(n);
 }
 
-U16 read_u16_bigendian(file fd)
+U16 read_u16_bigendian(filedesc fd)
 {
 	U16 n;
-	ft_fread(fd, (char *)&n, sizeof(U16));
+	ft_read(fd, (char *)&n, sizeof(U16));
 	return reverse16(n);
 }
 
-U16 read_u16_littleendian(file fd)
+U16 read_u16_littleendian(filedesc fd)
 {
 	U16 n;
-	ft_fread(fd, (char *)&n, sizeof(U16));
+	ft_read(fd, (char *)&n, sizeof(U16));
 	return n;
 }
 
-S16 read_s16_bigendian(file fd)
+S16 read_s16_bigendian(filedesc fd)
 {
 	S16 n;
-	ft_fread(fd, (char *)&n, sizeof(S16));
+	ft_read(fd, (char *)&n, sizeof(S16));
 	return reverse16(n);
 }
 
-S16 read_s16_littleendian(file fd)
+S16 read_s16_littleendian(filedesc fd)
 {
 	S16 n;
-	ft_fread(fd, (char *)&n, sizeof(S16));
+	ft_read(fd, (char *)&n, sizeof(S16));
 	return n;
 }
 
-U8 read_u8(file fd)
+U8 read_u8(filedesc fd)
 {
 	U8 n;
-	ft_fread(fd, (char *)&n, sizeof(U8));
+	ft_read(fd, (char *)&n, sizeof(U8));
 	return n;
 }
 
@@ -138,7 +139,7 @@ void read_table_header(t_ftgr_truetype_loader *loader)
 {
 	loader->header = malloc(sizeof(t_truetype_header));
 	if (!loader->header)
-		__FTRETURN_ERR(, FT_EOMEM);
+		FT_RET_ERR(, FT_EOMEM);
 	lseek(loader->fd, 0, SEEK_SET);
 	loader->header->scaler_type = read_u32_bigendian(loader->fd);
 	loader->header->num_tables = read_u16_bigendian(loader->fd);
@@ -156,7 +157,7 @@ void read_table_sections(t_ftgr_truetype_loader *loader)
 
 	loader->sections = malloc(sizeof(t_table_entry) * header->num_tables);
 	if (!loader->sections)
-		__FTRETURN_ERR(, FT_EOMEM);
+		FT_RET_ERR(, FT_EOMEM);
 	for (U16 i = 0; i < header->num_tables; i++)
 	{
 		loader->sections[i].tag = read_u32_litteendian(loader->fd);
@@ -233,7 +234,7 @@ void read_table_kerning(t_ftgr_truetype_loader *loader)
 		{
 			version |= read_u16_bigendian(loader->fd) << 16;
 			if (version != 0x00010000)
-				printf("Warning: unknown version");
+				ft_printf("Warning: unknown version");
 			n_tables = read_u32_bigendian(loader->fd);
 		}
 		else
@@ -273,14 +274,14 @@ void read_table_maxp(t_ftgr_truetype_loader *loader)
 
 	lseek(loader->fd, ent->offset, SEEK_SET);
 	t_max_profile *maxp = malloc(sizeof(t_max_profile));
-	ft_fread(loader->fd, (char *)maxp, ent->length);
+	ft_read(loader->fd, (char *)maxp, ent->length);
 
 	maxp->version = reverse32(maxp->version);
 
 	U32 _checksum = checksum((U32 *)maxp, sizeof(t_max_profile));
-	printf("%#x %#x %u\n", ent->checksum, _checksum, ent->checksum - _checksum);
+	ft_printf("%#x %#x %u\n", ent->checksum, _checksum, ent->checksum - _checksum);
 	if (_checksum != ent->checksum)
-		printf("Warning: maxp invalid checksum\n");
+		ft_printf("Warning: maxp invalid checksum\n");
 
 	for (U8 i = 0; i < 14; i++)
 		*(((U16 *)maxp) + 2 + i) = reverse16(*(((U16 *)maxp) + 2 + i));
@@ -288,7 +289,7 @@ void read_table_maxp(t_ftgr_truetype_loader *loader)
 	loader->maxp_loaded = TRUE;
 }
 
-void read_glyph(file fd, t_glyph *gl)
+void read_glyph(filedesc fd, t_glyph *gl)
 {
 	gl->contour_end_indices_len = read_s16_bigendian(fd);
 
@@ -326,6 +327,7 @@ void read_glyph(file fd, t_glyph *gl)
 		gl->points[i].x = gl->points[MAX(0, i - 1)].x;
 		U8 flag = all_flags[i];
 		bool on_curve = !!(flag & GLYPH_FLAG_ON_CURVE);
+		(void)on_curve;
 
 		if (flag & GLYPH_FLAG_X_SHORT)
 		{
@@ -342,6 +344,7 @@ void read_glyph(file fd, t_glyph *gl)
 		gl->points[i].y = gl->points[MAX(0, i - 1)].y;
 		U8 flag = all_flags[i];
 		bool on_curve = !!(flag & GLYPH_FLAG_ON_CURVE);
+		(void)on_curve;
 
 		if (flag & GLYPH_FLAG_Y_SHORT)
 		{
@@ -397,7 +400,7 @@ void read_table_glyphs(t_ftgr_truetype_loader *loader)
 
 	for (U32 i = 0; i < 8; i++)
 	{
-		printf("loca: %u\n", loca[i]);
+		ft_printf("loca: %u\n", loca[i]);
 		lseek(loader->fd, ent->offset + loca[i], SEEK_SET);
 		read_glyph(loader->fd, &loader->glyphs[i]);
 	}

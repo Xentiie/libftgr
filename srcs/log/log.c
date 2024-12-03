@@ -6,14 +6,14 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/26 23:07:41 by reclaire          #+#    #+#             */
-/*   Updated: 2024/10/02 19:03:09 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/12/03 03:40:52 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "log.h"
 #include "libft/std.h"
 #include "libft/ansi.h"
-#include "libft/path.h"
+#include "libft/paths.h"
 
 #include <stdlib.h>
 #include <stdarg.h>
@@ -28,36 +28,37 @@ static string log_type_str[][2] = {
 	{"warn", FT_BOLD FT_FOREGROUND_COLOR(255, 230, 0)},
 	{"error", FT_BOLD FT_FOREGROUND_COLOR(255, 50, 0)}};
 
-static void _log(const_string file, S32 line, enum e_log_level level, string tag, string fmt, va_list l)
+static void _log(FT_IFDEBUG(const_string file, S32 line, ) enum e_log_level level, const_string tag, string fmt, va_list l)
 {
-	FILE *f;
+	t_file *f;
 
 	if (log_level > level)
 		return;
-	f = level == LOG_ERROR ? stderr : stdout;
+	f = level == LOG_ERROR ? ft_fstderr : ft_fstdout;
 	if (log_level == LOG_DEBUG)
 	{
-		string filename = ft_path_filename(file);
-		string dirname = ft_path_dirname(file);
-		string dir_up = ft_path_filename(dirname);
-		fprintf(f, FT_FOREGROUND_COLOR(127, 127, 127) "[%s%s:%d]" FT_CRESET, dir_up, filename, line);
-		free(filename);
-		free(dirname);
-		free(dir_up);
+		FT_IFDEBUG(
+			string filename = ft_path_filename(file);
+			string dirname = ft_path_dirname(file);
+			string dir_up = ft_path_filename(dirname);
+			ft_fprintf(f, FT_FOREGROUND_COLOR(127, 127, 127) "[%s%s:%d]" FT_CRESET, dir_up, filename, line);
+			free(filename);
+			free(dirname);
+			free(dir_up);)
 	}
-	fprintf(f, "[%s%s" FT_CRESET "]" FT_CRESET, log_type_str[level][1], log_type_str[level][0]);
+	ft_fprintf(f, "[%s%s" FT_CRESET "]" FT_CRESET, log_type_str[level][1], log_type_str[level][0]);
 	if (tag)
-		fprintf(f, FT_FOREGROUND_COLOR(255, 127, 255) "[%s] " FT_CRESET, tag);
-	vfprintf(f, fmt, l);
+		ft_fprintf(f, FT_FOREGROUND_COLOR(255, 127, 255) "[%s] " FT_CRESET, tag);
+	ft_vfprintf(f, fmt, l);
 }
 
-#define mk_log_f(fname, type)                                      \
-	void fname(const_string file, S32 line, string tag, string fmt, ...) \
-	{                                                              \
-		va_list l;                                                 \
-		va_start(l, fmt);                                          \
-		_log(file, line, type, tag, fmt, l);                       \
-		va_end(l);                                                 \
+#define mk_log_f(fname, type)                                                               \
+	void fname(FT_IFDEBUG(const_string file, S32 line, ) const_string tag, string fmt, ...) \
+	{                                                                                       \
+		va_list l;                                                                          \
+		va_start(l, fmt);                                                                   \
+		_log(FT_IFDEBUG(file, line, ) type, tag, fmt, l);                                   \
+		va_end(l);                                                                          \
 	}
 
 mk_log_f((log_debug), LOG_DEBUG);

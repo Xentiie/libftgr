@@ -6,13 +6,14 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:33:35 by reclaire          #+#    #+#             */
-/*   Updated: 2024/10/07 16:17:46 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/12/03 03:31:57 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "gpu/clfw/clfw.h"
 #include "make_maths_cl.h"
-#include "libft/path.h"
+
+#include "libft/paths.h"
 #include "libft/strings.h"
 #include "libft/io.h"
 

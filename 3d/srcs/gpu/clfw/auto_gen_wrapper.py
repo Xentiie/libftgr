@@ -257,7 +257,7 @@ with open("clfw_wrapper_generated.c", "w+") as f:
 	f.write("#include \"clfw_wrapper_generated.h\"\n")
 
 	f.write("\n")
-	f.write("#pragma GCC diagnostics push\n")
+	f.write("#pragma GCC diagnostic push\n")
 	f.write("#pragma GCC diagnostic ignored \"-Wdeprecated-declarations\"\n")
 
 	f.write("\n")
@@ -291,7 +291,7 @@ with open("clfw_wrapper_generated.c", "w+") as f:
 	#f.write("#endif\n")
 
 	f.write("\n")
-	f.write("#pragma GCC diagnostics pop\n")
+	f.write("#pragma GCC diagnostic pop\n")
 
 with open("clfw_wrapper_generated.h", "w+") as f:
 

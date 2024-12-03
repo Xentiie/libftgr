@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/27 16:03:40 by reclaire          #+#    #+#             */
-/*   Updated: 2024/10/08 04:16:05 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/10/08 04:26:08 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,8 +49,8 @@ ProgramBuilder pipeline_shader_builder(Pipeline pipe, LibraryCache cache)
 
 	if (UNLIKELY(!clc_ingest_file(builder, "srcs/gpu/rasterizer/tris_setup.cl.c")))
 		goto exit_err;
-	//if (UNLIKELY(!clc_ingest_file(builder, "srcs/gpu/rasterizer/tris_raster.cl.c")))
-	//	goto exit_err;
+	if (UNLIKELY(!clc_ingest_file(builder, "srcs/gpu/rasterizer/tris_raster.cl.c")))
+		goto exit_err;
 
 	return builder;
 exit_err:
@@ -66,7 +66,7 @@ bool pipeline_link_shader(Pipeline pipe, ProgramBuilder builder)
 		return FALSE;
 
 	pipe->vert_shdr = clfw_create_kernel(pipe->shader_prog, "vertex_main");
-	//pipe->frgm_shdr = clfw_create_kernel(pipe->shader_prog, "fragment_main");
+	pipe->frgm_shdr = clfw_create_kernel(pipe->shader_prog, "fragment_main");
 	pipe->dirty = TRUE;
 	return TRUE;
 }

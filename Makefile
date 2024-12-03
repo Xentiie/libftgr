@@ -6,33 +6,23 @@
 #    By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/04/15 17:26:47 by reclaire          #+#    #+#              #
-#    Updated: 2024/09/13 21:00:23 by reclaire         ###   ########.fr        #
+#    Updated: 2024/12/03 01:56:21 by reclaire         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-NAME		=	libftgr.a
 include config.mk
 
-INCLUDES	+=	-I../libft -I./ -I./srcs -I./3rdparty/OpenCL/include
-#CFLAGS		+=	-Wall -Wextra -Werror -O3 -g
-#CFLAGS		+=	-g -fsanitize=address
-CFLAGS		+=	-g
+$(NAME): $(OBJS)
+	ar -rcs $(NAME) $(OBJS)
 
-$(NAME):	objs $(OBJS)
-			ar -rcs $(NAME) $(OBJS)
-			cp $(NAME) $(TARGET)_$(NAME)
+dyn: $(OBJS)
+	$(CC) -shared -fPIC $(CFLAGS) -o my_library.so my_library.c
 
-_libft:
-			$(MAKE) -C ../libft
-#			mingw32-make.exe -C ../libft
+test:	packages $(NAME)
+			$(CC) $(CFLAGS) $(INCLUDES) test2.c $(LIBS_PATHS) $(LIBS)
 
-test:	$(NAME) _libft
-			$(CC) $(CFLAGS) $(INCLUDES) -L./ -L../libft test2.c -lftgr -lft -lm -lgdi32
-#			$(CC) $(CFLAGS) $(INCLUDES) -L./ -L../libft test2.c -lftgr -lft -lm -lX11 -lXext
-#			$(CC) $(CFLAGS) $(INCLUDES) -L./ -L./3rdparty/OpenCL/lib -L../libft test.c -lftgr -lft -lm -lgdi32 -lopengl32 -lOpenCL
+test_deflate:	packages $(NAME)
+			$(CC) $(CFLAGS) $(INCLUDES) test_deflate.c $(LIBS_PATHS) $(LIBS)
 
-test_deflate:	$(NAME) _libft
-			$(CC) $(CFLAGS) -O3 $(INCLUDES) -L./ -L../libft test_deflate.c -lftgr -lft -lm
-
-test_text:	$(NAME) _libft
-			$(CC) $(CFLAGS) -O3 $(INCLUDES) -L./ -L../libft test_text.c -lftgr -lft -lm -lX11 -lXext
+test_text:	packages $(NAME)
+			$(CC) $(CFLAGS) $(INCLUDES) test_text.c $(LIBS_PATHS) $(LIBS)

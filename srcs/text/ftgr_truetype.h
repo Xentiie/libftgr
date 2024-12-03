@@ -6,20 +6,20 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/09 04:09:57 by reclaire          #+#    #+#             */
-/*   Updated: 2024/07/05 11:48:53 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/12/03 03:05:02 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef FTGR_TRUETYPE_H
 #define FTGR_TRUETYPE_H
 
-#include "../libftgr.h"
+#include "libftgr.h"
 #include "libft/io.h"
 #include "libft/limits.h"
 #include "libft/maths.h"
 
 #include <stdlib.h>
-#include <stdio.h>
+#include <unistd.h>
 
 //#define printf(...) do { (printf)("(%s:%d)", __FILE__, __LINE__); (printf)(__VA_ARGS__); } while (0)
 
@@ -138,7 +138,7 @@ typedef struct s_max_profile
 
 typedef struct s_ftgr_truetype_loader
 {
-	file fd;
+	filedesc fd;
 
 	SECTION_INIT(t_truetype_header *, header);
 	SECTION_INIT(t_head *, head);
@@ -158,24 +158,24 @@ SECTION_GETTER(t_glyph *, glyphs);
 SECTION_GETTER(t_kerning *, kerning);
 SECTION_GETTER(t_max_profile *, maxp);
 
-void skip_bytes(file fd, S64 n);
+void skip_bytes(filedesc fd, S64 n);
 
-U64 read_u64_litteendian(file fd);
-U64 read_u64_bigendian(file fd);
-S64 read_s64_litteendian(file fd);
-S64 read_s64_bigendian(file fd);
+U64 read_u64_litteendian(filedesc fd);
+U64 read_u64_bigendian(filedesc fd);
+S64 read_s64_litteendian(filedesc fd);
+S64 read_s64_bigendian(filedesc fd);
 
-U32 read_u32_litteendian(file fd);
-U32 read_u32_bigendian(file fd);
-S32 read_s32_litteendian(file fd);
-S32 read_s32_bigendian(file fd);
+U32 read_u32_litteendian(filedesc fd);
+U32 read_u32_bigendian(filedesc fd);
+S32 read_s32_litteendian(filedesc fd);
+S32 read_s32_bigendian(filedesc fd);
 
-U16 read_u16_littleendian(file fd);
-U16 read_u16_bigendian(file fd);
-S16 read_s16_littleendian(file fd);
-S16 read_s16_bigendian(file fd);
+U16 read_u16_littleendian(filedesc fd);
+U16 read_u16_bigendian(filedesc fd);
+S16 read_s16_littleendian(filedesc fd);
+S16 read_s16_bigendian(filedesc fd);
 
-U8 read_u8(file fd);
+U8 read_u8(filedesc fd);
 
 void print_truetype_loader(t_ftgr_truetype_loader *state);
 void print_table_header(t_ftgr_truetype_loader *state);
@@ -187,7 +187,7 @@ void print_table_glyphs(t_ftgr_truetype_loader *state);
 
 t_table_entry *goto_table_entry(string tag, t_ftgr_truetype_loader *state);
 
-void read_glyph(file fd, t_glyph *gl);
+void read_glyph(filedesc fd, t_glyph *gl);
 void print_glyph(t_glyph *glyph);
 
 #endif

@@ -9,13 +9,7 @@ Auto generated OpenCL wrapper from 'auto_gen_wrapper.py'
 #include "clfw_private.h"
 #include "libft/std.h"
 
-#define CLFW_DEBUG
-
-#ifdef CLFW_DEBUG
-#define CLFW_DEBUG_ARGS(...) __VA_ARGS__ __VA_OPT__(,) const_string _file, S32 _line
-#else
-#define CLFW_DEBUG_ARGS(...) __VA_ARGS__
-#endif
+#define CLFW_DEBUG_ARGS(...) __VA_ARGS__ FT_IFDEBUG(__VA_OPT__(,) const_string _file, S32 _line)
 
 #define __clfw_expand(x) x
 
@@ -249,7 +243,7 @@ cl_command_queue (clfw_create_command_queue)(CLFW_DEBUG_ARGS(cl_context context,
 cl_sampler (clfw_create_sampler)(CLFW_DEBUG_ARGS(cl_context context, bool normalized_coords, cl_addressing_mode addressing_mode, cl_filter_mode filter_mode));
 bool (clfw_enqueue_task)(CLFW_DEBUG_ARGS(cl_command_queue command_queue, cl_kernel kernel, U32 num_events_in_wait_list, const cl_event *event_wait_list, cl_event *event));
 
-#ifdef CLFW_DEBUG
+#if defined(DEBUG)
 #define clfw_get_platform_ids(num_entries, platforms, num_platforms) (clfw_get_platform_ids)(num_entries, platforms, num_platforms, __clfw_expand(__FILE__), __clfw_expand(__LINE__))
 #define clfw_get_platform_info(platform, param_name, param_value_size, param_value, param_value_size_ret) (clfw_get_platform_info)(platform, param_name, param_value_size, param_value, param_value_size_ret, __clfw_expand(__FILE__), __clfw_expand(__LINE__))
 #define clfw_get_device_ids(platform, device_type, num_entries, devices, num_devices) (clfw_get_device_ids)(platform, device_type, num_entries, devices, num_devices, __clfw_expand(__FILE__), __clfw_expand(__LINE__))

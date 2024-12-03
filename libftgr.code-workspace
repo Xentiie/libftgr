@@ -4,7 +4,7 @@
 			"path": "."
 		},
 		{
-			"path": "../libft"
+			"path": "3d"
 		}
 	],
 	"settings": {
@@ -20,16 +20,7 @@
 			"span": "c",
 			"utility": "c",
 			"format": "c",
-			"random": "cpp",
-			"typeinfo": "c",
-			"compare": "c",
-			"type_traits": "c",
-			"sstream": "c",
-			"system_error": "c",
-			"charconv": "c",
-			"chrono": "c",
-			"*.tcc": "c",
-			"tuple": "c"
+			"thread": "c"
 		}
 	}
 }

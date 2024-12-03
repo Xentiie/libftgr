@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 23:42:30 by reclaire          #+#    #+#             */
-/*   Updated: 2024/10/07 15:04:33 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/12/03 03:27:58 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,9 +119,9 @@ Returns NULL, with `clfw_last_error == 0` and with `ft_errno != 0` if an error o
 Returns NULL, with `clfw_last_error == 0` if their is no available platforms
 */
 ClPlatform *clfw_query_platforms_devices(U64 *platforms_cnt);
-void clfw_dump_platforms_json(file fd, ClPlatform *platforms, U64 platforms_count);
-void clfw_dump_platform_json(file fd, ClPlatform *platform);
-void clfw_dump_device_json(file fd, ClDevice *device);
+void clfw_dump_platforms_json(t_file *f, ClPlatform *platforms, U64 platforms_count);
+void clfw_dump_platform_json(t_file *f, ClPlatform *platform);
+void clfw_dump_device_json(t_file *f, ClDevice *device);
 
 /*
 Creates a OpenCL context for a device. If the device's context is non-null, do nothing and return TRUE
