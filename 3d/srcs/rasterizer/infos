@@ -1,0 +1,4 @@
+CU = compute units (Terme de OpenCL)
+SM = streaming multiprocessor
+
+device->compute_units contient les nombres de CUs sur la carte

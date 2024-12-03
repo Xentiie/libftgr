@@ -15,16 +15,12 @@
 
 #include "libft/std.h"
 
-// Set to 0 to test performances later
-#define CACHE_IMAGE_DC 1
-
 #ifdef FT_OS_WIN
 
 #include "libft/maths.h"
 #include "libft/lists.h"
 #include "libft/strings.h"
 #include "libft/time.h"
-#include "libftgr_constants.h"
 #include <windows.h>
 #include <stdio.h>
 

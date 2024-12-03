@@ -6,14 +6,14 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/18 02:00:26 by reclaire          #+#    #+#             */
-/*   Updated: 2024/08/20 18:46:47 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/10/11 01:17:04 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef LIBFTHTTP_H
 #define LIBFTHTTP_H
 
-#include "libft/types.h"
+#include "libft/std.h"
 
 enum e_http_method
 {

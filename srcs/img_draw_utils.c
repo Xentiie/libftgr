@@ -6,12 +6,13 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/07 17:32:16 by reclaire          #+#    #+#             */
-/*   Updated: 2024/12/03 16:31:48 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/12/03 19:25:25 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libftgr.h"
 #include "libft/time.h"
+#include "libft/io.h"
 #include "libft/maths.h"
 #include "libft/debug.h"
 
@@ -261,6 +262,8 @@ FUNCTION_HOT void ftgr_draw_line_e(t_ftgr_img *img, t_iv2 p1, t_iv2 p2, void (*e
 
 void ftgr_draw_line_horizontal(t_ftgr_img *img, t_iv2 p1, S32 x2, t_color col)
 {
+	S32 st;
+	S32 nd;
 	U32 col_i = ftgr_color_to_int(col);
 	U32 *addr;
 

@@ -1,19 +1,33 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   global.h                                           :+:      :+:    :+:   */
+/*   clfw_private.h                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/09/26 22:55:48 by reclaire          #+#    #+#             */
-/*   Updated: 2024/10/11 01:16:49 by reclaire         ###   ########.fr       */
+/*   Created: 2024/09/30 22:03:32 by reclaire          #+#    #+#             */
+/*   Updated: 2024/10/11 00:33:07 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef GLOBAL_H
-#define GLOBAL_H
+#ifndef CLFW_PRIVATE_H
+#define CLFW_PRIVATE_H
 
-#include "libft/std.h"
+#include "clfw/clfw.h"
+#include "libft/macros.h"
+#include "log.h"
+
+extern S32 clfw_last_call;
+extern S32 clfw_last_error;
+extern const_string clfw_func_calls[];
+
+#define clfw_tag "clfw"
+#define clfw_error(...) log_error(clfw_tag, __VA_ARGS__)
+#define clfw_warn(...) log_warn(clfw_tag, __VA_ARGS__)
+#define clfw_info(...) log_info(clfw_tag, __VA_ARGS__)
+#define clfw_debug(...) log_debug(clfw_tag, __VA_ARGS__)
+
+#define array_len(x) (sizeof(x) / sizeof(x[0]))
 
 /*
 initializes an array, where 'arr' is the buffer, 'count' is the number of elements in the array

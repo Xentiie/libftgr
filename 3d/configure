@@ -26,7 +26,6 @@ cf_error() {
 		skip=1
 		export skip
 	fi
-
 	echo "$_OWN_NAME: $1"
 	for ((i=skip; i<${#FUNCNAME[@]}; i++)); do
 		if [[ "${FUNCNAME[i]}" == cf_* ]]; then echo -n "  "; fi

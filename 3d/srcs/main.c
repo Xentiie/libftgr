@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/06 02:27:08 by reclaire          #+#    #+#             */
-/*   Updated: 2024/12/03 03:39:12 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/12/03 19:22:09 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,11 +20,9 @@
 
 #include "3dfw/3dfw.h"
 #include "infolines/infolines.h"
-#include "gpu/clc/clc.h"
-#include "gpu/maths.cl/make_maths_cl.h"
-#include "gpu/rasterizer/rasterizer_private.h"
-
-#include "gpu/clfw/clfw_private.h"
+#include "clfw/clfw.h"
+#include "clfw/clc.h"
+#include "rasterizer/rasterizer_private.h"
 
 #include "infolines_getters.h"
 
@@ -45,8 +43,8 @@ int main()
 
 	U64 platforms_cnt;
 	ClPlatform *platforms;
-	ClDevice *device;
-	LibraryCache libcache;
+	ClDevice device;
+	ProgramBuilder libcache;
 
 	log_level = LOG_DEBUG;
 
@@ -114,22 +112,22 @@ int main()
 			printf("error: %s\n", clfw_get_last_error_title());
 			return 0;
 		}
-		device = &platforms[0].devices[0]; // Should be NVIDIA
-		printf("%s/%s\n", platforms[0].name, device->name);
+		device = platforms[0]->devices[0]; // Should be NVIDIA
+		printf("%s/%s\n", platforms[0]->name, device->name);
 		clfw_init_device_ctx(device);
 		clfw_init_device_queue(device);
 	}
 
-	if ((libcache = clc_cache_init()) == NULL)
-		return 1;
-	if (!make_maths_cl(device, libcache))
+	if ((libcache = clc_builder_init(device)) == NULL)
 		return 1;
 
 	Pipeline pipe;
 	if ((pipe = pipeline_init(device)) == NULL)
 		return 1;
 
-	ProgramBuilder builder = pipeline_shader_builder(pipe, libcache);
+/*
+	ProgramBuilder builder = clc_builder_init_from(libcache);
+	pipeline_shader_builder(pipe, builder);
 	if (!clc_ingest_file(builder, "srcs/simple_vertex_shader.cl.c"))
 		return 1;
 	if (!pipeline_link_shader(pipe, builder))
@@ -138,27 +136,7 @@ int main()
 	pipeline_buffers_init(pipe, 0);
 	pipeline_fill_verts(pipe, cube.verts, cube.verts_cnt);
 	pipeline_fill_tris(pipe, cube.tris, cube.tris_cnt);
-
-
-
-/*
-	builder = clc_builder_init(device);
-	clc_executable_begin(builder);
-	clc_ingest_str(builder, "#include \"clfw.cl.h\"\n__kernel void test(global U8 *tmp) { *tmp = 10; }");
-	cl_program pr = clc_end(builder);
-
-	cl_kernel kn = clfw_create_kernel(pr, "test");
-	clfw_set_kernel_arg(kn, 0, sizeof(void*), &pipe->atm_subtris);
-	clfw_finish(device->queue);
-	clfw_enqueue_nd_range_kernel(device->queue, kn, 1, &(U64){0}, &(U64){1}, &(U64){1}, 0, NULL, NULL);
-	U8 val = 10;
-	clfw_enqueue_read_buffer(device->queue, pipe->atm_subtris, TRUE, 0, sizeof(U8), &val, 0, NULL, NULL);
-	printf("U8: %u\n", val);
-
-	return 0;
 */
-
-
 
 	while (ftgr_poll(ctx))
 	{
@@ -210,7 +188,7 @@ int main()
 		}
 
 		//render_model(cam2_view ? cam2 : cam, cube);
-		pipeline_execute(pipe, cube, cam2_view ? cam2 : cam);
+		//pipeline_execute(pipe, cube, cam2_view ? cam2 : cam);
 
 		ftgr_handle_widget_events(win, win->w_root);
 		ftgr_draw_widget_recursive(win->surface, win->w_root);
