@@ -10,6 +10,7 @@
         "initializer_list": "c",
         "span": "c",
         "utility": "c",
-        "format": "c"
-    }
+        "format": "c",
+        "thread": "c"
+    },
 }

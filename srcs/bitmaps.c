@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/10 21:44:36 by reclaire          #+#    #+#             */
-/*   Updated: 2024/09/18 15:40:00 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/12/03 18:38:24 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ U64 ftgr_bitmap_get_height(t_bitmap *bitmap, t_text text)
 void ftgr_draw_bitmap_text(t_ftgr_img *out, t_iv4 rect, t_bitmap *bitmap, t_text text, t_color col)
 {
 	string str = text.str;
-	S32 scale = text.scale;
+	F32 scale = text.scale;
 	S32 xkerning = text.kerning.x;
 	S32 ykerning = text.kerning.y;
 

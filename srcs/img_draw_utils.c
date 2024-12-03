@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/07 17:32:16 by reclaire          #+#    #+#             */
-/*   Updated: 2024/12/03 03:25:09 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/12/03 16:31:48 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -317,22 +317,10 @@ void ftgr_draw_line_vertical_e(t_ftgr_img *img, t_iv2 p1, S32 y2, void (*eval)(t
 
 void ftgr_draw_rect(t_ftgr_img *img, t_iv4 rect, t_color col)
 {
-	U32 col_i = ftgr_color_to_int(col);
-	rect.x = ft_clamp(0, img->size.x, rect.x);
-	rect.y = ft_clamp(0, img->size.y, rect.y);
-	rect.z = ft_clamp(0, img->size.x, rect.z);
-	rect.w = ft_clamp(0, img->size.y, rect.w);
-
-	for (S32 y = rect.y; y < rect.y; y++)
-	{
-		ft_memcpy(ftgr_get_pixel_addr(img, rect.x, y), &col_i, img->bpp);
-		ft_memcpy(ftgr_get_pixel_addr(img, rect.z, y), &col_i, img->bpp);
-	}
-	for (S32 x = rect.x; x < rect.x; x++)
-	{
-		ft_memcpy(ftgr_get_pixel_addr(img, x, rect.y), &col_i, img->bpp);
-		ft_memcpy(ftgr_get_pixel_addr(img, x, rect.w), &col_i, img->bpp);
-	}
+	ftgr_draw_line_horizontal(img, ivec2(rect.x, rect.y), rect.z, col);
+	ftgr_draw_line_horizontal(img, ivec2(rect.x, rect.w), rect.z, col);
+	ftgr_draw_line_vertical(img, ivec2(rect.x, rect.y), rect.w, col);
+	ftgr_draw_line_vertical(img, ivec2(rect.z, rect.y), rect.w, col);
 }
 
 void ftgr_draw_rect_e(t_ftgr_img *img, t_iv4 rect, void (*eval)(t_ftgr_img *img, t_iv2 xy, t_iv4 rect, void *data), void *data)

@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/13 01:58:46 by reclaire          #+#    #+#             */
-/*   Updated: 2024/12/03 02:24:21 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/12/03 18:38:08 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -315,6 +315,7 @@ bool ftgr_wdrawer_copy_img_cpu(t_widget *widget, t_ftgr_img *img);
 bool ftgr_wdrawer_stretch_img_cpu(t_widget *widget, t_ftgr_img *img);
 bool ftgr_wdrawer_paint_rect(t_widget *widget, t_color color);
 bool ftgr_wdrawer_draw_rect(t_widget *widget, t_color color);
+bool ftgr_wdrawer_draw_text(t_widget *widget, t_bitmap *bitmap, t_text *text, t_color color);
 
 /* bitmaps */
 struct s_bitmap
@@ -330,7 +331,7 @@ struct s_bitmap
 struct s_text
 {
 	string str;
-	S32 scale;
+	F32 scale;
 	t_iv2 kerning;
 };
 
