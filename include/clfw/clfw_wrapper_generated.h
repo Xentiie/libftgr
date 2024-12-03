@@ -5,7 +5,7 @@ Auto generated OpenCL wrapper from 'auto_gen_wrapper.py'
 #define CL_USE_DEPRECATED_OPENCL_1_0_APIS
 #define CL_TARGET_OPENCL_VERSION 300
 #include "CL/cl.h"
-#include "log.h"
+#include "log/log.h"
 #include "libft/std.h"
 
 #define CLFW_DEBUG_ARGS(...) __VA_ARGS__ FT_IFDEBUG(__VA_OPT__(,) const_string _file, S32 _line)

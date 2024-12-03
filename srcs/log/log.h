@@ -6,22 +6,14 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/26 23:07:32 by reclaire          #+#    #+#             */
-<<<<<<<< HEAD:srcs/log/log.h
-/*   Updated: 2024/12/03 03:32:56 by reclaire         ###   ########.fr       */
-========
-/*   Updated: 2024/10/11 01:17:07 by reclaire         ###   ########.fr       */
->>>>>>>> 3357d0c81fa52b9d081e13212418880d6cbadb44:include/log.h
+/*   Updated: 2024/12/03 19:28:11 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #if !defined(LOG_H)
 #define LOG_H
 
-<<<<<<<< HEAD:srcs/log/log.h
 #include "libft/libft.h"
-========
-#include "libft/std.h"
->>>>>>>> 3357d0c81fa52b9d081e13212418880d6cbadb44:include/log.h
 #include "libft/io.h"
 #include "libft/debug.h"
 

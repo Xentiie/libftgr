@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/25 18:07:19 by reclaire          #+#    #+#             */
-/*   Updated: 2024/11/12 03:49:58 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/12/03 19:30:51 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,6 @@
 
 #include "clfw/clc.h"
 #include "../clfw_private.h"
-#include "log.h"
 
 #include <stdlib.h>
 #include <stdio.h>

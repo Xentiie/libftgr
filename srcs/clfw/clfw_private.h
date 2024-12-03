@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 22:03:32 by reclaire          #+#    #+#             */
-/*   Updated: 2024/10/11 00:33:07 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/12/03 19:30:37 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 
 #include "clfw/clfw.h"
 #include "libft/macros.h"
-#include "log.h"
+#include "log/log.h"
 
 extern S32 clfw_last_call;
 extern S32 clfw_last_error;

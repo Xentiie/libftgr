@@ -3,7 +3,8 @@
         {
             "name": "Linux",
             "includePath": [
-                "${workspaceFolder}/**",
+                "${workspaceFolder}/include",
+                "${workspaceFolder}/srcs",
                 "/home/reclaire/Desktop/libft/include",
 				"./3rdparty/OpenCL/include"
             ],

@@ -6,14 +6,14 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/26 22:35:18 by reclaire          #+#    #+#             */
-/*   Updated: 2024/12/03 19:24:41 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/12/03 19:29:40 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef CLC_H
+#if !defined(CLC_H)
 #define CLC_H
 
-#include "gpu/clfw/clfw.h"
+#include "clfw/clfw.h"
 
 #include "libft/types.h"
 #include "libft/std.h"

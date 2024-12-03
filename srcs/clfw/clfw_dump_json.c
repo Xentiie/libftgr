@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/03 21:15:48 by reclaire          #+#    #+#             */
-/*   Updated: 2024/12/03 19:25:55 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/12/03 19:31:37 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@
 		ft_fprintf(f, _Generic((p->v), U64: _U64_fmt, U32: "%u", U16: "%u", U8: "%s", S64: _S64_fmt, S32: "%d", S16: "%d", S8: "%d", string: "\"%s\""), _Generic((p->v), U8: (p->v ? "true" : "false"), default: p->v)); \
 	}
 
-void clfw_dump_device_json(t_file *f, ClDevice *device)
+void clfw_dump_device_json(t_file *f, ClDevice device)
 {
 	json_begin_obj();
 	dump_json_val(device, type);
@@ -115,7 +115,7 @@ void clfw_dump_device_json(t_file *f, ClDevice *device)
 	json_end_obj();
 }
 
-void clfw_dump_platform_json(t_file *f, ClPlatform *platform)
+void clfw_dump_platform_json(t_file *f, ClPlatform platform)
 {
 	json_begin_obj();
 
@@ -149,7 +149,7 @@ void clfw_dump_platforms_json(t_file *f, ClPlatform *platforms, U64 platforms_co
 	json_begin_array();
 	for (U64 i = 0; i < platforms_count; i++)
 	{
-		clfw_dump_platform_json(f, &platforms[i]);
+		clfw_dump_platform_json(f, platforms[i]);
 		if (i != platforms_count - 1)
 			json_sep();
 	}

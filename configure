@@ -524,7 +524,7 @@ configure() {
 		cf_add_include "./srcs"
 		cf_add_include "./include"
 
-		cf_add_srcs "$(find "./srcs" -type f -name '*.c')"
+		cf_add_srcs "$(find "./srcs" -type f -name '*.c' -not -name '*.cl.c')"
 	cf_end_target
 }
 
