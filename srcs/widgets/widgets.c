@@ -6,9 +6,11 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/09 00:44:07 by reclaire          #+#    #+#             */
-/*   Updated: 2024/09/21 01:09:00 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/12/03 22:06:41 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
+#define _FT_RETURN 1
 
 #include "libft/std.h"
 #include "libft/limits.h"
@@ -22,83 +24,112 @@
 #pragma region "Widget new/free"
 t_widget *ftgr_new_widget()
 {
-	t_widget *widget = malloc(sizeof(t_widget));
-	if (widget == NULL || ftgr_init_widget(widget) == FALSE)
-	{
-		free(widget);
+	t_widget *widget;
+
+	if (UNLIKELY((widget = malloc(sizeof(t_widget))) == NULL))
+		FT_RET_ERR(NULL, FT_EOMEM);
+	if (ftgr_init_widget(widget) == FALSE)
 		return NULL;
-	}
-	return widget;
+	FT_RET_OK(widget);
 }
 
 bool ftgr_init_widget(t_widget *widget)
 {
+	const U64 widget_init_childrens_alloc = 4;
 	const U64 widget_init_drawers_alloc = 4;
 
 	ft_bzero(widget, sizeof(t_widget));
+
 	if ((widget->drawers = malloc(sizeof(t_widget_drawer) * widget_init_drawers_alloc)) == NULL)
-		return FALSE;
+		FT_RET_ERR(FALSE, FT_EOMEM);
 	widget->drawers_alloc = widget_init_drawers_alloc;
-	return TRUE;
+
+	if ((widget->childrens = malloc(sizeof(t_widget_drawer) * widget_init_childrens_alloc)) == FALSE)
+	{
+		free(widget->drawers);
+		FT_RET_ERR(FALSE, FT_EOMEM);
+	}
+	widget->childrens_alloc = widget_init_childrens_alloc;
+
+	FT_RET_OK(TRUE);
 }
 
-void ftgr_add_widget(t_widget *widget, t_widget *master)
+static void _widget_childrens_compact(t_widget *widget)
 {
-	widget->master = master;
+	U64 i, j;
+	U64 free_len;
+	U64 len;
 
-	if (master->childrens == NULL)
+	i = 0;
+	j = 0;
+	while (i < widget->childrens_n)
 	{
-		master->childrens = widget;
-		master->last = widget;
+		if (widget->childrens[i] != NULL)
+		{
+			i++;
+			continue;
+		}
+
+		j = i;
+		while (widget->childrens[j] == NULL)
+			j++;
+		len = 0;
+		while (widget->childrens[j + len] != NULL && len < free_len)
+			len++;
+		ft_memcpy(&widget->childrens[i], &widget->childrens[j], sizeof(t_widget *) * len);
+		for (; (j - i) < len; j++, i++)
+			widget->childrens[j]->master_i = j;
 	}
-	else
+	widget->childrens_del = 0;
+}
+
+bool ftgr_add_widget(t_widget *widget, t_widget *master)
+{
+	void *new;
+
+	if (widget->childrens_n >= widget->childrens_alloc)
 	{
-		master->last->next = widget;
-		master->last = widget;
+		if (UNLIKELY((new = malloc(sizeof(t_widget *) * widget->childrens_n * 2)) == NULL))
+			FT_RET_ERR(FALSE, FT_EOMEM);
+		ft_memcpy(new, widget->childrens, sizeof(t_widget *) * widget->childrens_n);
+		free(widget->childrens);
+		widget->childrens = new;
+		widget->childrens_alloc = widget->childrens_n * 2;
 	}
+
+	widget->master = master;
+	master->childrens[master->childrens_n] = widget;
+	widget->master_i = master->childrens_n;
+	master->childrens_n++;
+	FT_RET_OK(FALSE);
 }
 
 void ftgr_remove_widget(t_widget *widget)
 {
 	t_widget *master;
-	t_widget *w;
 
 	master = widget->master;
-	if (UNLIKELY(master == NULL))
+	if (widget == master->childrens[master->childrens_n])
+	{
+		master->childrens_n--;
 		return;
-	w = master->childrens;
+	}
 
-	if (w == widget)
-	{
-		if (w == master->last)
-			master->last = NULL;
-		master->childrens = w->next;
-	}
-	else
-	{
-		while (w)
-		{
-			if (w->next == widget)
-			{
-				if (w->next == master->last)
-					master->last = w;
-				w->next = widget->next;
-				break;
-			}
-			w = w->next;
-		}
-	}
+	ft_memcpy(&master->childrens[widget->master_i], &master->childrens[widget->master_i + 1], master->childrens_n - widget->master_i - 1);
+	master->childrens_n--;
 	widget->master = NULL;
 }
 
 void ftgr_free_widget(t_widget *widget)
 {
 	ftgr_remove_widget(widget);
-	while (widget->childrens)
+	for (U64 i = 0; i < widget->childrens_n; i++)
 	{
-		widget->childrens->master = NULL;
-		widget->childrens = widget->childrens->next;
+		widget->childrens[i]->master = NULL;
+		widget->childrens[i]->master_i = 0;
 	}
+	free(widget->childrens);
+	free(widget->drawers);
 	free(widget);
 }
 
@@ -108,7 +139,7 @@ bool ftgr_add_wdrawer(t_widget *widget, t_widget_drawer drawer)
 	{
 		void *new = malloc(sizeof(t_widget_drawer) * widget->drawers_n * 2);
 		if (UNLIKELY(new == NULL))
-			return FALSE;
+			FT_RET_ERR(FALSE, FT_EOMEM);
 		ft_memcpy(new, widget->drawers, sizeof(t_widget_drawer) * widget->drawers_n);
 		free(widget->drawers);
 		widget->drawers = new;
@@ -116,19 +147,15 @@ bool ftgr_add_wdrawer(t_widget *widget, t_widget_drawer drawer)
 	}
 
 	widget->drawers[widget->drawers_n++] = drawer;
-	return TRUE;
+	FT_RET_OK(TRUE);
 }
 
 static void _ftgr_free_widget_recursive(t_widget *widget)
 {
-	t_widget *next;
-
-	while (widget->childrens)
+	for (U64 i = 0; i < widget->childrens_n; i++)
 	{
-		next = widget->childrens->next;
-		_ftgr_free_widget_recursive(widget->childrens);
-		free(widget->childrens);
-		widget->childrens = next;
+		_ftgr_free_widget_recursive(widget->childrens[i]);
+		ftgr_free_widget(widget);
 	}
 }
 
@@ -136,7 +163,7 @@ void ftgr_free_widget_recursive(t_widget *widget)
 {
 	ftgr_remove_widget(widget);
 	_ftgr_free_widget_recursive(widget);
-	free(widget);
+	ftgr_free_widget(widget);
 }
 #pragma endregion
 
@@ -198,8 +225,9 @@ static void ftgr_handle_widget_events_rec(t_ftgr_ctx *ctx, t_widget *w, t_iv2 mo
 				w->on_cursor_release(w, mouse_pos);
 		}
 	}
-	for (t_widget *c = w->childrens; c; c = c->next)
-		ftgr_handle_widget_events_rec(ctx, c, mouse_pos, pos);
+	
+	for (U64 i = 0; i < w->childrens_n; i++)
+		ftgr_handle_widget_events_rec(ctx, w->childrens[i], mouse_pos, pos);
 }
 
 void ftgr_handle_widget_events(t_ftgr_win *win, t_widget *w)
@@ -213,8 +241,8 @@ void ftgr_handle_widget_events(t_ftgr_win *win, t_widget *w)
 void ftgr_draw_widget_recursive(t_ftgr_img *out, t_widget *widget)
 {
 	ftgr_draw_widget(out, widget);
-	for (t_widget *w = widget->childrens; w; w = w->next)
-		ftgr_draw_widget_recursive(out, w);
+	for (U64 i = 0; i < widget->childrens_n; i++)
+		ftgr_draw_widget_recursive(out, widget->childrens[i]);
 }
 
 void ftgr_draw_widget(t_ftgr_img *out, t_widget *widget)

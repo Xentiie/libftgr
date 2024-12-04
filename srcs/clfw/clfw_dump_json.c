@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/03 21:15:48 by reclaire          #+#    #+#             */
-/*   Updated: 2024/12/03 19:31:37 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/12/03 20:38:33 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -135,7 +135,7 @@ void clfw_dump_platform_json(t_file *f, ClPlatform platform)
 	json_begin_array("devices");
 	for (U64 i = 0; i < platform->devices_cnt; i++)
 	{
-		clfw_dump_device_json(f, &platform->devices[i]);
+		clfw_dump_device_json(f, platform->devices[i]);
 		if (i != platform->devices_cnt - 1)
 			json_sep();
 	}

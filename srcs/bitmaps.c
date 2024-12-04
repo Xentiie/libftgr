@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/10 21:44:36 by reclaire          #+#    #+#             */
-/*   Updated: 2024/12/03 18:38:24 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/12/04 00:45:24 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,12 +34,12 @@ t_iv4 ftgr_bitmap_rect_char_lines(t_bitmap *bitmap, t_iv2 pos, U32 line_width, U
 U64 ftgr_bitmap_get_width(t_bitmap *bitmap, t_text text)
 {
 	S64 len = ft_strlen(text.str);
-	return len * (bitmap->char_width * text.scale + text.kerning.x);
+	return len * (ft_ceil(bitmap->char_width * text.scale) + text.kerning.x);
 }
 
 U64 ftgr_bitmap_get_height(t_bitmap *bitmap, t_text text)
 {
-	return bitmap->char_height * text.scale + text.kerning.y;
+	return ft_ceil(bitmap->char_height * text.scale) + text.kerning.y;
 }
 
 void ftgr_draw_bitmap_text(t_ftgr_img *out, t_iv4 rect, t_bitmap *bitmap, t_text text, t_color col)

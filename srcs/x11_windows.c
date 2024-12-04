@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/16 22:36:34 by reclaire          #+#    #+#             */
-/*   Updated: 2024/12/03 02:18:30 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/12/04 01:53:54 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -194,7 +194,7 @@ void ftgr_swap_buffers(t_ftgr_win *win)
 		XSetClipOrigin(win->ctx->display, gc, 0, 0);
 	}
 
-	t_framebuffer_data fb = win_int->buffers[win_int->front];
+	t_framebuffer_data fb = win_int->buffers[win_int->back];
 
 	if (fb.shm)
 	{

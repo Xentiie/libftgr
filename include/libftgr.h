@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/13 01:58:46 by reclaire          #+#    #+#             */
-/*   Updated: 2024/12/03 19:24:13 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/12/04 01:37:44 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -177,21 +177,28 @@ t_color ftgr_int_to_color(U32 v);
 t_color ftgr_get_pixel(t_ftgr_img *img, t_iv2 p);
 void ftgr_set_pixel(t_ftgr_img *img, t_iv2 p, t_color col);
 void ftgr_draw_line(t_ftgr_img *img, t_iv2 p1, t_iv2 p2, t_color col);
+void ftgr_draw_line2(t_ftgr_img *img, t_iv2 p1, t_iv2 p2, t_color col);
 void ftgr_draw_line_e(t_ftgr_img *img, t_iv2 p1, t_iv2 p2, void (*eval)(t_ftgr_img *img, t_iv2 xy, t_iv4 lp1lp2, void *data), void *data);
 void ftgr_draw_line_horizontal(t_ftgr_img *img, t_iv2 p1, S32 x2, t_color col);
+void ftgr_draw_line_horizontal2(t_ftgr_img *img, t_iv2 p1, S32 x2, t_color col);
 void ftgr_draw_line_horizontal_e(t_ftgr_img *img, t_iv2 p1, S32 x2, void (*eval)(t_ftgr_img *img, t_iv2 xy, t_iv4 lp1lp2, void *data), void *data);
 void ftgr_draw_line_vertical(t_ftgr_img *img, t_iv2 p1, S32 y2, t_color col);
+void ftgr_draw_line_vertical2(t_ftgr_img *img, t_iv2 p1, S32 y2, t_color col);
 void ftgr_draw_line_vertical_e(t_ftgr_img *img, t_iv2 p1, S32 y2, void (*eval)(t_ftgr_img *img, t_iv2 xy, t_iv4 lp1lp2, void *data), void *data);
 void ftgr_draw_bezier(t_ftgr_img *img, t_color col, t_v2 p1, t_v2 p2, t_v2 p3, S32 res);
+void ftgr_draw_bezier2(t_ftgr_img *img, t_color col, t_v2 p1, t_v2 p2, t_v2 p3, S32 res);
 void ftgr_draw_rect(t_ftgr_img *img, t_iv4 rect, t_color col);
+void ftgr_draw_rect2(t_ftgr_img *img, t_iv4 rect, t_color col);
 void ftgr_draw_rect_e(t_ftgr_img *img, t_iv4 rect, void (*eval)(t_ftgr_img *img, t_iv2 xy, t_iv4 rect, void *data), void *data);
 void ftgr_fill_rect(t_ftgr_img *img, t_iv4 rect, t_color col);
+void ftgr_fill_rect2(t_ftgr_img *img, t_iv4 rect, t_color col);
 void ftgr_fill_rect_e(t_ftgr_img *img, t_iv4 rect, void (*eval)(t_ftgr_img *img, t_iv2 xy, t_iv4 rect, void *data), void *data);
 void ftgr_draw_triangle(t_ftgr_img *img, t_iv2 p1, t_iv2 p2, t_iv2 p3, t_color col);
 void ftgr_draw_triangle_e(t_ftgr_img *img, t_iv2 p1, t_iv2 p2, t_iv2 p3, void (*eval)(t_ftgr_img *img, t_iv2 xy, t_v3 w, void *data), void *data);
 void ftgr_fill_triangle_e(t_ftgr_img *img, t_iv2 ip1, t_iv2 ip2, t_iv2 ip3, void (*eval)(t_ftgr_img *img, t_iv2 xy, t_v3 w, void *data), void *data);
 void ftgr_draw_circle(t_ftgr_img *img, t_iv2 pos, S32 radius, t_color col);
 void ftgr_draw_disc(t_ftgr_img *img, t_iv2 pos, S32 radius, t_color col);
+void ftgr_draw_disc2(t_ftgr_img *img, t_iv2 pos, S32 radius, t_color col);
 void ftgr_stretch_img(t_ftgr_img *dst, t_iv4 dst_rect, t_ftgr_img *src, t_iv4 src_rect);
 void ftgr_stretch_img2(t_ftgr_img *dst, t_iv4 dst_rect, t_ftgr_img *src, t_iv4 src_rect, t_color col);
 void ftgr_cpy_img(t_ftgr_img *dst, t_iv2 dst_pos, t_ftgr_img *src, t_iv4 src_rect);
@@ -274,9 +281,12 @@ typedef struct s_widget
 	bool handle_input;	// Does this widget receives inputs events
 	bool capture_input; // Does this widget captures inputs events (doesn't pass them down to childrens)
 	struct s_widget *master;
-	struct s_widget *next;
-	struct s_widget *childrens;
-	struct s_widget *last;
+	U64 master_i;
+
+	U64 childrens_n;
+	U64 childrens_del;
+	U64 childrens_alloc;
+	struct s_widget **childrens;
 
 	union u_widget_data data;
 	string name; // optional, can be NULL
@@ -300,7 +310,7 @@ void ftgr_free_widget_recursive(t_widget *widget);
 void ftgr_free_widget(t_widget *widget);
 bool ftgr_add_wdrawer(t_widget *widget, t_widget_drawer drawer);
 
-void ftgr_add_widget(t_widget *widget, t_widget *master);
+bool ftgr_add_widget(t_widget *widget, t_widget *master);
 void ftgr_remove_widget(t_widget *widget);
 
 void ftgr_handle_widget_events(t_ftgr_win *win, t_widget *w);

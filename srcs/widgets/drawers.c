@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/18 16:48:01 by reclaire          #+#    #+#             */
-/*   Updated: 2024/12/03 16:42:24 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/12/04 01:38:45 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ bool ftgr_wdrawer_copy_img_cpu(t_widget *widget, t_ftgr_img *img)
 
 static void __ftgr_wdrawer_paint_rect(t_ftgr_img *out, t_widget *widget, t_iv2 abs_pos, union u_widget_data data)
 {
-	ftgr_fill_rect(out,
+	ftgr_fill_rect2(out,
 				   ivec4(abs_pos.x, abs_pos.y,
 						 widget->size.x + abs_pos.x,
 						 widget->size.y + abs_pos.y),
@@ -62,7 +62,7 @@ bool ftgr_wdrawer_paint_rect(t_widget *widget, t_color color)
 
 static void __ftgr_wdrawer_draw_rect(t_ftgr_img *out, t_widget *widget, t_iv2 abs_pos, union u_widget_data data)
 {
-	ftgr_draw_rect(out,
+	ftgr_draw_rect2(out,
 				   ivec4(abs_pos.x, abs_pos.y,
 						 widget->size.x + abs_pos.x,
 						 widget->size.y + abs_pos.y),

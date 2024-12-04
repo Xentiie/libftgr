@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/07 17:32:16 by reclaire          #+#    #+#             */
-/*   Updated: 2024/12/03 19:25:25 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/12/04 01:56:01 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,22 +71,33 @@ static U8 line_draw_intersect(t_iv2 p, S32 width, S32 height)
 	return outcode;
 }
 
+static inline void overlay_pixel_alpha(U32 *ptr, t_color col)
+{
+	t_color under;
+
+	under = ftgr_int_to_color(*ptr);
+	//printf("%u\n", under.r);
+	*ptr = ftgr_color_to_int(ftgr_alpha_blend(under, col));
+}
+
 FUNCTION_HOT void ftgr_draw_line(t_ftgr_img *img, t_iv2 p1, t_iv2 p2, t_color col)
 {
-	U32 col_i = ftgr_color_to_int(col);
-	S32 width = img->size.x;
-	S32 height = img->size.y;
+	U32 col_i;
+	S32 width;
+	S32 height;
+	U8 intersect1;
+	U8 intersect2;
+	bool accept;
 
-	U8 intersect1 = line_draw_intersect(p1, width, height);
-	U8 intersect2 = line_draw_intersect(p2, width, height);
-	// printf("(%d %d):{%u %u %u %u} (%d %d)\n", p1.x, p1.y, !!(intersect1 & INSIDE), !!(intersect1 & LEFT), !!(intersect1 & RIGHT), !!(intersect1 & BOTTOM), !!(intersect1 & TOP),
-	//	   p2.x, p2.y, !!(intersect2 & INSIDE), !!(intersect2 & LEFT), !!(intersect2 & RIGHT), !!(intersect2 & BOTTOM), !!(intersect2 & TOP));
+	col_i = ftgr_color_to_int(col);
+	width = img->size.x;
+	height = img->size.y;
 
-	bool accept = FALSE;
-	// bool accept = TRUE;
+	intersect1 = line_draw_intersect(p1, width, height);
+	intersect2 = line_draw_intersect(p2, width, height);
 
+	accept = FALSE;
 	while (TRUE)
-	// while (FALSE)
 	{
 		if (!(intersect1 | intersect2)) /* both inside */
 		{
@@ -148,7 +159,101 @@ FUNCTION_HOT void ftgr_draw_line(t_ftgr_img *img, t_iv2 p1, t_iv2 p2, t_color co
 		while (TRUE)
 		{
 			if (p1.x >= 0 && p1.x < img->size.x && p1.y >= 0 && p1.y < img->size.y)
-				ft_memcpy(ftgr_get_pixel_addr(img, p1.x, p1.y), &col_i, img->bpp);
+			{
+				U32 *ptr = (U32 *)ftgr_get_pixel_addr(img, p1.x, p1.y);
+				*ptr = col_i;
+			}
+
+			if (p1.x == p2.x && p1.y == p2.y)
+				break;
+
+			e2 = 2 * err;
+			if (e2 > -dy)
+			{
+				err -= dy;
+				p1.x += sx;
+			}
+			if (e2 < dx)
+			{
+				err += dx;
+				p1.y += sy;
+			}
+		}
+	}
+}
+
+FUNCTION_HOT void ftgr_draw_line2(t_ftgr_img *img, t_iv2 p1, t_iv2 p2, t_color col)
+{
+	S32 width = img->size.x;
+	S32 height = img->size.y;
+
+	U8 intersect1 = line_draw_intersect(p1, width, height);
+	U8 intersect2 = line_draw_intersect(p2, width, height);
+	bool accept = FALSE;
+
+	while (TRUE)
+	{
+		if (!(intersect1 | intersect2)) /* both inside */
+		{
+			accept = TRUE;
+			break;
+		}
+		else if (intersect1 & intersect2) /* both outside */
+			return;
+		else
+		{
+			t_iv2 intersection;
+			U8 intersect_out = (intersect1 != INSIDE) ? intersect1 : intersect2;
+			if (intersect_out & TOP)
+			{
+				intersection.x = p1.x + (p2.x - p1.x) * (height - 1 - p1.y) / (p2.y - p1.y);
+				intersection.y = height - 1;
+			}
+			else if (intersect_out & BOTTOM)
+			{
+				intersection.x = p1.x + (p2.x - p1.x) * (0 - p1.y) / (p2.y - p1.y);
+				intersection.y = 0;
+			}
+			else if (intersect_out & RIGHT)
+			{
+				intersection.y = p1.y + (p2.y - p1.y) * (width - 1 - p1.x) / (p2.x - p1.x);
+				intersection.x = width - 1;
+			}
+			else if (intersect_out & LEFT)
+			{
+				intersection.y = p1.y + (p2.y - p1.y) * (0 - p1.x) / (p2.x - p1.x);
+				intersection.x = 0;
+			}
+			else
+			{
+				intersection = ivec2(0, 0);
+				ft_debug_break();
+			}
+
+			if (intersect_out == intersect1)
+			{
+				p1 = intersection;
+				intersect1 = line_draw_intersect(p1, width, height);
+			}
+			else
+			{
+				p2 = intersection;
+				intersect2 = line_draw_intersect(p2, width, height);
+			}
+		}
+	}
+
+	if (accept)
+	{
+		S32 dx = abs(p2.x - p1.x), dy = abs(p2.y - p1.y);
+		S32 sx = (p1.x < p2.x) ? 1 : -1;
+		S32 sy = (p1.y < p2.y) ? 1 : -1;
+		S32 err = dx - dy, e2;
+
+		while (TRUE)
+		{
+			if (p1.x >= 0 && p1.x < img->size.x && p1.y >= 0 && p1.y < img->size.y)
+				overlay_pixel_alpha((U32 *)ftgr_get_pixel_addr(img, p1.x, p1.y), col);
 
 			if (p1.x == p2.x && p1.y == p2.y)
 				break;
@@ -262,21 +367,40 @@ FUNCTION_HOT void ftgr_draw_line_e(t_ftgr_img *img, t_iv2 p1, t_iv2 p2, void (*e
 
 void ftgr_draw_line_horizontal(t_ftgr_img *img, t_iv2 p1, S32 x2, t_color col)
 {
-	S32 st;
-	S32 nd;
-	U32 col_i = ftgr_color_to_int(col);
-	U32 *addr;
+	U32 col_i;
+	U32 *ptr;
+	S32 xlen;
 
 	if (p1.y < 0 || p1.y >= img->size.y)
 		return;
 
-	//TODO: bpp
+	col_i = ftgr_color_to_int(col);
 	p1.x = ft_clamp(0, img->size.x - 1, p1.x);
 	x2 = ft_clamp(0, img->size.x - 1, x2);
 
-	addr = (U32 *)ftgr_get_pixel_addr(img, ft_imin(p1.x, x2), p1.y);
-	for (S32 i = 0; i < ft_abs(p1.x - x2); i++)
-		addr[i] = col_i;
+	xlen = ft_abs(p1.x - x2);
+
+	ptr = (U32 *)ftgr_get_pixel_addr(img, ft_imin(p1.x, x2), p1.y);
+	for (S32 i = 0; i < xlen; i++, ptr++)
+		*ptr = col_i;
+}
+
+void ftgr_draw_line_horizontal2(t_ftgr_img *img, t_iv2 p1, S32 x2, t_color col)
+{
+	U32 *ptr;
+	S32 xlen;
+
+	if (p1.y < 0 || p1.y >= img->size.y)
+		return;
+
+	p1.x = ft_clamp(0, img->size.x - 1, p1.x);
+	x2 = ft_clamp(0, img->size.x - 1, x2);
+
+	xlen = ft_abs(p1.x - x2);
+
+	ptr = (U32 *)ftgr_get_pixel_addr(img, ft_imin(p1.x, x2), p1.y);
+	for (S32 i = 0; i < xlen; i++, ptr++)
+		overlay_pixel_alpha(ptr, col);
 }
 
 void ftgr_draw_line_horizontal_e(t_ftgr_img *img, t_iv2 p1, S32 x2, void (*eval)(t_ftgr_img *img, t_iv2 xy, t_iv4 lp1lp2, void *data), void *data)
@@ -294,15 +418,40 @@ void ftgr_draw_line_horizontal_e(t_ftgr_img *img, t_iv2 p1, S32 x2, void (*eval)
 
 void ftgr_draw_line_vertical(t_ftgr_img *img, t_iv2 p1, S32 y2, t_color col)
 {
-	U32 col_i = ftgr_color_to_int(col);
+	U32 col_i;
+	U32 *ptr;
+	S32 ylen;
+
+	if (p1.x < 0 || p1.x >= img->size.x)
+		return;
+
+	col_i = ftgr_color_to_int(col);
+	p1.y = ft_clamp(0, img->size.y - 1, p1.y);
+	y2 = ft_clamp(0, img->size.y - 1, y2);
+
+	ylen = ft_abs(p1.y - y2);
+
+	ptr = (U32 *)ftgr_get_pixel_addr(img, p1.x, ft_imin(p1.y, y2));
+	for (S32 y = 0; y < ylen; y++, ptr += img->size.x)
+		*ptr = col_i;
+}
+
+void ftgr_draw_line_vertical2(t_ftgr_img *img, t_iv2 p1, S32 y2, t_color col)
+{
+	U32 *ptr;
+	S32 ylen;
 
 	if (p1.x < 0 || p1.x >= img->size.x)
 		return;
 
 	p1.y = ft_clamp(0, img->size.y - 1, p1.y);
 	y2 = ft_clamp(0, img->size.y - 1, y2);
-	for (U64 y = p1.y; y < (U64)y2; y++)
-		ft_memcpy(ftgr_get_pixel_addr(img, p1.x, y), &col_i, img->bpp);
+
+	ylen = ft_abs(p1.y - y2);
+
+	ptr = (U32 *)ftgr_get_pixel_addr(img, p1.x, ft_imin(p1.y, y2));
+	for (S32 y = 0; y < ylen; y++, ptr += img->size.x)
+		overlay_pixel_alpha(ptr, col);
 }
 
 void ftgr_draw_line_vertical_e(t_ftgr_img *img, t_iv2 p1, S32 y2, void (*eval)(t_ftgr_img *img, t_iv2 xy, t_iv4 lp1lp2, void *data), void *data)
@@ -324,6 +473,14 @@ void ftgr_draw_rect(t_ftgr_img *img, t_iv4 rect, t_color col)
 	ftgr_draw_line_horizontal(img, ivec2(rect.x, rect.w), rect.z, col);
 	ftgr_draw_line_vertical(img, ivec2(rect.x, rect.y), rect.w, col);
 	ftgr_draw_line_vertical(img, ivec2(rect.z, rect.y), rect.w, col);
+}
+
+void ftgr_draw_rect2(t_ftgr_img *img, t_iv4 rect, t_color col)
+{
+	ftgr_draw_line_horizontal2(img, ivec2(rect.x, rect.y), rect.z, col);
+	ftgr_draw_line_horizontal2(img, ivec2(rect.x, rect.w), rect.z, col);
+	ftgr_draw_line_vertical2(img, ivec2(rect.x, rect.y), rect.w, col);
+	ftgr_draw_line_vertical2(img, ivec2(rect.z, rect.y), rect.w, col);
 }
 
 void ftgr_draw_rect_e(t_ftgr_img *img, t_iv4 rect, void (*eval)(t_ftgr_img *img, t_iv2 xy, t_iv4 rect, void *data), void *data)
@@ -350,15 +507,46 @@ void ftgr_draw_rect_e(t_ftgr_img *img, t_iv4 rect, void (*eval)(t_ftgr_img *img,
 void ftgr_fill_rect(t_ftgr_img *img, t_iv4 rect, t_color col)
 {
 	U32 col_i = ftgr_color_to_int(col);
+	U32 *ptr;
+	S32 ystep;
+	S32 ylen;
+	S32 xlen;
 
 	rect.x = ft_clamp(0, img->size.x, rect.x);
 	rect.y = ft_clamp(0, img->size.y, rect.y);
 	rect.z = ft_clamp(0, img->size.x, rect.z);
 	rect.w = ft_clamp(0, img->size.y, rect.w);
 
-	for (S32 y = rect.y; y < rect.w; y++)
-		for (S32 x = rect.x; x < rect.z; x++)
-			ft_memcpy(ftgr_get_pixel_addr(img, x, y), &col_i, img->bpp);
+	ptr = (U32 *)ftgr_get_pixel_addr(img, rect.x, rect.y);
+
+	ylen = rect.w - rect.y;
+	xlen = rect.z - rect.x;
+	ystep = img->size.x - (rect.z - rect.x);
+	for (S32 y = 0; y < ylen; y++, ptr += ystep)
+		for (S32 x = 0; x < xlen; x++, ptr++)
+			*ptr = col_i;
+}
+
+void ftgr_fill_rect2(t_ftgr_img *img, t_iv4 rect, t_color col)
+{
+	U32 *ptr;
+	S32 ystep;
+	S32 ylen;
+	S32 xlen;
+
+	rect.x = ft_clamp(0, img->size.x, rect.x);
+	rect.y = ft_clamp(0, img->size.y, rect.y);
+	rect.z = ft_clamp(0, img->size.x, rect.z);
+	rect.w = ft_clamp(0, img->size.y, rect.w);
+
+	ptr = (U32 *)ftgr_get_pixel_addr(img, rect.x, rect.y);
+
+	ylen = rect.w - rect.y;
+	xlen = rect.z - rect.x;
+	ystep = img->size.x - (rect.z - rect.x);
+	for (S32 y = 0; y < ylen; y++, ptr += ystep)
+		for (S32 x = 0; x < xlen; x++, ptr++)
+			overlay_pixel_alpha(ptr, col);
 }
 
 void ftgr_fill_rect_e(t_ftgr_img *img, t_iv4 rect, void (*eval)(t_ftgr_img *img, t_iv2 xy, t_iv4 rect, void *data), void *data)
@@ -371,14 +559,8 @@ void ftgr_fill_rect_e(t_ftgr_img *img, t_iv4 rect, void (*eval)(t_ftgr_img *img,
 	rect.w = ft_clamp(0, img->size.y, rect.w);
 
 	for (S32 y = rect.y; y < rect.y; y++)
-	{
 		for (S32 x = rect.x; x < rect.x; x++)
-		{
-			// col_i = ftgr_color_to_int(eval(ivec2(rect.x, rect.y), ivec2(rect.z, rect.w), ivec2(x, y)));
-			// ft_memcpy(ftgr_get_pixel_addr(img, x, y), &col_i, img->bpp);
 			eval(img, ivec2(x, y), rect_full, data);
-		}
-	}
 }
 
 void ftgr_draw_triangle(t_ftgr_img *img, t_iv2 p1, t_iv2 p2, t_iv2 p3, t_color col)
@@ -492,6 +674,18 @@ void ftgr_draw_bezier(t_ftgr_img *img, t_color col, t_v2 p1, t_v2 p2, t_v2 p3, S
 	}
 }
 
+void ftgr_draw_bezier2(t_ftgr_img *img, t_color col, t_v2 p1, t_v2 p2, t_v2 p3, S32 res)
+{
+	t_v2 prev = p1;
+	for (S32 i = 0; i < res; i++)
+	{
+		F32 t = (i + 1.0f) / res;
+		t_v2 p_on_curve = ft_bezier_interp(p1, p2, p3, t);
+		ftgr_draw_line2(img, vec2_int(prev), vec2_int(p_on_curve), col);
+		prev = p_on_curve;
+	}
+}
+
 void ftgr_draw_circle(t_ftgr_img *img, t_iv2 pos, S32 radius, t_color col)
 {
 	S32 x = 0, y = radius;
@@ -502,14 +696,14 @@ void ftgr_draw_circle(t_ftgr_img *img, t_iv2 pos, S32 radius, t_color col)
 		return;
 
 	// Draw initial points on all octants
-	ft_memcpy(ftgr_get_pixel_addr(img, pos.x + x, pos.y + y), &col_i, img->bpp);
-	ft_memcpy(ftgr_get_pixel_addr(img, pos.x - x, pos.y + y), &col_i, img->bpp);
-	ft_memcpy(ftgr_get_pixel_addr(img, pos.x + x, pos.y - y), &col_i, img->bpp);
-	ft_memcpy(ftgr_get_pixel_addr(img, pos.x - x, pos.y - y), &col_i, img->bpp);
-	ft_memcpy(ftgr_get_pixel_addr(img, pos.x + y, pos.y + x), &col_i, img->bpp);
-	ft_memcpy(ftgr_get_pixel_addr(img, pos.x - y, pos.y + x), &col_i, img->bpp);
-	ft_memcpy(ftgr_get_pixel_addr(img, pos.x + y, pos.y - x), &col_i, img->bpp);
-	ft_memcpy(ftgr_get_pixel_addr(img, pos.x - y, pos.y - x), &col_i, img->bpp);
+	*(U32 *)(ftgr_get_pixel_addr(img, pos.x + x, pos.y + y)) = col_i;
+	*(U32 *)(ftgr_get_pixel_addr(img, pos.x - x, pos.y + y)) = col_i;
+	*(U32 *)(ftgr_get_pixel_addr(img, pos.x + x, pos.y - y)) = col_i;
+	*(U32 *)(ftgr_get_pixel_addr(img, pos.x - x, pos.y - y)) = col_i;
+	*(U32 *)(ftgr_get_pixel_addr(img, pos.x + y, pos.y + x)) = col_i;
+	*(U32 *)(ftgr_get_pixel_addr(img, pos.x - y, pos.y + x)) = col_i;
+	*(U32 *)(ftgr_get_pixel_addr(img, pos.x + y, pos.y - x)) = col_i;
+	*(U32 *)(ftgr_get_pixel_addr(img, pos.x - y, pos.y - x)) = col_i;
 
 	while (x < y)
 	{
@@ -524,14 +718,14 @@ void ftgr_draw_circle(t_ftgr_img *img, t_iv2 pos, S32 radius, t_color col)
 		}
 
 		// Draw points for each octant
-		ft_memcpy(ftgr_get_pixel_addr(img, pos.x + x, pos.y + y), &col_i, img->bpp);
-		ft_memcpy(ftgr_get_pixel_addr(img, pos.x - x, pos.y + y), &col_i, img->bpp);
-		ft_memcpy(ftgr_get_pixel_addr(img, pos.x + x, pos.y - y), &col_i, img->bpp);
-		ft_memcpy(ftgr_get_pixel_addr(img, pos.x - x, pos.y - y), &col_i, img->bpp);
-		ft_memcpy(ftgr_get_pixel_addr(img, pos.x + y, pos.y + x), &col_i, img->bpp);
-		ft_memcpy(ftgr_get_pixel_addr(img, pos.x - y, pos.y + x), &col_i, img->bpp);
-		ft_memcpy(ftgr_get_pixel_addr(img, pos.x + y, pos.y - x), &col_i, img->bpp);
-		ft_memcpy(ftgr_get_pixel_addr(img, pos.x - y, pos.y - x), &col_i, img->bpp);
+		*(U32 *)(ftgr_get_pixel_addr(img, pos.x + x, pos.y + y)) = col_i;
+		*(U32 *)(ftgr_get_pixel_addr(img, pos.x - x, pos.y + y)) = col_i;
+		*(U32 *)(ftgr_get_pixel_addr(img, pos.x + x, pos.y - y)) = col_i;
+		*(U32 *)(ftgr_get_pixel_addr(img, pos.x - x, pos.y - y)) = col_i;
+		*(U32 *)(ftgr_get_pixel_addr(img, pos.x + y, pos.y + x)) = col_i;
+		*(U32 *)(ftgr_get_pixel_addr(img, pos.x - y, pos.y + x)) = col_i;
+		*(U32 *)(ftgr_get_pixel_addr(img, pos.x + y, pos.y - x)) = col_i;
+		*(U32 *)(ftgr_get_pixel_addr(img, pos.x - y, pos.y - x)) = col_i;
 	}
 }
 
@@ -563,6 +757,37 @@ void ftgr_draw_disc(t_ftgr_img *img, t_iv2 pos, S32 radius, t_color col)
 		ftgr_draw_line_horizontal(img, ivec2(pos.x - x, pos.y - y), pos.x + x, col);
 		ftgr_draw_line_horizontal(img, ivec2(pos.x - y, pos.y + x), pos.x + y, col);
 		ftgr_draw_line_horizontal(img, ivec2(pos.x - y, pos.y - x), pos.x + y, col);
+	}
+}
+
+void ftgr_draw_disc2(t_ftgr_img *img, t_iv2 pos, S32 radius, t_color col)
+{
+	S32 x = 0, y = radius;
+	S32 d = 1 - radius; // Decision parameter
+
+	// Draw and fill the initial points on all octants
+	ftgr_draw_line_horizontal2(img, ivec2(pos.x - x, pos.y + y), pos.x + x, col);
+	ftgr_draw_line_horizontal2(img, ivec2(pos.x - x, pos.y - y), pos.x + x, col);
+	ftgr_draw_line_horizontal2(img, ivec2(pos.x - y, pos.y + x), pos.x + y, col);
+	ftgr_draw_line_horizontal2(img, ivec2(pos.x - y, pos.y - x), pos.x + y, col);
+
+	while (x < y)
+	{
+		x++;
+
+		if (d < 0)
+			d += 2 * x + 1;
+		else
+		{
+			y--;
+			d += 2 * (x - y) + 1;
+		}
+
+		// Draw and fill horizontal lines for each segment
+		ftgr_draw_line_horizontal2(img, ivec2(pos.x - x, pos.y + y), pos.x + x, col);
+		ftgr_draw_line_horizontal2(img, ivec2(pos.x - x, pos.y - y), pos.x + x, col);
+		ftgr_draw_line_horizontal2(img, ivec2(pos.x - y, pos.y + x), pos.x + y, col);
+		ftgr_draw_line_horizontal2(img, ivec2(pos.x - y, pos.y - x), pos.x + y, col);
 	}
 }
 
