@@ -23,7 +23,8 @@
 			"span": "c",
 			"utility": "c",
 			"format": "c",
-			"thread": "c"
+			"thread": "c",
+			"random": "c"
 		}
 	}
 }

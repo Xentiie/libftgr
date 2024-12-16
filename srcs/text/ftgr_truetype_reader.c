@@ -6,11 +6,11 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/09 04:11:20 by reclaire          #+#    #+#             */
-/*   Updated: 2024/12/03 03:17:54 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/12/05 03:09:05 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#define _FT_RETURN 1
+#define _FT_RETURN
 #include "ftgr_truetype.h"
 
 static U32 checksum(U32 *table, U32 numberOfBytesInTable)

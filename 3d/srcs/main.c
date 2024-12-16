@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/06 02:27:08 by reclaire          #+#    #+#             */
-/*   Updated: 2024/12/03 19:22:09 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/12/04 04:28:26 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@ int main()
 		win = ftgr_new_window(ctx, ivec2(1024, 512), "3D");
 
 		{ /* bitmap init */
-			bitmap_img = ftgr_load_png(ctx, "./font_bitmap_white.png");
+			bitmap_img = ftgr_load_png("./font_bitmap_white.png");
 			ftgr_init_bitmap(&bitmap, bitmap_img, ivec2(5, 7), 18, ivec2(2, 2));
 		}
 

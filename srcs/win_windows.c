@@ -348,6 +348,7 @@ void ftgr_swap_buffers(t_ftgr_win *win)
 	win_int->front = !win_int->front;
 	win_int->back = !win_int->back;
 	win->surface = &win_int->buffers[win_int->back];
+	ft_bzero(win->surface->data, win->surface->data_size);
 }
 
 #endif

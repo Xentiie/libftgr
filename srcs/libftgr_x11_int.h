@@ -13,7 +13,7 @@
 #ifndef LIBFTGR_X11_INT
 #define LIBFTGR_X11_INT
 
-#define _FT_RETURN TRUE
+#define _FT_RETURN
 
 #include "libft/std.h"
 
@@ -114,6 +114,7 @@ typedef struct
 	t_framebuffer_data buffers[2];
 } t_ftgr_win_int;
 
+bool _ftgr_add_event(t_ftgr_win *win, t_ftgr_ev ev);
 U32 _ftgr_keysym2uni(U32 keysym);
 void _ftx11_keys_cleanup(t_ftgr_ctx *ctx);
 void _ftx11_register_key_up(t_ftgr_ctx *ctx, U32 key);

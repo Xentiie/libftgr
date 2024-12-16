@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   info_lines.c                                       :+:      :+:    :+:   */
+/*   infolines.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/12 01:07:27 by reclaire          #+#    #+#             */
-/*   Updated: 2024/09/30 12:18:46 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/12/06 05:23:00 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,12 +111,12 @@ t_widget *new_info_line(t_list **lines, t_bitmap *bitmap, string label, string (
 		if (dump_value_str)
 		{
 			dump_btn_w->handle_input = TRUE;
-			ftgr_wdrawer_paint_rect(dump_btn_w, COL_WHITE);
+			ftgr_wdrawer_fill_rect(dump_btn_w, COL_WHITE);
 			dump_btn_w->data = (union u_widget_data){.ptr = {infoline}};
 			dump_btn_w->on_cursor_click = (t_widget_callback)info_line_dump;
 		}
 		else
-			ftgr_wdrawer_paint_rect(dump_btn_w, COL_DARK_GRAY);
+			ftgr_wdrawer_fill_rect(dump_btn_w, COL_DARK_GRAY);
 		ftgr_add_widget(dump_btn_w, root_w);
 	}
 

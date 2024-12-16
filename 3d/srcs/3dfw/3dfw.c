@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/13 01:25:15 by reclaire          #+#    #+#             */
-/*   Updated: 2024/10/04 08:47:51 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/12/07 06:58:12 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,8 +112,8 @@ void setcol(t_ftgr_img *img, t_iv2 xy, t_v3 w, void *data)
 	{
 
 		*(F32 *)ftgr_get_pixel_addr(depth_buffer, xy.x, xy.y) = depth;
-		*(U32 *)ftgr_get_pixel_addr(img, xy.x, xy.y) = ftgr_color_to_int((t_color){uv.x * 255.0f, uv.y * 255.0f, 0, 255});
-		//*(U32 *)ftgr_get_pixel_addr(img, xy.x, xy.y) = ftgr_color_to_int((t_color){depth * 25, depth * 25, depth * 25, 255});
+		*ftgr_get_pixel_addr(img, xy.x, xy.y) = ftgr_color_to_int((t_color){uv.x * 255.0f, uv.y * 255.0f, 0, 255});
+		//*ftgr_get_pixel_addr(img, xy.x, xy.y) = ftgr_color_to_int((t_color){depth * 25, depth * 25, depth * 25, 255});
 	}
 }
 
@@ -213,8 +213,8 @@ static void _draw_3d_line(t_ftgr_img *img, t_iv2 xy, t_iv4 lp1lp2, void *data)
 	if (*(F32 *)ftgr_get_pixel_addr(depth_buffer, xy.x, xy.y) < w)
 	{
 		*(F32 *)ftgr_get_pixel_addr(depth_buffer, xy.x, xy.y) = w;
-		*(U32 *)ftgr_get_pixel_addr(img, xy.x, xy.y) = ftgr_color_to_int(col);
-		//*(U32 *)ftgr_get_pixel_addr(img, xy.x, xy.y) = ftgr_color_to_int((t_color){w * 25, w * 25, w * 25, 255});
+		*ftgr_get_pixel_addr(img, xy.x, xy.y) = ftgr_color_to_int(col);
+		//*ftgr_get_pixel_addr(img, xy.x, xy.y) = ftgr_color_to_int((t_color){w * 25, w * 25, w * 25, 255});
 	}
 }
 

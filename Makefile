@@ -6,7 +6,7 @@
 #    By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/04/15 17:26:47 by reclaire          #+#    #+#              #
-#    Updated: 2024/12/03 18:57:39 by reclaire         ###   ########.fr        #
+#    Updated: 2024/12/05 00:15:44 by reclaire         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -19,7 +19,7 @@ dyn: $(OBJS)
 	$(CC) -shared -fPIC $(CFLAGS) -o my_library.so my_library.c
 
 test:	packages $(NAME)
-			$(CC) $(CFLAGS) $(INCLUDES) test2.c $(LIBS_PATHS) $(LIBS)
+			$(CC) $(CFLAGS) $(INCLUDES) test.c -L./ $(LIBS_PATHS) -lftgr $(LIBS)
 
 test_deflate:	packages $(NAME)
 			$(CC) $(CFLAGS) $(INCLUDES) test_deflate.c $(LIBS_PATHS) $(LIBS)

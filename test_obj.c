@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   test.cpp                                           :+:      :+:    :+:   */
+/*   test_obj.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/05 11:57:10 by reclaire          #+#    #+#             */
-/*   Updated: 2024/07/07 20:16:35 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/12/04 04:27:37 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -341,7 +341,7 @@ int main(S32 argc, const_string *argv)
 	t_ftgr_ctx *ctx = ftgr_create_ctx();
 	t_ftgr_win *win = ftgr_new_window(ctx, ivec2(400, 400), "3D");
 
-	t_ftgr_img *display = ftgr_new_img(ctx, ivec2(400, 400));
+	t_ftgr_img *display = ftgr_new_img(ivec2(400, 400));
 
 	t_mesh *mesh = parse_wavefront(argv[1]);
 

@@ -1,0 +1,105 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   triangle.c.old                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/12/06 16:38:50 by reclaire          #+#    #+#             */
+/*   Updated: 2024/12/06 16:39:04 by reclaire         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "libftgr.h"
+
+static F32 edgeFunction(t_v2 a, t_v2 b, t_v2 c)
+{
+	return (c.x - a.x) * (b.y - a.y) - (c.y - a.y) * (b.x - a.x);
+}
+FUNCTION_HOT static void _ftgr_draw_triangle_e(t_ftgr_img *img, t_iv2 xy, t_iv4 lp1lp2, void *tris_data)
+{
+	void (*eval)(t_ftgr_img *img, t_iv2 xy, t_v3 w, void *data) = *((void (**)(t_ftgr_img *img, t_iv2 xy, t_v3 w, void *data))tris_data);
+	void *data = *(void **)(((U8 *)tris_data) + sizeof(void *));
+	t_v2 p1 = vec2(lp1lp2.x, lp1lp2.y);
+	t_v2 p2 = vec2(lp1lp2.z, lp1lp2.w);
+	t_v2 p3 = ivec2_flt(*((t_iv2 *)(((U8 *)tris_data) + sizeof(void *) * 2)));
+
+	F32 area = edgeFunction(p1, p2, p3);
+	if (area < 0)
+		area = edgeFunction(p3, p2, p1);
+	t_v2 _p2 = vec2(xy.x + 0.5, xy.y + 0.5);
+	t_v3 w = vec3(edgeFunction(p3, p1, _p2),
+				  edgeFunction(p2, p3, _p2),
+				  edgeFunction(p1, p2, _p2));
+
+	w.x /= area;
+	w.y /= area;
+	w.z /= area;
+	/*
+		t_v2 t1 = {0, 0};
+		t_v2 t2 = {1, 0};
+		t_v2 t3 = {1, 1};
+		t_v2 uv;
+		uv.x = w.x * t1.x + w.y * t2.x + w.z * t3.x;
+		uv.y = w.x * t1.y + w.y * t2.y + w.z * t3.y;
+		uv.y = 1 - uv.y;
+	*/
+	eval(img, xy, w, data);
+}
+void ftgr_draw_triangle_e(t_ftgr_img *img, t_iv2 p1, t_iv2 p2, t_iv2 p3, void (*eval)(t_ftgr_img *img, t_iv2 xy, t_v3 w, void *data), void *data)
+{
+	struct
+	{
+		void *eval;
+		void *data;
+		t_iv2 p3;
+	} tris_data = {
+		.eval = eval,
+		.data = data,
+		.p3 = p3};
+	ftgr_draw_line_e(img, p1, p2, _ftgr_draw_triangle_e, &tris_data);
+	ftgr_draw_line_e(img, p2, p3, _ftgr_draw_triangle_e, &tris_data);
+	ftgr_draw_line_e(img, p3, p1, _ftgr_draw_triangle_e, &tris_data);
+}
+
+FUNCTION_HOT void ftgr_fill_triangle_e(t_ftgr_img *img, t_iv2 ip1, t_iv2 ip2, t_iv2 ip3, void (*eval)(t_ftgr_img *img, t_iv2 xy, t_v3 w, void *data), void *data)
+{
+	t_v2 p1, p2, p3;
+	F32 area;
+	t_iv2 bbox_min, bbox_max;
+	S32 x, y;
+
+	p1 = ivec2_flt(ip1);
+	p2 = ivec2_flt(ip2);
+	p3 = ivec2_flt(ip3);
+	area = edgeFunction(p3, p2, p1);
+
+	bbox_min = vec2_int(ft_ceil2(ft_fmin2_3(p1, p2, p3)));
+	bbox_max = vec2_int(ft_ceil2(ft_fmax2_3(p1, p2, p3)));
+
+	bbox_min = ft_imax2(bbox_min, ivec2(0, 0));
+	bbox_max = ft_imin2(bbox_max, img->size);
+
+	x = bbox_min.x;
+	while (x < bbox_max.x)
+	{
+		y = bbox_min.y;
+		while (y < bbox_max.y)
+		{
+
+			t_v2 _p2 = vec2(x + 0.5, y + 0.5);
+			t_v3 w = vec3(edgeFunction(p3, p1, _p2),
+						  edgeFunction(p2, p3, _p2),
+						  edgeFunction(p1, p2, _p2));
+			if (w.x >= 0 && w.y >= 0 && w.z >= 0)
+			{
+				w.x /= area;
+				w.y /= area;
+				w.z /= area;
+				eval(img, ivec2(x, y), w, data);
+			}
+			y++;
+		}
+		x++;
+	}
+}

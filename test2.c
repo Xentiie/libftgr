@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/07 01:33:38 by reclaire          #+#    #+#             */
-/*   Updated: 2024/07/10 02:33:34 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/12/06 05:23:00 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ int main(int argc, char **argv)
 	t_ftgr_win *win = ftgr_new_window(ctx, ivec2(700, 700), "PNG");
 	t_ftgr_img *img1, *img2;
 
-	t_ftgr_img *png = ftgr_load_png(ctx, argv[1]);
+	t_ftgr_img *png = ftgr_load_png(argv[1]);
 
 	if (png == NULL)
 		return 1;
@@ -49,7 +49,7 @@ int main(int argc, char **argv)
 	widget_img->pos = vec2(0, 100);
 
 	t_color col2 = (t_color){.r = 255, .g = 0, .b = 0, .a = 0};
-	ftgr_wdrawer_paint_rect(widget_img, &col2);
+	ftgr_wdrawer_fill_rect(widget_img, &col2);
 	ftgr_add_widget(widget_img, win->w_root);
 
 	float speed = 30.0f;

@@ -170,7 +170,8 @@ cf_fmt_imported_includes() {
 #Usage: cf_add_raw_lib_path <path>
 cf_add_raw_lib_path() {
 	_chk_target_scope
-	LIBS_PATHS+=("$1")
+	tmp=$(realpath "$1")
+	LIBS_PATHS+=("$tmp")
 }
 cf_fmt_libs_paths() {
 	_chk_target_scope

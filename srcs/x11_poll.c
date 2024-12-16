@@ -51,6 +51,13 @@ static S32 get_key_mods(XKeyEvent xkey)
 
 bool ftgr_poll(t_ftgr_ctx *ctx)
 {
+	XEvent ev;
+	t_list *win_lst;
+	KeySym keysym;
+	U32 key_uni;
+	/* key modifiers */
+	S32 mods;
+
 	update_time(ctx);
 	_ftx11_keys_cleanup(ctx);
 
@@ -60,20 +67,14 @@ bool ftgr_poll(t_ftgr_ctx *ctx)
 
 	while (XPending(ctx->display))
 	{
-		XEvent ev;
 		XNextEvent(ctx->display, &ev);
 
-		t_list *win_lst = ft_lstfind(ctx->windows, find_event_win, &ev.xany.window);
-		if (!win_lst)
+		if ((win_lst = ft_lstfind(ctx->windows, find_event_win, &ev.xany.window)) == NULL)
 			continue;
 
 		if (ev.type == ClientMessage && ev.xclient.message_type == ctx->protocols_atom && (long unsigned int)ev.xclient.data.l[0] == ctx->del_win_atom)
 			return FALSE;
 
-		KeySym keysym;
-		U32 key_uni;
-		/* key modifiers */
-		S32 mods;
 		(void)mods;
 		switch (ev.type)
 		{
@@ -86,12 +87,12 @@ bool ftgr_poll(t_ftgr_ctx *ctx)
 			if (ev.type == KeyPress)
 			{
 				_ftx11_register_key_down(ctx, key_uni);
-				printf("Pressed key: %lc\n", key_uni);
+				// printf("Pressed key: %lc\n", key_uni);
 			}
 			else
 			{
 				_ftx11_register_key_up(ctx, key_uni);
-				printf("Released key: %lc\n", key_uni);
+				// printf("Released key: %lc\n", key_uni);
 			}
 			break;
 
@@ -143,8 +144,10 @@ bool ftgr_poll(t_ftgr_ctx *ctx)
 
 bool ftgr_wait(t_ftgr_ctx *ctx)
 {
-	while (!XPending(ctx->display))
-		;
+	XEvent ev;
+
+	XNextEvent(ctx->display, &ev);
+	XPutBackEvent(ctx->display, &ev);
 	return ftgr_poll(ctx);
 }
 

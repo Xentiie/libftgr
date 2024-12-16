@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/08 22:48:14 by reclaire          #+#    #+#             */
-/*   Updated: 2024/07/02 18:43:32 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/12/04 04:27:41 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,7 +77,7 @@ int main()
 	t_ftgr_win *win = ftgr_new_window(ctx, ivec2(sizex, sizey), "Text");
 	ftgr_move_window(win, ivec2(sizex, sizey));
 
-	t_ftgr_img *img = ftgr_new_img(ctx, ivec2(sizex, sizey));
+	t_ftgr_img *img = ftgr_new_img(ivec2(sizex, sizey));
 
 	//file fd = ft_fopen("./font3.ttf", "r");
 	//ftgr_load_font(fd, img);

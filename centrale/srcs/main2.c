@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/04 03:12:47 by reclaire          #+#    #+#             */
-/*   Updated: 2024/09/12 04:14:35 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/12/06 05:23:00 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ t_bitmap main_bitmap;
 
 static void init_bitmap()
 {
-	main_bitmap_img = ftgr_load_png(ctx, BITMAP_BLACK_PATH);
+	main_bitmap_img = ftgr_load_png(BITMAP_BLACK_PATH);
 	main_bitmap = (t_bitmap){.char_height = 7, .char_width = 5, .img = main_bitmap_img, .line_width = 18, .sep_width = 2, .sep_height = 2};
 }
 
@@ -37,7 +37,7 @@ int main()
 	ctx = ftgr_create_ctx();
 	init_bitmap();
 	main_win = ftgr_new_window(ctx, ivec2(main_bitmap_img->size.x * 4, main_bitmap_img->size.y * 4), "Bitmap");
-	ftgr_wdrawer_paint_rect(main_win->w_root, COL_WHITE);
+	ftgr_wdrawer_fill_rect(main_win->w_root, COL_WHITE);
 	//ftgr_wdrawer_copy_img_cpu(main_win->w_root, main_bitmap_img);
 
 	t_label_widget *label = ftgr_label_widget(&main_bitmap);
@@ -50,7 +50,7 @@ int main()
 	t_widget *child = ftgr_new_widget();
 	child->pos = ivec2(12, 5);
 	child->size = ivec2(30, 30);
-	ftgr_wdrawer_paint_rect(child, COL_BLUE);
+	ftgr_wdrawer_fill_rect(child, COL_BLUE);
 	//ftgr_add_widget(child, (t_widget *)label);
 
 	while (ftgr_poll(ctx))

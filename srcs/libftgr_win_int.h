@@ -91,6 +91,7 @@ typedef struct s_ftgr_win_int
 		ft_clk_get(&__freq_t1);                               \
 	} while (0)
 
+bool _ftgr_add_event(t_ftgr_win *win, t_ftgr_ev ev);
 void(_ftgr_error)(char *file, int line);
 void _ftwin32_keys_cleanup(t_ftgr_ctx *ctx);
 void _ftwin32_register_key_up(t_ftgr_ctx *ctx, U8 key);

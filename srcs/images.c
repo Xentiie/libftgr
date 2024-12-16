@@ -6,16 +6,15 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/17 03:03:13 by reclaire          #+#    #+#             */
-/*   Updated: 2024/09/21 01:08:03 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/12/10 05:35:40 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libftgr.h"
 #include <stdlib.h>
 
-t_ftgr_img *ftgr_new_img(t_ftgr_ctx *ctx, t_iv2 size)
+t_ftgr_img *ftgr_new_img(t_iv2 size)
 {
-	(void)ctx;
 	t_ftgr_img *img = malloc(sizeof(t_ftgr_img));
 	if (!img)
 		return NULL;
@@ -30,6 +29,7 @@ t_ftgr_img *ftgr_new_img(t_ftgr_ctx *ctx, t_iv2 size)
 		free(img);
 		return NULL;
 	}
+	img->pixels = (t_color *)img->data;
 
 	return img;
 }

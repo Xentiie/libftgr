@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/16 22:36:34 by reclaire          #+#    #+#             */
-/*   Updated: 2024/12/04 01:53:54 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/12/12 13:25:45 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@ static inline bool _init_buffer(t_ftgr_ctx *ctx, t_framebuffer_data *buffer, t_i
 	buffer->img.data = malloc(sizeof(U8) * buffer->img.data_size);
 	if (UNLIKELY(buffer->img.data == NULL))
 		return FALSE;
+	buffer->img.pixels = (t_color *)buffer->img.data;
 	ft_memset(buffer->img.data, 255, buffer->img.data_size);
 
 	buffer->ximage = XCreateImage(ctx->display, ctx->visual, ctx->depth, ZPixmap, 0,
@@ -116,15 +117,45 @@ t_ftgr_win *ftgr_new_window(t_ftgr_ctx *ctx, t_iv2 size, const_string title)
 		win_int->front = 0;
 		win_int->back = 1;
 		win->surface = &(win_int->buffers[win_int->back].img);
+		ft_bzero(win->surface->data, win->surface->data_size);
+		ftgr_swap_buffers(win);
+		ft_bzero(win->surface->data, win->surface->data_size);
+		ftgr_swap_buffers(win);
 	}
 
 	win->name = ft_strdup(title);
+	
+
 	win->w_root = ftgr_new_widget();
 	win->w_root->size = size;
 
-	ftgr_swap_buffers(win);
+
+	win->events_n = 0;
+	win->events_alloc = 8;
+	if (UNLIKELY((win->events = malloc(sizeof(t_ftgr_ev) * win->events_alloc)) == NULL))
+	{
+		return NULL;
+	}
 
 	return win;
+}
+
+bool _ftgr_add_event(t_ftgr_win *win, t_ftgr_ev ev)
+{
+	t_ftgr_ev *new;
+
+	if (win->events_n >= win->events_alloc)
+	{
+		if (UNLIKELY((new = malloc(sizeof(t_ftgr_ev *) * win->events_n * 2)) == NULL))
+			FT_RET_ERR(FALSE, FT_EOMEM);
+		ft_memcpy(new, win->events, sizeof(t_ftgr_ev *) * win->events_n);
+		free(win->events);
+		win->events = new;
+		win->events_alloc = win->events_n * 2;
+	}
+
+	win->events[win->events_n++] = ev;
+	FT_RET_OK(TRUE);
 }
 
 static bool cmp_window(void *a1, void *a2)
@@ -183,7 +214,7 @@ void ftgr_clear_window(t_ftgr_ctx *xvar, t_ftgr_win *win)
 		XFlush(xvar->display);
 }
 
-void ftgr_swap_buffers(t_ftgr_win *win)
+void ftgr_blt_screen(t_ftgr_win *win)
 {
 	t_ftgr_win_int *win_int = FTGR_WINDOW_INT(win);
 
@@ -209,6 +240,13 @@ void ftgr_swap_buffers(t_ftgr_win *win)
 			  0, 0, win->size.x, win->size.y, 0, 0);
 	if (win->ctx->flush)
 		XFlush(win->ctx->display);
+}
+
+void ftgr_swap_buffers(t_ftgr_win *win)
+{
+	t_ftgr_win_int *win_int = FTGR_WINDOW_INT(win);
+
+	ftgr_blt_screen(win);
 
 	win_int->front = !win_int->front;
 	win_int->back = !win_int->back;
