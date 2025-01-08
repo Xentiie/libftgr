@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/12 12:09:01 by reclaire          #+#    #+#             */
-/*   Updated: 2024/12/12 16:02:49 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/12/27 14:59:33 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,8 +46,6 @@ bool ftgr_init_widget(t_widget *widget)
 		FT_RET_ERR(FALSE, FT_EOMEM);
 
 	widget->childrens_alloc = widget_init_childrens_alloc;
-
-	widget->damage = ivec4(S32_MAX, S32_MAX, S32_MIN, S32_MIN);
 
 	FT_RET_OK(TRUE);
 }
@@ -111,50 +109,79 @@ void ftgr_remove_widget(t_widget *widget)
 	widget->master = NULL;
 }
 
-void _ftgr_update_widgets(struct s_widget_root *root_data, t_widget *w, t_iv2 ofs, t_iv2 mouse_pos)
+#define MOUSE_EVENTS_MOVE_MASK_OFS 0
+#define MOUSE_EVENTS_ENTER_MASK_OFS 1
+#define MOUSE_EVENTS_EXIT_MASK_OFS 2
+#define MOUSE_EVENTS_CLICK_MASK_OFS 3
+#define MOUSE_EVENTS_RELEASE_MASK_OFS 4
+
+#define MOUSE_EVENTS_MOVE_MASK (1 << MOUSE_EVENTS_MOVE_MASK_OFS)
+#define MOUSE_EVENTS_ENTER_MASK (1 << MOUSE_EVENTS_ENTER_MASK_OFS)
+#define MOUSE_EVENTS_EXIT_MASK (1 << MOUSE_EVENTS_EXIT_MASK_OFS)
+#define MOUSE_EVENTS_CLICK_MASK (1 << MOUSE_EVENTS_CLICK_MASK_OFS)
+#define MOUSE_EVENTS_RELEASE_MASK (1 << MOUSE_EVENTS_RELEASE_MASK_OFS)
+
+#define call_proc_update_mask(w, ev, mask_ofs) mask &= (w->widget_proc(w, ev) << mask_ofs)
+
+static void do_mouse_events(t_widget *w, t_iv2 last_mouse_pos, t_iv2 mouse_pos, t_iv2 ofs, U8 mask)
 {
-	t_ftgr_widget_ev ev;
-	bool prev_mouse_in;
-	bool mouse_in;
-	t_iv2 pos;
+	t_ftgr_ev ev;			/* event to send */
+	bool prev_mouse_in;		/* is previous mouse pos in widget w */
+	bool mouse_in;			/* is current mouse pos in widget w */
+	t_iv2 ofs_pos; /* ofs + w->pos */
 
-	pos = ivec2_add(ofs, w->pos);
-	mouse_in = (mouse_pos.x >= pos.x && mouse_pos.y >= pos.y &&
-				mouse_pos.x <= pos.x + w->size.x && mouse_pos.y <= pos.y + w->size.y);
-	prev_mouse_in = (root_data->last_mouse_pos.x >= pos.x && root_data->last_mouse_pos.y >= pos.y &&
-					 root_data->last_mouse_pos.x <= pos.x + w->size.x && root_data->last_mouse_pos.y <= pos.y + w->size.y);
+	ofs_pos = ivec2_add(ofs, w->pos);
+	mouse_in = (mouse_pos.x >= ofs_pos.x && mouse_pos.y >= ofs_pos.y &&
+				mouse_pos.x <= ofs_pos.x + w->size.x && mouse_pos.y <= ofs_pos.y + w->size.y);
+	prev_mouse_in = (last_mouse_pos.x >= ofs_pos.x && last_mouse_pos.y >= ofs_pos.y &&
+					 last_mouse_pos.x <= ofs_pos.x + w->size.x && last_mouse_pos.y <= ofs_pos.y + w->size.y);
 
-	if (prev_mouse_in && !mouse_in)
+	if ((mask & MOUSE_EVENTS_EXIT_MASK) && prev_mouse_in && !mouse_in)
 	{
-		ev.type = FTGR_WIDGET_EV_CURSOR_EXIT;
-		w->widget_proc(w, ev);
+		ev.type = FTGR_MOUSE_EXIT;
+		ev.mouse_exit.pos = mouse_pos;
+		call_proc_update_mask(w, ev, MOUSE_EVENTS_EXIT_MASK_OFS);
 	}
 	else if (mouse_in)
 	{
-		if (!prev_mouse_in)
+		if ((mask & MOUSE_EVENTS_ENTER_MASK) && !prev_mouse_in)
 		{
-			ev.type = FTGR_WIDGET_EV_CURSOR_ENTER;
-			w->widget_proc(w, ev);
+			ev.type = FTGR_MOUSE_ENTER;
+			ev.mouse_enter.pos = mouse_pos;
+			call_proc_update_mask(w, ev, MOUSE_EVENTS_ENTER_MASK_OFS);
 		}
 
-		if (mouse_pos.x != root_data->last_mouse_pos.x || mouse_pos.y != root_data->last_mouse_pos.y)
+		if ((mask & MOUSE_EVENTS_MOVE_MASK) && (mouse_pos.x != last_mouse_pos.x || mouse_pos.y != last_mouse_pos.y))
 		{
-			ev.type = FTGR_WIDGET_EV_CURSOR_MOVE;
-			w->widget_proc(w, ev);
+			ev.type = FTGR_MOUSE_MOVE;
+			ev.mouse_move.pos = mouse_pos;
+			call_proc_update_mask(w, ev, MOUSE_EVENTS_MOVE_MASK_OFS);
 		}
 	}
 
 	for (U64 i = 0; i < w->childrens_n; i++)
-		_ftgr_update_widgets(root_data, w->childrens[i], mouse_pos);
+		do_mouse_events(w->childrens[i], last_mouse_pos, mouse_pos, ofs_pos, mask);
 }
 
-void ftgr_update_widgets(t_ftgr_win *win, struct s_widget_root *root_data, t_widget *root)
+void ftgr_update_widgets(t_ftgr_win *win, t_widget *root)
 {
 	t_iv2 mouse_pos;
 
 	mouse_pos = ftgr_mouse_get_pos(win->ctx, win);
-	_ftgr_update_widgets(root_data, root, ivec2(0, 0), mouse_pos);
-	root_data->last_mouse_pos = mouse_pos;
+	do_mouse_events(root, win->last_mouse_pos, mouse_pos, ivec2(0, 0), 0xFFFF);
+	win->last_mouse_pos = mouse_pos;
+}
+
+void ftgr_draw_widgets(t_ftgr_win *win, t_widget *root)
+{
+	t_ftgr_ev ev;
+
+	if (win->damage.x > win->damage.z)
+		return;
+
+	ev.type = FTGR_EXPOSE;
+	ev.expose.win = win;
+	ev.expose.rect = win->damage;
 }
 
 #endif

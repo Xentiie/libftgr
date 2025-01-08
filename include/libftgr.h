@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/13 01:58:46 by reclaire          #+#    #+#             */
-/*   Updated: 2024/12/12 13:23:49 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/12/27 01:04:46 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,13 +70,19 @@ struct s_ftgr_win
 	U64 events_alloc;
 	U64 events_n;
 	t_ftgr_ev *events;
+
+	t_iv4 damage;
+	t_iv2 last_mouse_pos;
 };
 
 enum
 {
-	MOUSE_PRESS,
-	MOUSE_RELEASE,
-	MOUSE_MOVE,
+	FTGR_MOUSE_ENTER,
+	FTGR_MOUSE_EXIT,
+	FTGR_MOUSE_PRESS,
+	FTGR_MOUSE_RELEASE,
+	FTGR_MOUSE_MOVE,
+	FTGR_EXPOSE,
 };
 
 struct s_ftgr_ev
@@ -94,6 +100,22 @@ struct s_ftgr_ev
 		{
 			t_iv2 pos;
 		} mouse_move;
+
+		struct
+		{
+			t_iv2 pos;
+		} mouse_enter;
+
+		struct
+		{
+			t_iv2 pos;
+		} mouse_exit;
+
+		struct
+		{
+			t_ftgr_win *win;
+			t_iv4 rect;
+		} expose;
 	};
 };
 

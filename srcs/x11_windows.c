@@ -6,11 +6,12 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/16 22:36:34 by reclaire          #+#    #+#             */
-/*   Updated: 2024/12/12 13:25:45 by reclaire         ###   ########.fr       */
+/*   Updated: 2024/12/27 00:39:04 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libftgr_x11_int.h"
+#include "libft/limits.h"
 
 #ifdef FT_OS_LINUX
 
@@ -124,11 +125,11 @@ t_ftgr_win *ftgr_new_window(t_ftgr_ctx *ctx, t_iv2 size, const_string title)
 	}
 
 	win->name = ft_strdup(title);
-	
 
 	win->w_root = ftgr_new_widget();
 	win->w_root->size = size;
 
+	win->damage = ivec4(S32_MAX, S32_MAX, S32_MIN, S32_MIN);
 
 	win->events_n = 0;
 	win->events_alloc = 8;

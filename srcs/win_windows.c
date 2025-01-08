@@ -236,6 +236,8 @@ t_ftgr_win *ftgr_new_window(t_ftgr_ctx *ctx, t_iv2 size, const_string title)
 	win->cursor_mode = FTGR_CURSOR_NORMAL;
 	win->size = size;
 
+	win->damage = ivec2(S32_MAX, S32_MAX, S32_MIN, S32_MIN);
+
 	{
 		win->w_root = ftgr_new_widget();
 		if (UNLIKELY(win->w_root == NULL))
