@@ -501,6 +501,7 @@ configure() {
 		cf_add_cflag "-DDEBUG"
 		cf_add_cflag "-g"
 		cf_add_cflag "-O3"
+		cf_add_cflag "-masm=intel"
 
 		cf_add_include "./3rdparty/OpenCL/include"
 

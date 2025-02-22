@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 08:07:44 by reclaire          #+#    #+#             */
-/*   Updated: 2024/09/11 19:24:15 by reclaire         ###   ########.fr       */
+/*   Updated: 2025/02/01 13:13:37 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,47 +71,25 @@ t_iv2 ftgr_mouse_get_pos(t_ftgr_ctx *ctx, t_ftgr_win *win)
 
 bool ftgr_mouse_pressed(t_ftgr_ctx *ctx, S32 button)
 {
-	switch (button)
-	{
-	case MOUSE_LEFT:
-		return ctx->left_mouse_pressed;
-	case MOUSE_MIDDLE:
-		return ctx->middle_mouse_pressed;
-	case MOUSE_RIGHT:
-		return ctx->right_mouse_pressed;
-	default:
+	if (button < 0 || button >= 3)
 		return FALSE;
-	}
+
+	return !!(ctx->mouse[button]);
 }
 
 bool ftgr_mouse_down(t_ftgr_ctx *ctx, S32 button)
 {
-	switch (button)
-	{
-	case MOUSE_LEFT:
-		return ctx->left_mouse_clicked;
-	case MOUSE_MIDDLE:
-		return ctx->middle_mouse_clicked;
-	case MOUSE_RIGHT:
-		return ctx->right_mouse_clicked;
-	default:
+	if (button < 0 || button >= 3)
 		return FALSE;
-	}
+	
+	return ctx->mouse[button] == _FTGR_MOUSE_DOWN;	
 }
 
 bool ftgr_mouse_released(t_ftgr_ctx *ctx, S32 button)
 {
-	switch (button)
-	{
-	case MOUSE_LEFT:
-		return ctx->left_mouse_released;
-	case MOUSE_MIDDLE:
-		return ctx->middle_mouse_released;
-	case MOUSE_RIGHT:
-		return ctx->right_mouse_released;
-	default:
-		return FALSE;
-	}
+	(void)ctx;
+	(void)button;
+	return FALSE; //TODO: 
 }
 
 #endif

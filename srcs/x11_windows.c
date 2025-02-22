@@ -6,26 +6,24 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/16 22:36:34 by reclaire          #+#    #+#             */
-/*   Updated: 2024/12/27 00:39:04 by reclaire         ###   ########.fr       */
+/*   Updated: 2025/01/31 16:57:23 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#define _FT_RETURN
+
 #include "libftgr_x11_int.h"
+
+#include "libft/std.h"
 #include "libft/limits.h"
 
 #ifdef FT_OS_LINUX
 
 static inline bool _init_buffer(t_ftgr_ctx *ctx, t_framebuffer_data *buffer, t_iv2 size)
 {
-	buffer->img.bpp = 4;
-	buffer->img.size = size;
-	buffer->img.line_size = size.x * 4;
-	buffer->img.data_size = buffer->img.line_size * size.y;
-	buffer->img.data = malloc(sizeof(U8) * buffer->img.data_size);
-	if (UNLIKELY(buffer->img.data == NULL))
-		return FALSE;
-	buffer->img.pixels = (t_color *)buffer->img.data;
-	ft_memset(buffer->img.data, 255, buffer->img.data_size);
+	if (!ftgr_init_img(&buffer->img, size))
+		FT_RET_ERR(FALSE, ft_errno);
+	ft_bzero(buffer->img.data, sizeof(t_color) * size.x * size.y);
 
 	buffer->ximage = XCreateImage(ctx->display, ctx->visual, ctx->depth, ZPixmap, 0,
 								  (char *)buffer->img.data, size.x, size.y, 32, 0);
@@ -35,7 +33,7 @@ static inline bool _init_buffer(t_ftgr_ctx *ctx, t_framebuffer_data *buffer, t_i
 	buffer->shm = FALSE;
 	buffer->gc = 0;
 
-	return TRUE;
+	FT_RET_OK(TRUE);
 }
 
 t_ftgr_win *ftgr_new_window(t_ftgr_ctx *ctx, t_iv2 size, const_string title)
@@ -118,45 +116,11 @@ t_ftgr_win *ftgr_new_window(t_ftgr_ctx *ctx, t_iv2 size, const_string title)
 		win_int->front = 0;
 		win_int->back = 1;
 		win->surface = &(win_int->buffers[win_int->back].img);
-		ft_bzero(win->surface->data, win->surface->data_size);
-		ftgr_swap_buffers(win);
-		ft_bzero(win->surface->data, win->surface->data_size);
-		ftgr_swap_buffers(win);
 	}
 
 	win->name = ft_strdup(title);
 
-	win->w_root = ftgr_new_widget();
-	win->w_root->size = size;
-
-	win->damage = ivec4(S32_MAX, S32_MAX, S32_MIN, S32_MIN);
-
-	win->events_n = 0;
-	win->events_alloc = 8;
-	if (UNLIKELY((win->events = malloc(sizeof(t_ftgr_ev) * win->events_alloc)) == NULL))
-	{
-		return NULL;
-	}
-
 	return win;
-}
-
-bool _ftgr_add_event(t_ftgr_win *win, t_ftgr_ev ev)
-{
-	t_ftgr_ev *new;
-
-	if (win->events_n >= win->events_alloc)
-	{
-		if (UNLIKELY((new = malloc(sizeof(t_ftgr_ev *) * win->events_n * 2)) == NULL))
-			FT_RET_ERR(FALSE, FT_EOMEM);
-		ft_memcpy(new, win->events, sizeof(t_ftgr_ev *) * win->events_n);
-		free(win->events);
-		win->events = new;
-		win->events_alloc = win->events_n * 2;
-	}
-
-	win->events[win->events_n++] = ev;
-	FT_RET_OK(TRUE);
 }
 
 static bool cmp_window(void *a1, void *a2)

@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/24 00:07:37 by reclaire          #+#    #+#             */
-/*   Updated: 2024/12/07 06:58:12 by reclaire         ###   ########.fr       */
+/*   Updated: 2025/02/14 03:07:33 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ float edgeFunction(t_v2 a, t_v2 b, t_v2 c)
 	return (c.x - a.x) * (b.y - a.y) - (c.y - a.y) * (b.x - a.x);
 }
 
-static void draw_bins(t_ftgr_img *img, t_v4 *tris, U32 tris_cnt, t_iv2 tile_size)
+static void draw_bins(t_image *img, t_v4 *tris, U32 tris_cnt, t_iv2 tile_size)
 {
 	for (U32 i = 0; i < tris_cnt; i++)
 	{

@@ -19,7 +19,7 @@
 LRESULT CALLBACK windowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 static inline ATOM _init_main_window_class(HINSTANCE hInstance);
 static inline HWND _create_window(const_string title, t_iv2 size, HINSTANCE hInstance);
-static inline bool _init_buffer(t_ftgr_img *buffer, t_iv2 size);
+static inline bool _init_buffer(t_image *buffer, t_iv2 size);
 
 #define RESIZE_TIMER_DELAY 300 // ms
 #define RESIZE_TIMER 1		   // For WM_TIMER
@@ -176,7 +176,7 @@ static inline HWND _create_window(const_string title, t_iv2 size, HINSTANCE hIns
 	);
 }
 
-static inline bool _init_buffer(t_ftgr_img *buffer, t_iv2 size)
+static inline bool _init_buffer(t_image *buffer, t_iv2 size)
 {
 	buffer->bpp = 4;
 	buffer->size = size;

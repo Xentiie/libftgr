@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/13 01:25:15 by reclaire          #+#    #+#             */
-/*   Updated: 2024/12/07 06:58:12 by reclaire         ###   ########.fr       */
+/*   Updated: 2025/02/14 03:07:33 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,11 +83,11 @@ bool clip_line_with_plane(t_v3 plane_n, t_v3 plane_pos, t_v3 p1, t_v3 p2, t_v3 *
 	return TRUE;
 }
 
-void setcol(t_ftgr_img *img, t_iv2 xy, t_v3 w, void *data)
+void setcol(t_image *img, t_iv2 xy, t_v3 w, void *data)
 {
 	U8 *ptr = data;
 
-	t_ftgr_img *depth_buffer = *(t_ftgr_img **)ptr;
+	t_image *depth_buffer = *(t_image **)ptr;
 	ptr += sizeof(void *);
 	t_v4 p1 = *(t_v4 *)ptr;
 	ptr += sizeof(t_v4);
@@ -183,7 +183,7 @@ void render_model(struct s_camera cam, struct s_object obj)
 
 			struct
 			{
-				t_ftgr_img *depth_buffer;
+				t_image *depth_buffer;
 				t_v4 p1;
 				t_v4 p2;
 				t_v4 p3;
@@ -195,11 +195,11 @@ void render_model(struct s_camera cam, struct s_object obj)
 	}
 }
 
-static void _draw_3d_line(t_ftgr_img *img, t_iv2 xy, t_iv4 lp1lp2, void *data)
+static void _draw_3d_line(t_image *img, t_iv2 xy, t_iv4 lp1lp2, void *data)
 {
 	U8 *ptr = data;
 
-	t_ftgr_img *depth_buffer = *(t_ftgr_img **)ptr;
+	t_image *depth_buffer = *(t_image **)ptr;
 	ptr += sizeof(void *);
 	t_v4 p1 = *(t_v4 *)ptr;
 	ptr += sizeof(t_v4);
@@ -231,7 +231,7 @@ void draw_3d_line(struct s_camera cam, t_v3 lp1, t_v3 lp2, t_color col, bool dep
 
 		struct
 		{
-			t_ftgr_img *depth_buffer;
+			t_image *depth_buffer;
 			t_v4 p1;
 			t_v4 p2;
 			t_color col;

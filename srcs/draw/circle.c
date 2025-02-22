@@ -6,19 +6,19 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 19:48:33 by reclaire          #+#    #+#             */
-/*   Updated: 2024/12/10 05:17:55 by reclaire         ###   ########.fr       */
+/*   Updated: 2025/02/14 03:07:33 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libftgr.h"
 
-inline static void draw_bounded_pixel(t_ftgr_img *img, S32 x, S32 y, t_color col, t_iv4 bound)
+inline static void draw_bounded_pixel(t_image *img, S32 x, S32 y, t_color col, t_iv4 bound)
 {
 	if (x >= bound.x && x < bound.z && y >= bound.y && y < bound.w)
 		*ftgr_get_pixel(img, x, y) = col;
 }
 
-inline static void draw_bounded_pixel2(t_ftgr_img *img, S32 x, S32 y, t_color col, t_iv4 bound)
+inline static void draw_bounded_pixel2(t_image *img, S32 x, S32 y, t_color col, t_iv4 bound)
 {
 	t_color *addr;
 
@@ -29,7 +29,7 @@ inline static void draw_bounded_pixel2(t_ftgr_img *img, S32 x, S32 y, t_color co
 	}
 }
 
-void ftgr_draw_circle_bound(t_ftgr_img *img, t_iv2 pos, S32 radius, t_color col, t_iv4 bound)
+void ftgr_draw_circle_bound(t_image *img, t_iv2 pos, S32 radius, t_color col, t_iv4 bound)
 {
 	S32 x;
 	S32 y;
@@ -76,12 +76,12 @@ void ftgr_draw_circle_bound(t_ftgr_img *img, t_iv2 pos, S32 radius, t_color col,
 	}
 }
 
-void ftgr_draw_circle(t_ftgr_img *img, t_iv2 pos, S32 radius, t_color col)
+void ftgr_draw_circle(t_image *img, t_iv2 pos, S32 radius, t_color col)
 {
 	ftgr_draw_circle_bound(img, pos, radius, col, ivec4(0, 0, img->size.x, img->size.y));
 }
 
-void ftgr_draw_circle_bound2(t_ftgr_img *img, t_iv2 pos, S32 radius, t_color col, t_iv4 bound)
+void ftgr_draw_circle_bound2(t_image *img, t_iv2 pos, S32 radius, t_color col, t_iv4 bound)
 {
 	S32 x;
 	S32 y;
@@ -128,7 +128,7 @@ void ftgr_draw_circle_bound2(t_ftgr_img *img, t_iv2 pos, S32 radius, t_color col
 	}
 }
 
-void ftgr_draw_circle2(t_ftgr_img *img, t_iv2 pos, S32 radius, t_color col)
+void ftgr_draw_circle2(t_image *img, t_iv2 pos, S32 radius, t_color col)
 {
 	ftgr_draw_circle_bound2(img, pos, radius, col, ivec4(0, 0, img->size.x, img->size.y));
 }

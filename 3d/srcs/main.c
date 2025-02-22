@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/06 02:27:08 by reclaire          #+#    #+#             */
-/*   Updated: 2024/12/04 04:28:26 by reclaire         ###   ########.fr       */
+/*   Updated: 2025/02/14 03:07:33 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ int main()
 {
 	t_list *info_lines;		/* info lines list */
 	t_bitmap bitmap;		/* default bitmap */
-	t_ftgr_img *bitmap_img; /* image for default bitmap */
+	t_image *bitmap_img; /* image for default bitmap */
 	struct s_camera cam;	/* main camera */
 	struct s_camera cam2;	/* debug camera */
 
@@ -49,7 +49,7 @@ int main()
 	log_level = LOG_DEBUG;
 
 	{ /* general init */
-		ctx = ftgr_create_ctx();
+		ctx = ftgr_new_ctx();
 		win = ftgr_new_window(ctx, ivec2(1024, 512), "3D");
 
 		{ /* bitmap init */
@@ -66,7 +66,7 @@ int main()
 			cam.far = 90.0f;
 			cam.fov = 70.0f;
 			cam.surface = win->surface;
-			cam.depth_buffer = malloc(sizeof(t_ftgr_img));
+			cam.depth_buffer = malloc(sizeof(t_image));
 			cam_init_depth_buffer(&cam);
 		}
 

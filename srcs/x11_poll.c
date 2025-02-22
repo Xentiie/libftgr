@@ -59,11 +59,9 @@ bool ftgr_poll(t_ftgr_ctx *ctx)
 	S32 mods;
 
 	update_time(ctx);
+	//TODO: also cleanup mouse, bad
+	//TODO: rename
 	_ftx11_keys_cleanup(ctx);
-
-	ctx->left_mouse_clicked = FALSE;
-	ctx->middle_mouse_clicked = FALSE;
-	ctx->right_mouse_clicked = FALSE;
 
 	while (XPending(ctx->display))
 	{
@@ -97,41 +95,10 @@ bool ftgr_poll(t_ftgr_ctx *ctx)
 			break;
 
 		case ButtonPress:;
-			switch ((ev.xbutton.button - 1) % 3)
-			{
-			case MOUSE_LEFT:
-				ctx->left_mouse_pressed = TRUE;
-				ctx->left_mouse_clicked = TRUE;
-				break;
-			case MOUSE_MIDDLE:
-				ctx->middle_mouse_pressed = TRUE;
-				ctx->middle_mouse_clicked = TRUE;
-				break;
-			case MOUSE_RIGHT:
-				ctx->right_mouse_pressed = TRUE;
-				ctx->right_mouse_clicked = TRUE;
-				break;
-			}
+			ctx->mouse[(ev.xbutton.button - 1) % 3] = _FTGR_MOUSE_DOWN;
 			break;
 		case ButtonRelease:
-			switch ((ev.xbutton.button - 1) % 3)
-			{
-			case MOUSE_LEFT:
-				ctx->left_mouse_pressed = FALSE;
-				ctx->left_mouse_clicked = FALSE;
-				ctx->left_mouse_released = TRUE;
-				break;
-			case MOUSE_MIDDLE:
-				ctx->middle_mouse_pressed = FALSE;
-				ctx->middle_mouse_clicked = FALSE;
-				ctx->middle_mouse_released = TRUE;
-				break;
-			case MOUSE_RIGHT:
-				ctx->right_mouse_pressed = FALSE;
-				ctx->right_mouse_clicked = FALSE;
-				ctx->right_mouse_released = TRUE;
-				break;
-			}
+			ctx->mouse[(ev.xbutton.button - 1) % 3] = FALSE;
 			break;
 
 		default:

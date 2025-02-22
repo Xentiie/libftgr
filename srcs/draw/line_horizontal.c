@@ -6,13 +6,13 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 15:22:58 by reclaire          #+#    #+#             */
-/*   Updated: 2024/12/10 19:15:29 by reclaire         ###   ########.fr       */
+/*   Updated: 2025/02/14 03:07:33 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libftgr.h"
 
-void ftgr_draw_line_horizontal_bound(t_ftgr_img *img, t_iv2 p1, S32 x2, t_color col, t_iv4 bound)
+void ftgr_draw_line_horizontal_bound(t_image *img, t_iv2 p1, S32 x2, t_color col, t_iv4 bound)
 {
 	t_color *ptr;
 	S32 xlen;
@@ -35,12 +35,12 @@ void ftgr_draw_line_horizontal_bound(t_ftgr_img *img, t_iv2 p1, S32 x2, t_color 
 		*ptr = col;
 }
 
-void ftgr_draw_line_horizontal(t_ftgr_img *img, t_iv2 p1, S32 x2, t_color col)
+void ftgr_draw_line_horizontal(t_image *img, t_iv2 p1, S32 x2, t_color col)
 {
 	ftgr_draw_line_horizontal_bound(img, p1, x2, col, ivec4(0, 0, img->size.x, img->size.y));
 }
 
-void ftgr_draw_line_horizontal_bound2(t_ftgr_img *img, t_iv2 p1, S32 x2, t_color col, t_iv4 bound)
+void ftgr_draw_line_horizontal_bound2(t_image *img, t_iv2 p1, S32 x2, t_color col, t_iv4 bound)
 {
 	t_color *ptr;
 	S32 xlen;
@@ -63,7 +63,7 @@ void ftgr_draw_line_horizontal_bound2(t_ftgr_img *img, t_iv2 p1, S32 x2, t_color
 		*ptr = ftgr_alpha_blend(*ptr, col);
 }
 
-void ftgr_draw_line_horizontal2(t_ftgr_img *img, t_iv2 p1, S32 x2, t_color col)
+void ftgr_draw_line_horizontal2(t_image *img, t_iv2 p1, S32 x2, t_color col)
 {
 	ftgr_draw_line_horizontal_bound2(img, p1, x2, col, ivec4(0, 0, img->size.x, img->size.y));
 }

@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/08 23:01:33 by reclaire          #+#    #+#             */
-/*   Updated: 2024/12/10 04:56:35 by reclaire         ###   ########.fr       */
+/*   Updated: 2025/02/14 03:07:33 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ SECTION_GETTER_IMPL(t_glyph *, glyphs)
 SECTION_GETTER_IMPL(t_kerning *, kerning)
 SECTION_GETTER_IMPL(t_max_profile *, maxp)
 
-void draw_glyph(t_glyph glyph, t_ftgr_img *img, S32 xoffset)
+void draw_glyph(t_glyph glyph, t_image *img, S32 xoffset)
 {
 	t_iv2 min = ivec2(S32_MAX, S32_MAX);
 	t_iv2 max = ivec2(S32_MIN, S32_MIN);
@@ -58,7 +58,7 @@ void draw_glyph(t_glyph glyph, t_ftgr_img *img, S32 xoffset)
 	}
 }
 
-void *ftgr_load_font(filedesc fd, t_ftgr_img *img)
+void *ftgr_load_font(filedesc fd, t_image *img)
 {
 	t_ftgr_truetype_loader *loader = malloc(sizeof(t_ftgr_truetype_loader));
 	if (!loader)

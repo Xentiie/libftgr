@@ -40,12 +40,10 @@
 #include <X11/extensions/XShm.h>
 #include <X11/XKBlib.h>
 
-typedef struct
-{
-	bool up;
-	bool down;
-	U32 k;
-} t_key;
+#define _FTGR_KEY_DOWN 2
+#define _FTGR_KEY_PRESSED TRUE
+#define _FTGR_MOUSE_DOWN 2
+#define _FTGR_MOUSE_PRESSED TRUE
 
 typedef struct s_ftgr_ctx
 {
@@ -69,13 +67,11 @@ typedef struct s_ftgr_ctx
 
 	t_time global_time;
 	t_time delta_time_clk;
-	float delta_time;
+	F32 delta_time;
 
-	bool left_mouse_pressed, left_mouse_clicked, left_mouse_released;
-	bool right_mouse_pressed, right_mouse_clicked, right_mouse_released;
-	bool middle_mouse_pressed, middle_mouse_clicked, middle_mouse_released;
+	S8 mouse[3];
+	S8 keys[256];
 
-	t_list *keys;
 } t_ftgr_ctx;
 
 #define LIMIT_FREQ(secs, ...)                                 \
@@ -102,7 +98,7 @@ typedef struct
 	S32 format;
 	bool shm;
 
-	t_ftgr_img img;
+	t_image img;
 } t_framebuffer_data;
 
 typedef struct
@@ -114,7 +110,6 @@ typedef struct
 	t_framebuffer_data buffers[2];
 } t_ftgr_win_int;
 
-bool _ftgr_add_event(t_ftgr_win *win, t_ftgr_ev ev);
 U32 _ftgr_keysym2uni(U32 keysym);
 void _ftx11_keys_cleanup(t_ftgr_ctx *ctx);
 void _ftx11_register_key_up(t_ftgr_ctx *ctx, U32 key);

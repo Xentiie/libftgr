@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/12 01:02:07 by reclaire          #+#    #+#             */
-/*   Updated: 2024/10/11 00:36:52 by reclaire         ###   ########.fr       */
+/*   Updated: 2025/02/14 03:07:33 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,8 +42,8 @@ struct s_camera
 	F32 far;
 	F32 fov;
 
-	t_ftgr_img *surface;
-	t_ftgr_img *depth_buffer;
+	t_image *surface;
+	t_image *depth_buffer;
 };
 
 bool cam_init_depth_buffer(struct s_camera *cam);

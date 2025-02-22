@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/07 17:32:16 by reclaire          #+#    #+#             */
-/*   Updated: 2024/12/10 05:29:33 by reclaire         ###   ########.fr       */
+/*   Updated: 2025/02/14 03:07:33 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@
 #include <time.h>
 #include <stdlib.h>
 
-void ftgr_stretch_img_bound(t_ftgr_img *dst, t_iv4 dst_rect, t_ftgr_img *src, t_iv4 src_rect)
+void ftgr_stretch_img_bound(t_image *dst, t_iv4 dst_rect, t_image *src, t_iv4 src_rect)
 {
 	dst_rect.x = ft_clamp(0, dst->size.x, dst_rect.x);
 	dst_rect.y = ft_clamp(0, dst->size.y, dst_rect.y);
@@ -52,7 +52,7 @@ void ftgr_stretch_img_bound(t_ftgr_img *dst, t_iv4 dst_rect, t_ftgr_img *src, t_
 	}
 }
 
-void ftgr_stretch_img2(t_ftgr_img *dst, t_iv4 dst_rect, t_ftgr_img *src, t_iv4 src_rect, t_color col)
+void ftgr_stretch_img2(t_image *dst, t_iv4 dst_rect, t_image *src, t_iv4 src_rect, t_color col)
 {
 	dst_rect.x = ft_clamp(0, dst->size.x, dst_rect.x);
 	dst_rect.y = ft_clamp(0, dst->size.y, dst_rect.y);
@@ -92,15 +92,10 @@ void ftgr_stretch_img2(t_ftgr_img *dst, t_iv4 dst_rect, t_ftgr_img *src, t_iv4 s
 	}
 }
 
-void ftgr_cpy_img(t_ftgr_img *dst, t_iv2 dst_pos, t_ftgr_img *src, t_iv4 src_rect)
+void ftgr_cpy_img(t_image *dst, t_iv2 dst_pos, t_image *src, t_iv4 src_rect)
 {
 	src_rect = ft_imin4(ivec4(dst_pos.x, dst_pos.y, dst->size.x, dst->size.y), src_rect);
 	for (S32 y = src_rect.y; y < src_rect.w; y++)
 		for (S32 x = src_rect.x; x < src_rect.z; x++)
-		{
-			// TODO:
-			U32 dst_addr = ((x + dst_pos.x + ((y + dst_pos.y) * dst->size.x)) * dst->bpp);
-			U32 src_addr = ((x + y * dst->size.x) * dst->bpp);
-			*(U32 *)(dst->data + dst_addr) = *(U32 *)(src->data + src_addr);
-		}
+			*ftgr_get_pixel(dst, x + dst_pos.x, y + dst_pos.y) = *ftgr_get_pixel(src, x, y);
 }

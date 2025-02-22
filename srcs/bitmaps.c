@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/10 21:44:36 by reclaire          #+#    #+#             */
-/*   Updated: 2024/12/04 00:45:24 by reclaire         ###   ########.fr       */
+/*   Updated: 2025/02/14 03:07:33 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 //#define BITMAP_TEXT_DEBUG 1
 
-void ftgr_init_bitmap(t_bitmap *bitmap, t_ftgr_img *img, t_iv2 char_size, U32 line_chars_count, t_iv2 sep_size)
+void ftgr_init_bitmap(t_bitmap *bitmap, t_image *img, t_iv2 char_size, U32 line_chars_count, t_iv2 sep_size)
 {
 	bitmap->img = img;
 	bitmap->char_width = char_size.x;
@@ -31,66 +31,81 @@ t_iv4 ftgr_bitmap_rect_char_lines(t_bitmap *bitmap, t_iv2 pos, U32 line_width, U
 		pos.x + (line_width * (bitmap->sep_width + bitmap->char_width)), pos.y + (lines_cnt * (bitmap->sep_height + bitmap->char_height)));
 }
 
-U64 ftgr_bitmap_get_width(t_bitmap *bitmap, t_text text)
+
+void ftgr_draw_bitmap_text(t_image *out, t_iv4 rect, t_bitmap *bitmap, string str, F32 scale, t_iv2 kerning, t_color col)
 {
-	S64 len = ft_strlen(text.str);
-	return len * (ft_ceil(bitmap->char_width * text.scale) + text.kerning.x);
-}
+	S32 char_size;
+	S32 line_size;
+	S32 chars_per_line;
+	S32 available_lines;
+	U64 len;
+	S32 str_len;
 
-U64 ftgr_bitmap_get_height(t_bitmap *bitmap, t_text text)
-{
-	return ft_ceil(bitmap->char_height * text.scale) + text.kerning.y;
-}
+	S32 bitmap_x_step;
+	S32 bitmap_y_step;
 
-void ftgr_draw_bitmap_text(t_ftgr_img *out, t_iv4 rect, t_bitmap *bitmap, t_text text, t_color col)
-{
-	string str = text.str;
-	F32 scale = text.scale;
-	S32 xkerning = text.kerning.x;
-	S32 ykerning = text.kerning.y;
+	len = ft_strlen(str);
+	char_size = (bitmap->char_width * scale + kerning.x);
+	line_size = (bitmap->char_height * scale + kerning.y);
 
-	U64 str_len = ft_strlen(str);
+	chars_per_line = (rect.z - rect.x + kerning.x) / char_size;
+	available_lines = (rect.w - rect.y + kerning.y) / line_size;
 
-	F32 out_x_step = bitmap->char_width * scale + xkerning;
-	F32 out_y_step = bitmap->char_height * scale + ykerning;
+	str_len = ft_imin(len, chars_per_line * available_lines);
 
-	U32 line_width = (F32)(rect.z - rect.x) / out_x_step;
-	U32 lines_cnt = (F32)(rect.w - rect.y) / out_y_step;
-	str_len = ft_imin(str_len, line_width * lines_cnt);
+	bitmap_x_step = bitmap->char_width + bitmap->sep_width;
+	bitmap_y_step = bitmap->char_height + bitmap->sep_height;
 
-	S32 bitmap_x_step = bitmap->char_width + bitmap->sep_width;
-	S32 bitmap_y_step = bitmap->char_height + bitmap->sep_height;
+#if BITMAP_TEXT_DEBUG
+	t_iv4 bitmap_debug_draw_rect;
+	t_iv2 _ofs = ivec2(0, out->size.y / 2 - bitmap->img->size.y / 2);
+	F32	  _scl = 3.0f;
+	F32	  aspect_ratio = bitmap->img->size.x / bitmap->img->size.y;
+	bitmap_debug_draw_rect.x = _ofs.x;
+	bitmap_debug_draw_rect.y = _ofs.y;
+	bitmap_debug_draw_rect.z = _ofs.x + (bitmap->img->size.x * _scl);
+	bitmap_debug_draw_rect.w = _ofs.y + (bitmap->img->size.y * _scl);
 
-	for (U64 i = 0; i < str_len; i++)
+	ftgr_stretch_img(out, bitmap_debug_draw_rect, bitmap->img, ivec4(0, 0, bitmap->img->size.x, bitmap->img->size.y),
+					 ftgr_color(255, 255, 255, 255));
+#endif
+
+	for (S32 i = 0; i < str_len; i++)
 	{
 		S8 v = str[i];
 		if (v < 32)
 			v = ' ';
 		v -= 32;
 
-		t_iv2 out_pos = ivec2(rect.x + ((i % line_width) * out_x_step), rect.y + ((i / line_width) * out_y_step));
-		t_iv2 bitmap_pos = ivec2((v % bitmap->line_width) * bitmap_x_step + 1, (v / bitmap->line_width) * bitmap_y_step + 1);
+		t_iv2 out_pos = ivec2(rect.x + ((i % chars_per_line) * char_size), rect.y + ((i / chars_per_line) * line_size));
+		t_iv2 bitmap_pos
+			= ivec2((v % bitmap->line_width) * bitmap_x_step + 1, (v / bitmap->line_width) * bitmap_y_step + 1);
 
-		t_iv4 out_rect = ivec4(out_pos.x, out_pos.y, out_pos.x + bitmap->char_width * scale, out_pos.y + bitmap->char_height * scale);
-		t_iv4 bitmap_rect = ivec4(bitmap_pos.x, bitmap_pos.y, bitmap_pos.x + bitmap->char_width, bitmap_pos.y + bitmap->char_height);
+		t_iv4 out_rect = ivec4(out_pos.x, out_pos.y, out_pos.x + bitmap->char_width * scale,
+							   out_pos.y + bitmap->char_height * scale);
+		t_iv4 bitmap_rect
+			= ivec4(bitmap_pos.x, bitmap_pos.y, bitmap_pos.x + bitmap->char_width, bitmap_pos.y + bitmap->char_height);
 
 		ftgr_stretch_img2(out, out_rect, bitmap->img, bitmap_rect, col);
 
-#ifdef BITMAP_TEXT_DEBUG
+#if BITMAP_TEXT_DEBUG
 		{
-			t_color col = ftgr_rand_color(ofs++);
-			ftgr_draw_rect(out, out_rect, col);
-			ftgr_draw_rect(out, bitmap_rect, col);
+			t_color chars_rect_col = ftgr_color(0, 0, 0, 255);
+			t_color chars_arrows_col = ftgr_color(127, 0, 127, 255);
+			ftgr_draw_rect(out, rect, chars_rect_col);
+			ftgr_draw_rect(out, out_rect, chars_rect_col);
+			ftgr_draw_rect(out, bitmap_debug_draw_rect, chars_arrows_col);
 			ftgr_draw_line(out, ivec2((out_rect.x + out_rect.z) / 2, (out_rect.y + out_rect.w) / 2),
-						   ivec2((bitmap_rect.x + bitmap_rect.z) / 2, (bitmap_rect.y + bitmap_rect.w) / 2),
-						   col);
+						   ivec2(bitmap_debug_draw_rect.x + (bitmap_pos.x * _scl) + bitmap->char_width * _scl / 2,
+								 bitmap_debug_draw_rect.y + (bitmap_pos.y * _scl) + bitmap->char_height * _scl / 2),
+						   chars_arrows_col);
 		}
 #endif
 	}
 
-#ifdef BITMAP_TEXT_DEBUG2
+#if BITMAP_TEXT_DEBUG2
 	{
-		ftgr_draw_rect(out, rect, COL_BLACK);	
+		ftgr_draw_rect(out, rect, COL_BLACK);
 	}
 #endif
 }

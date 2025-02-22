@@ -6,13 +6,13 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 16:22:26 by reclaire          #+#    #+#             */
-/*   Updated: 2024/12/06 16:32:54 by reclaire         ###   ########.fr       */
+/*   Updated: 2025/02/14 03:07:33 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libftgr.h"
 
-void ftgr_draw_bezier(t_ftgr_img *img, t_color col, t_v2 p1, t_v2 p2, t_v2 p3, S32 res)
+void ftgr_draw_bezier(t_image *img, t_color col, t_v2 p1, t_v2 p2, t_v2 p3, S32 res)
 {
 	t_v2 prev = p1;
 	for (S32 i = 0; i < res; i++)
@@ -24,7 +24,7 @@ void ftgr_draw_bezier(t_ftgr_img *img, t_color col, t_v2 p1, t_v2 p2, t_v2 p3, S
 	}
 }
 
-void ftgr_draw_bezier_bound(t_ftgr_img *img, t_color col, t_v2 p1, t_v2 p2, t_v2 p3, S32 res, t_iv4 bound)
+void ftgr_draw_bezier_bound(t_image *img, t_color col, t_v2 p1, t_v2 p2, t_v2 p3, S32 res, t_iv4 bound)
 {
 	t_v2 prev = p1;
 	for (S32 i = 0; i < res; i++)
@@ -37,7 +37,7 @@ void ftgr_draw_bezier_bound(t_ftgr_img *img, t_color col, t_v2 p1, t_v2 p2, t_v2
 	}
 }
 
-void ftgr_draw_bezier2(t_ftgr_img *img, t_color col, t_v2 p1, t_v2 p2, t_v2 p3, S32 res)
+void ftgr_draw_bezier2(t_image *img, t_color col, t_v2 p1, t_v2 p2, t_v2 p3, S32 res)
 {
 	t_v2 prev = p1;
 	for (S32 i = 0; i < res; i++)
@@ -49,7 +49,7 @@ void ftgr_draw_bezier2(t_ftgr_img *img, t_color col, t_v2 p1, t_v2 p2, t_v2 p3, 
 	}
 }
 
-void ftgr_draw_bezier_bound2(t_ftgr_img *img, t_color col, t_v2 p1, t_v2 p2, t_v2 p3, S32 res, t_iv4 bound)
+void ftgr_draw_bezier_bound2(t_image *img, t_color col, t_v2 p1, t_v2 p2, t_v2 p3, S32 res, t_iv4 bound)
 {
 	t_v2 prev = p1;
 	for (S32 i = 0; i < res; i++)

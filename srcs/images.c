@@ -6,40 +6,49 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/17 03:03:13 by reclaire          #+#    #+#             */
-/*   Updated: 2024/12/10 05:35:40 by reclaire         ###   ########.fr       */
+/*   Updated: 2025/02/14 03:07:33 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#define _FT_RETURN
+
 #include "libftgr.h"
+
 #include <stdlib.h>
 
-t_ftgr_img *ftgr_new_img(t_iv2 size)
+t_image *ftgr_new_img(t_iv2 size)
 {
-	t_ftgr_img *img = malloc(sizeof(t_ftgr_img));
-	if (!img)
-		return NULL;
+	t_image *img;
+	
+	if (UNLIKELY((img = malloc(sizeof(t_image))) == NULL))
+		FT_RET_ERR(NULL, FT_EOMEM);
 
-	img->size = size;
-	img->bpp = 4;
-	img->line_size = img->bpp * size.x;
-	img->data_size = img->line_size * size.y;
-	img->data = malloc(sizeof(U8) * img->data_size);
-	if (!img->data)
+	if (!ftgr_init_img(img, size))
 	{
 		free(img);
-		return NULL;
+		FT_RET_ERR(NULL, ft_errno);
 	}
-	img->pixels = (t_color *)img->data;
 
-	return img;
+	FT_RET_OK(img);
 }
 
-void ftgr_display_image(t_ftgr_img *img, t_ftgr_win *win, t_iv2 pos)
+bool ftgr_init_img(t_image *img, t_iv2 size)
+{
+	if (UNLIKELY((img->data = malloc(sizeof(t_color) * size.x * size.y)) == NULL))
+		FT_RET_ERR(FALSE, FT_EOMEM);
+
+	img->size = size;
+	img->pixels = (t_color *)img->data;
+
+	FT_RET_OK(TRUE);
+}
+
+void ftgr_display_image(t_image *img, t_ftgr_win *win, t_iv2 pos)
 {
 	ftgr_cpy_img(win->surface, pos, img, ivec4(0, 0, img->size.x, img->size.y));
 }
 
-void ftgr_free_img(t_ftgr_img *img)
+void ftgr_free_img(t_image *img)
 {
 	free(img->data);
 	free(img);

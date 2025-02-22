@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/09 16:46:04 by reclaire          #+#    #+#             */
-/*   Updated: 2024/12/03 03:01:39 by reclaire         ###   ########.fr       */
+/*   Updated: 2025/02/01 13:14:17 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,8 +15,6 @@
 #ifdef FT_OS_LINUX
 #include "libft/time.h"
 #include "libft/io.h"
-
-#include "log/log.h"
 
 #include <X11/Xproto.h>
 
@@ -192,7 +190,7 @@ static int error_handler(Display *display, XErrorEvent *event)
 	return 0;
 }
 
-t_ftgr_ctx *ftgr_create_ctx()
+t_ftgr_ctx *ftgr_new_ctx()
 {
 	t_ftgr_ctx *ctx;
 	XVisualInfo template;
@@ -240,7 +238,8 @@ t_ftgr_ctx *ftgr_create_ctx()
 	ft_clk_get(&ctx->global_time);
 	ft_clk_get(&ctx->delta_time_clk);
 
-	ctx->keys = NULL;
+	ft_bzero(ctx->keys, sizeof(ctx->keys));
+	ft_bzero(ctx->mouse, sizeof(ctx->mouse));
 	return (ctx);
 
 exit_err:
@@ -263,10 +262,7 @@ static bool ftgr_init_shm(t_ftgr_ctx *ctx)
 	}
 
 	if (gethostname(hostname, sizeof(hostname) - 1) == -1)
-	{
-		log_error("ftgr", "gethostname: %s\n", ft_strerror2());
 		goto exit_err;
-	}
 
 	if ((dpy = getenv("DISPLAY")) != NULL								 /* DISPLAY exists in env */
 		&& ft_strlen(dpy)												 /* DISPLAY is set to something */
@@ -278,14 +274,14 @@ static bool ftgr_init_shm(t_ftgr_ctx *ctx)
 	}
 
 	if (!ctx->use_xshm)
-		log_warn("ftgr", "not using shared memory\n");
+		ft_fprintf(ft_fstderr, "warning: not using shared memory images\n");
 exit_err:
 	ctx->pixmap_shm_format = -1;
 	ctx->use_xshm = FALSE;
 	return FALSE;
 }
 
-void ftgr_free(t_ftgr_ctx *ctx)
+void ftgr_destroy(t_ftgr_ctx *ctx)
 {
 	t_list *win = ctx->windows;
 	while (win)

@@ -1,5 +1,6 @@
 {
     "files.associations": {
+		"*.c.old": "c",
         "*.h": "c",
         "array": "c",
         "string": "c",

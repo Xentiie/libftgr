@@ -6,13 +6,14 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 15:22:58 by reclaire          #+#    #+#             */
-/*   Updated: 2024/12/12 12:18:49 by reclaire         ###   ########.fr       */
+/*   Updated: 2025/02/14 03:07:33 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libftgr.h"
 
-#include "libft/debug.h"
+#include "libft/maths.h"
+#include "libft/io.h"
 
 #define INSIDE 0
 #define LEFT (1 << 0)
@@ -36,23 +37,18 @@ static U8 line_draw_intersect(t_iv2 p, t_iv4 bound)
 	return outcode;
 }
 
-static bool line_accept(t_iv2 p1, t_iv2 p2, S32 width, S32 height, t_iv4 bound)
+static bool line_accept(t_iv2 *p1, t_iv2 *p2, S32 width, S32 height, t_iv4 bound)
 {
 	U8 intersect1;
 	U8 intersect2;
-	bool accept;
 
-	intersect1 = line_draw_intersect(p1, bound);
-	intersect2 = line_draw_intersect(p2, bound);
+	intersect1 = line_draw_intersect(*p1, bound);
+	intersect2 = line_draw_intersect(*p2, bound);
 
-	accept = FALSE;
 	while (TRUE)
 	{
 		if (!(intersect1 | intersect2)) /* both inside */
-		{
-			accept = TRUE;
-			break;
-		}
+			return TRUE;
 		else if (intersect1 & intersect2) /* both outside */
 			return FALSE;
 		else
@@ -61,46 +57,42 @@ static bool line_accept(t_iv2 p1, t_iv2 p2, S32 width, S32 height, t_iv4 bound)
 			U8 intersect_out = (intersect1 != INSIDE) ? intersect1 : intersect2;
 			if (intersect_out & TOP)
 			{
-				intersection.x = p1.x + (p2.x - p1.x) * (height - 1 - p1.y) / (p2.y - p1.y);
+				intersection.x = p1->x + (p2->x - p1->x) * (height - 1 - p1->y) / (p2->y - p1->y);
 				intersection.y = height - 1;
 			}
 			else if (intersect_out & BOTTOM)
 			{
-				intersection.x = p1.x + (p2.x - p1.x) * (0 - p1.y) / (p2.y - p1.y);
+				intersection.x = p1->x + (p2->x - p1->x) * (0 - p1->y) / (p2->y - p1->y);
 				intersection.y = 0;
 			}
 			else if (intersect_out & RIGHT)
 			{
-				intersection.y = p1.y + (p2.y - p1.y) * (width - 1 - p1.x) / (p2.x - p1.x);
+				intersection.y = p1->y + (p2->y - p1->y) * (width - 1 - p1->x) / (p2->x - p1->x);
 				intersection.x = width - 1;
 			}
 			else if (intersect_out & LEFT)
 			{
-				intersection.y = p1.y + (p2.y - p1.y) * (0 - p1.x) / (p2.x - p1.x);
+				intersection.y = p1->y + (p2->y - p1->y) * (0 - p1->x) / (p2->x - p1->x);
 				intersection.x = 0;
 			}
 			else
-			{
 				intersection = ivec2(0, 0);
-				ft_debug_break();
-			}
 
 			if (intersect_out == intersect1)
 			{
-				p1 = intersection;
-				intersect1 = line_draw_intersect(p1, bound);
+				*p1 = intersection;
+				intersect1 = line_draw_intersect(*p1, bound);
 			}
 			else
 			{
-				p2 = intersection;
-				intersect2 = line_draw_intersect(p2, bound);
+				*p2 = intersection;
+				intersect2 = line_draw_intersect(*p2, bound);
 			}
 		}
 	}
-	return accept;
 }
 
-FUNCTION_HOT void ftgr_draw_line_bound(t_ftgr_img *img, t_iv2 p1, t_iv2 p2, t_color col, t_iv4 bound)
+FUNCTION_HOT void ftgr_draw_line_bound(t_image *img, t_iv2 p1, t_iv2 p2, t_color col, t_iv4 bound)
 {
 	S32 width;
 	S32 height;
@@ -113,7 +105,7 @@ FUNCTION_HOT void ftgr_draw_line_bound(t_ftgr_img *img, t_iv2 p1, t_iv2 p2, t_co
 	width = bound.z - bound.x;
 	height = bound.w - bound.y;
 
-	if (line_accept(p1, p2, width, height, bound))
+	if (line_accept(&p1, &p2, width, height, bound))
 	{
 		S32 dx = ft_abs(p2.x - p1.x), dy = ft_abs(p2.y - p1.y);
 		S32 sx = (p1.x < p2.x) ? 1 : -1;
@@ -140,15 +132,18 @@ FUNCTION_HOT void ftgr_draw_line_bound(t_ftgr_img *img, t_iv2 p1, t_iv2 p2, t_co
 				p1.y += sy;
 			}
 		}
+		ft_printf("Accept (%d %d) (%d %d)\n", p1.x, p1.y, p2.x, p2.y);
 	}
+	else
+		ft_printf("Deny (%d %d) (%d %d)\n", p1.x, p1.y, p2.x, p2.y);
 }
 
-void ftgr_draw_line(t_ftgr_img *img, t_iv2 p1, t_iv2 p2, t_color col)
+void ftgr_draw_line(t_image *img, t_iv2 p1, t_iv2 p2, t_color col)
 {
 	ftgr_draw_line_bound(img, p1, p2, col, ivec4(0, 0, img->size.x, img->size.y));
 }
 
-FUNCTION_HOT void ftgr_draw_line_bound2(t_ftgr_img *img, t_iv2 p1, t_iv2 p2, t_color col, t_iv4 bound)
+FUNCTION_HOT void ftgr_draw_line_bound2(t_image *img, t_iv2 p1, t_iv2 p2, t_color col, t_iv4 bound)
 {
 	t_color *addr;
 	S32 width;
@@ -162,7 +157,7 @@ FUNCTION_HOT void ftgr_draw_line_bound2(t_ftgr_img *img, t_iv2 p1, t_iv2 p2, t_c
 	width = bound.z - bound.x;
 	height = bound.w - bound.y;
 
-	if (line_accept(p1, p2, width, height, bound))
+	if (line_accept(&p1, &p2, width, height, bound))
 	{
 		S32 dx = ft_abs(p2.x - p1.x), dy = ft_abs(p2.y - p1.y);
 		S32 sx = (p1.x < p2.x) ? 1 : -1;
@@ -171,10 +166,10 @@ FUNCTION_HOT void ftgr_draw_line_bound2(t_ftgr_img *img, t_iv2 p1, t_iv2 p2, t_c
 
 		while (TRUE)
 		{
-			//if (p1.x >= 0 && p1.x < img->size.x && p1.y >= 0 && p1.y < img->size.y)
+			// if (p1.x >= 0 && p1.x < img->size.x && p1.y >= 0 && p1.y < img->size.y)
 			//{
-				addr = ftgr_get_pixel(img, p1.x, p1.y);
-				*addr = ftgr_alpha_blend(*addr, col);
+			addr = ftgr_get_pixel(img, p1.x, p1.y);
+			*addr = ftgr_alpha_blend(*addr, col);
 			//}
 
 			if (p1.x == p2.x && p1.y == p2.y)
@@ -195,7 +190,7 @@ FUNCTION_HOT void ftgr_draw_line_bound2(t_ftgr_img *img, t_iv2 p1, t_iv2 p2, t_c
 	}
 }
 
-void ftgr_draw_line2(t_ftgr_img *img, t_iv2 p1, t_iv2 p2, t_color col)
+void ftgr_draw_line2(t_image *img, t_iv2 p1, t_iv2 p2, t_color col)
 {
 	ftgr_draw_line_bound2(img, p1, p2, col, ivec4(0, 0, img->size.x, img->size.y));
 }

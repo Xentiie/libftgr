@@ -6,13 +6,13 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 20:16:13 by reclaire          #+#    #+#             */
-/*   Updated: 2024/12/06 20:19:55 by reclaire         ###   ########.fr       */
+/*   Updated: 2025/02/14 03:07:33 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libftgr.h"
 
-void ftgr_draw_disc_bound(t_ftgr_img *img, t_iv2 pos, S32 radius, t_color col, t_iv4 bound)
+void ftgr_draw_disc_bound(t_image *img, t_iv2 pos, S32 radius, t_color col, t_iv4 bound)
 {
 	S32 x = 0, y = radius;
 	S32 d = 1 - radius; // Decision parameter
@@ -43,12 +43,12 @@ void ftgr_draw_disc_bound(t_ftgr_img *img, t_iv2 pos, S32 radius, t_color col, t
 	}
 }
 
-void ftgr_draw_disc(t_ftgr_img *img, t_iv2 pos, S32 radius, t_color col)
+void ftgr_draw_disc(t_image *img, t_iv2 pos, S32 radius, t_color col)
 {
 	ftgr_draw_disc_bound(img, pos, radius, col, ivec4(0, 0, img->size.x, img->size.y));
 }
 
-void ftgr_draw_disc_bound2(t_ftgr_img *img, t_iv2 pos, S32 radius, t_color col, t_iv4 rect)
+void ftgr_draw_disc_bound2(t_image *img, t_iv2 pos, S32 radius, t_color col, t_iv4 rect)
 {
 	S32 x = 0, y = radius;
 	S32 d = 1 - radius; // Decision parameter
@@ -79,7 +79,7 @@ void ftgr_draw_disc_bound2(t_ftgr_img *img, t_iv2 pos, S32 radius, t_color col, 
 	}
 }
 
-void ftgr_draw_disc2(t_ftgr_img *img, t_iv2 pos, S32 radius, t_color col)
+void ftgr_draw_disc2(t_image *img, t_iv2 pos, S32 radius, t_color col)
 {
 	ftgr_draw_disc_bound2(img, pos, radius, col, ivec4(0, 0, img->size.x, img->size.y));
 }

@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/12 01:07:27 by reclaire          #+#    #+#             */
-/*   Updated: 2024/12/06 05:23:00 by reclaire         ###   ########.fr       */
+/*   Updated: 2025/02/14 03:07:33 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ struct s_info_line
 	void *ptr;
 };
 
-static void info_line_draw(t_ftgr_img *out, t_widget *widget, t_iv2 abs_pos, union u_widget_data data)
+static void info_line_draw(t_image *out, t_widget *widget, t_iv2 abs_pos, union u_widget_data data)
 {
 	(void)data;
 	char buf[1250];
@@ -113,7 +113,7 @@ t_widget *new_info_line(t_list **lines, t_bitmap *bitmap, string label, string (
 			dump_btn_w->handle_input = TRUE;
 			ftgr_wdrawer_fill_rect(dump_btn_w, COL_WHITE);
 			dump_btn_w->data = (union u_widget_data){.ptr = {infoline}};
-			dump_btn_w->on_cursor_click = (t_widget_callback)info_line_dump;
+			dump_btn_w->on_cursor_click = (t_widget_event)info_line_dump;
 		}
 		else
 			ftgr_wdrawer_fill_rect(dump_btn_w, COL_DARK_GRAY);

@@ -70,7 +70,7 @@ typedef struct s_ftgr_win_int
 {
 	HWND window_handle;
 	HDC dc;
-	t_ftgr_img buffers[2];
+	t_image buffers[2];
 	U8 front;
 	U8 back;
 } t_ftgr_win_int;

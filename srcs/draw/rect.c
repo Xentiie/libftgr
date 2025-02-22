@@ -6,13 +6,13 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 16:22:47 by reclaire          #+#    #+#             */
-/*   Updated: 2024/12/10 19:11:33 by reclaire         ###   ########.fr       */
+/*   Updated: 2025/02/14 03:23:02 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libftgr.h"
 
-void ftgr_draw_rect_bound(t_ftgr_img *img, t_iv4 rect, t_color col, t_iv4 bound)
+void ftgr_draw_rect_bound(t_image *img, t_iv4 rect, t_color col, t_iv4 bound)
 {
 	rect.x = ft_imax(rect.x, bound.x);
 	rect.y = ft_imax(rect.y, bound.y);
@@ -22,7 +22,7 @@ void ftgr_draw_rect_bound(t_ftgr_img *img, t_iv4 rect, t_color col, t_iv4 bound)
 	ftgr_draw_rect(img, rect, col);
 }
 
-void ftgr_draw_rect(t_ftgr_img *img, t_iv4 rect, t_color col)
+void ftgr_draw_rect(t_image *img, t_iv4 rect, t_color col)
 {
 	ftgr_draw_line_horizontal(img, ivec2(rect.x, rect.y), rect.z, col);
 	ftgr_draw_line_horizontal(img, ivec2(rect.x, rect.w), rect.z, col);
@@ -30,7 +30,7 @@ void ftgr_draw_rect(t_ftgr_img *img, t_iv4 rect, t_color col)
 	ftgr_draw_line_vertical(img, ivec2(rect.z, rect.y), rect.w, col);
 }
 
-void ftgr_draw_rect_bound2(t_ftgr_img *img, t_iv4 rect, t_color col, t_iv4 bound)
+void ftgr_draw_rect_bound2(t_image *img, t_iv4 rect, t_color col, t_iv4 bound)
 {
 	rect.x = ft_imax(rect.x, bound.x);
 	rect.y = ft_imax(rect.y, bound.y);
@@ -40,7 +40,7 @@ void ftgr_draw_rect_bound2(t_ftgr_img *img, t_iv4 rect, t_color col, t_iv4 bound
 	ftgr_draw_rect2(img, rect, col);
 }
 
-void ftgr_draw_rect2(t_ftgr_img *img, t_iv4 rect, t_color col)
+void ftgr_draw_rect2(t_image *img, t_iv4 rect, t_color col)
 {
 	ftgr_draw_line_horizontal2(img, ivec2(rect.x, rect.y), rect.z, col);
 	ftgr_draw_line_horizontal2(img, ivec2(rect.x, rect.w), rect.z, col);
@@ -48,7 +48,7 @@ void ftgr_draw_rect2(t_ftgr_img *img, t_iv4 rect, t_color col)
 	ftgr_draw_line_vertical2(img, ivec2(rect.z, rect.y), rect.w, col);
 }
 
-void ftgr_fill_rect_bound(t_ftgr_img *img, t_iv4 rect, t_color col, t_iv4 bound)
+void ftgr_fill_rect_bound(t_image *img, t_iv4 rect, t_color col, t_iv4 bound)
 {
 	rect.x = ft_imax(rect.x, bound.x);
 	rect.y = ft_imax(rect.y, bound.y);
@@ -58,7 +58,7 @@ void ftgr_fill_rect_bound(t_ftgr_img *img, t_iv4 rect, t_color col, t_iv4 bound)
 	ftgr_fill_rect(img, rect, col);
 }
 
-void ftgr_fill_rect(t_ftgr_img *img, t_iv4 rect, t_color col)
+void ftgr_fill_rect(t_image *img, t_iv4 rect, t_color col)
 {
 	t_color *ptr;
 	S32 ystep;
@@ -80,7 +80,7 @@ void ftgr_fill_rect(t_ftgr_img *img, t_iv4 rect, t_color col)
 			*ptr = col;
 }
 
-void ftgr_fill_rect_bound2(t_ftgr_img *img, t_iv4 rect, t_color col, t_iv4 bound)
+void ftgr_fill_rect_bound2(t_image *img, t_iv4 rect, t_color col, t_iv4 bound)
 {
 	rect.x = ft_imax(rect.x, bound.x);
 	rect.y = ft_imax(rect.y, bound.y);
@@ -90,7 +90,7 @@ void ftgr_fill_rect_bound2(t_ftgr_img *img, t_iv4 rect, t_color col, t_iv4 bound
 	ftgr_fill_rect2(img, rect, col);
 }
 
-void ftgr_fill_rect2(t_ftgr_img *img, t_iv4 rect, t_color col)
+void ftgr_fill_rect2(t_image *img, t_iv4 rect, t_color col)
 {
 	t_color *ptr;
 	S32 ystep;

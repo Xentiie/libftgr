@@ -6,24 +6,25 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/03 15:43:38 by reclaire          #+#    #+#             */
-/*   Updated: 2024/12/10 05:30:01 by reclaire         ###   ########.fr       */
+/*   Updated: 2025/02/14 03:07:33 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libftgr.h"
+
 #include "libft/images.h"
 #include "libft/io.h"
 
-t_ftgr_img *ftgr_load_png(const_string path)
+t_image *ftgr_load_png(const_string path)
 {
-	filedesc fd = ft_open((string)path, "r");
-	t_png_img *png = ft_load_png(fd, TRUE);
+	filedesc fd = ft_open((string)path, "r"); /* test1 */
+	t_png_img *png = ft_load_png(fd, TRUE);	  /* test2 */
 	ft_close(fd);
 
 	if (UNLIKELY(png == NULL) || (png->color_type != 0 && png->color_type != 2 && png->color_type != 4 && png->color_type != 6))
 		return FALSE;
 
-	t_ftgr_img *img = ftgr_new_img(ivec2(png->width, png->height));
+	t_image *img = ftgr_new_img(ivec2(png->width, png->height));
 	if (UNLIKELY(img == NULL))
 	{
 		ft_free_png_img(png);
