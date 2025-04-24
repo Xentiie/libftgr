@@ -21,6 +21,8 @@
 #include "libft/lists.h"
 #include "libft/strings.h"
 #include "libft/time.h"
+#include "libft/bits/ft_return.h"
+
 #include <windows.h>
 #include <stdio.h>
 

@@ -13,8 +13,6 @@
 #ifndef LIBFTGR_X11_INT
 #define LIBFTGR_X11_INT
 
-#define _FT_RETURN
-
 #include "libft/std.h"
 
 #ifdef FT_OS_LINUX
@@ -24,6 +22,7 @@
 #include "libft/strings.h"
 #include "libft/time.h"
 #include "libft/debug.h"
+#include "libft/bits/ft_return.h"
 
 #include "libftgr.h"
 

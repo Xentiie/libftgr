@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/08 23:01:33 by reclaire          #+#    #+#             */
-/*   Updated: 2025/02/14 03:07:33 by reclaire         ###   ########.fr       */
+/*   Updated: 2025/03/27 17:09:39 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,14 +45,14 @@ void draw_glyph(t_glyph glyph, t_image *img, S32 xoffset)
 	for (int i = 0; i < glyph.contour_end_indices_len; i++)
 	{
 		int points_n = glyph.contour_end_indices[i] - contourStartIndex + 1;
-		t_color col = ftgr_color((i%3) == 0 ? 255 : 0, (i%3) == 1 ? 255 : 0, (i%3) == 2 ? 255 : 0, 255);
+		t_color col = ft_color((i%3) == 0 ? 255 : 0, (i%3) == 1 ? 255 : 0, (i%3) == 2 ? 255 : 0, 255);
 
 		t_iv2 *points = glyph.points + contourStartIndex;
 		for (int j = 0; j < points_n; j++)
 		{
 			t_iv2 st = conv(points[j]);
 			t_iv2 nd = conv(points[(j + 1) % points_n]);
-			ftgr_draw_line(img, st, nd, col);
+			ft_draw_line(img, st, nd, col);
 		}
 		contourStartIndex = glyph.contour_end_indices[i] + 1;
 	}

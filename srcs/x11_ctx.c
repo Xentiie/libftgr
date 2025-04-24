@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/09 16:46:04 by reclaire          #+#    #+#             */
-/*   Updated: 2025/02/01 13:14:17 by reclaire         ###   ########.fr       */
+/*   Updated: 2025/04/22 18:55:20 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -267,7 +267,7 @@ static bool ftgr_init_shm(t_ftgr_ctx *ctx)
 	if ((dpy = getenv("DISPLAY")) != NULL								 /* DISPLAY exists in env */
 		&& ft_strlen(dpy)												 /* DISPLAY is set to something */
 		&& *dpy != ':' && ft_strncmp(dpy, hostname, ft_strlen(hostname)) /* DISPLAY n'est pas notre hostname */
-		&& ft_strncmp(dpy, LOCALHOST, ft_strlen(LOCALHOST)))			 /* DISPLAY n'est pas localhost */
+		&& ft_strncmp(dpy, "localhost", 10))							 /* DISPLAY n'est pas localhost */
 	{																	 /* -> pas de xshm */
 		ctx->pixmap_shm_format = -1;
 		ctx->use_xshm = FALSE;

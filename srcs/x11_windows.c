@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/16 22:36:34 by reclaire          #+#    #+#             */
-/*   Updated: 2025/01/31 16:57:23 by reclaire         ###   ########.fr       */
+/*   Updated: 2025/03/04 21:31:47 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@
 
 static inline bool _init_buffer(t_ftgr_ctx *ctx, t_framebuffer_data *buffer, t_iv2 size)
 {
-	if (!ftgr_init_img(&buffer->img, size))
+	if (!ft_init_image(&buffer->img, size))
 		FT_RET_ERR(FALSE, ft_errno);
 	ft_bzero(buffer->img.data, sizeof(t_color) * size.x * size.y);
 
@@ -135,6 +135,10 @@ void ftgr_free_window(t_ftgr_win *win)
 	XFreeGC(win->ctx->display, win_int->gc);
 	XDestroyWindow(win->ctx->display, win_int->window);
 	ft_lstremoveif(&win->ctx->windows, NULL, cmp_window, win);
+
+	XDestroyImage(win_int->buffers[0].ximage);
+	XDestroyImage(win_int->buffers[1].ximage);
+	free(win_int);
 	free(win);
 }
 

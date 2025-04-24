@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/09 04:09:57 by reclaire          #+#    #+#             */
-/*   Updated: 2024/12/03 03:05:02 by reclaire         ###   ########.fr       */
+/*   Updated: 2025/04/22 18:54:24 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,13 +18,19 @@
 #include "libft/limits.h"
 #include "libft/maths.h"
 
+#include "libft/bits/ft_return.h"
+
 #include <stdlib.h>
 #include <unistd.h>
 
 //#define printf(...) do { (printf)("(%s:%d)", __FILE__, __LINE__); (printf)(__VA_ARGS__); } while (0)
 
+#if !defined(MIN)
 #define MIN(a, b) ((a < b) ? a : b)
+#endif
+#if !defined(MAX)
 #define MAX(a, b) ((a > b) ? a : b)
+#endif
 
 #define GLYPH_FLAG_ON_CURVE (0x1)
 #define GLYPH_FLAG_X_SHORT (0x2)
