@@ -6,18 +6,19 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/04 16:45:09 by reclaire          #+#    #+#             */
-/*   Updated: 2024/12/06 15:21:37 by reclaire         ###   ########.fr       */
+/*   Updated: 2025/05/26 22:38:09 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft/std.h"
-#include "libftgr.h"
+#include "libftGFX.h"
 #include <stdio.h>
 
-void ftgr_display_fps(t_ftgr_win *win)
+void ftGFX_display_fps(struct s_ftGFX_window *win)
 {
 	char buffer[100];
-	snprintf(buffer, sizeof(buffer), "%.5f", 1.0f / ftgr_delta_time(win->ctx));
-	ftgr_set_win_name_infos(win, buffer);
+
+	snprintf(buffer, sizeof(buffer), "%.5f", 1.0f / win->ctx->delta_time);
+	ftGFX_set_win_name_infos(win, buffer);
 }
 

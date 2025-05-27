@@ -701,7 +701,7 @@ configure() {
 		fi
 	done
 
-	cf_set_name "libftgr.a"
+	cf_set_name "libftGFX.a"
 
 	cf_add_cflag "-Wall"
 	cf_add_cflag "-Wextra"
@@ -734,10 +734,11 @@ configure() {
 
 	cf_add_output_include "include"
 	cf_add_output_lib_path "./"
-	cf_add_output_lib "libftgr"
+	cf_add_output_lib "libftGFX"
 
 	shopt -s globstar
 	for f in srcs/**/*.c; do
+		if [[ "$f" == srcs/text/* ]]; then continue; fi
 		cf_add_source "$f"
 	done
 }

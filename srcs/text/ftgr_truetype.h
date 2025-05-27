@@ -6,14 +6,14 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/09 04:09:57 by reclaire          #+#    #+#             */
-/*   Updated: 2025/04/22 18:54:24 by reclaire         ###   ########.fr       */
+/*   Updated: 2025/05/26 22:34:13 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef FTGR_TRUETYPE_H
 #define FTGR_TRUETYPE_H
 
-#include "libftgr.h"
+#include "libftGFX.h"
 #include "libft/io.h"
 #include "libft/limits.h"
 #include "libft/maths.h"

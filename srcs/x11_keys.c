@@ -6,75 +6,45 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 08:26:57 by reclaire          #+#    #+#             */
-/*   Updated: 2025/02/01 13:13:48 by reclaire         ###   ########.fr       */
+/*   Updated: 2025/05/27 04:07:11 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libftgr_x11_int.h"
+#include "libftGFX_x11.h"
 #ifdef FT_OS_LINUX
 
 #include "libft/limits.h"
 
-/*
-==================================================
-*/
-
-void _ftx11_register_key_down(t_ftgr_ctx *ctx, U32 key)
-{
-	if (key >= 255)
-		return;
-	ctx->keys[key] = _FTGR_KEY_DOWN;
-}
-
-void _ftx11_register_key_up(t_ftgr_ctx *ctx, U32 key)
-{
-	if (key >= 255)
-		return;
-	ctx->keys[key] = FALSE;
-}
-
-void _ftx11_keys_cleanup(t_ftgr_ctx *ctx)
+void ftgfxx11_keys_reset(struct s_ftGFX_ctx *ctx)
 {
 	for (U16 i = 0; i < sizeof(ctx->keys) / sizeof(ctx->keys[0]); i++)
 	{
-		if (ctx->keys[i] == _FTGR_KEY_DOWN)
-			ctx->keys[i] = _FTGR_KEY_PRESSED;
+		if (ctx->keys[i] == FTGFX_KEY_PRESSED)
+			ctx->keys[i] = FTGFX_KEY_DOWN;
+		else if (ctx->keys[i] == FTGFX_KEY_RELEASED)
+			ctx->keys[i] = FTGFX_KEY_UP;
 	}
 
 	for (U8 i = 0; i < sizeof(ctx->mouse) / sizeof(ctx->mouse[0]); i++)
 	{
-		if (ctx->mouse[i] == _FTGR_MOUSE_DOWN)
-			ctx->mouse[i] = _FTGR_MOUSE_PRESSED;
+		if (ctx->mouse[i] == FTGFX_MOUSE_PRESSED)
+			ctx->mouse[i] = FTGFX_MOUSE_DOWN;
+		else if (ctx->mouse[i] == FTGFX_MOUSE_RELEASED)
+			ctx->mouse[i] = FTGFX_MOUSE_UP;
 	}
 }
-/*
-==================================================
-*/
 
-bool ftgr_is_key_pressed(t_ftgr_ctx *ctx, U8 key)
+void ftGFX_key_autorepeat(struct s_ftGFX_ctx *ctx, bool active)
 {
-	return !!(ctx->keys[key]);
-}
+	struct s_ftGFX_ctx_private *private;
 
-bool ftgr_is_key_down(t_ftgr_ctx *ctx, U8 key)
-{
-	return ctx->keys[key] == _FTGR_KEY_DOWN;
-}
+	private = (struct s_ftGFX_ctx_private *)ctx->private;
 
-bool ftgr_is_key_up(t_ftgr_ctx *ctx, U8 key)
-{
-	(void)ctx;
-	(void)key;
-	return FALSE; //TODO: 
-}
-
-void ftgr_key_autorepeat(t_ftgr_ctx *ctx, bool active)
-{
 	if (active)
-		XAutoRepeatOn(ctx->display);
+		XAutoRepeatOn(private->display);
 	else
-		XAutoRepeatOff(ctx->display);
-	XFlush(ctx->display);
+		XAutoRepeatOff(private->display);
+	XFlush(private->display);
 }
 
 #endif

@@ -6,19 +6,19 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 08:47:06 by reclaire          #+#    #+#             */
-/*   Updated: 2024/07/04 16:40:08 by reclaire         ###   ########.fr       */
+/*   Updated: 2025/05/26 22:30:09 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 //Shamelessly stolen from glfw: https://github.com/glfw/glfw/blob/master/src/xkb_unicode.c
 
-#include "libftgr_x11_int.h"
+#include "libftGFX_x11.h"
 
 #ifdef FT_OS_LINUX
 
 static const struct codepair {
-  unsigned short keysym;
-  unsigned short ucs;
+  U16 keysym;
+  U16 ucs;
 } keysymtab[] = {
   { 0x01a1, 0x0104 },
   { 0x01a2, 0x02d8 },
@@ -851,14 +851,14 @@ static const struct codepair {
 };
 
 
-U32	_ftgr_keysym2uni(U32 keysym)
+U32	ftgfxx11_keysym_to_unicode(U32 keysym)
 {
     int min = 0;
     int max = sizeof(keysymtab) / sizeof(struct codepair) - 1;
     int mid;
 
     // First check for Latin-1 characters (1:1 mapping)
-    if ((keysym >= 0x0020 && keysym <= 0x007e) ||
+    if ((keysym >= ' ' && keysym <= '~') ||
         (keysym >= 0x00a0 && keysym <= 0x00ff))
     {
         return keysym;

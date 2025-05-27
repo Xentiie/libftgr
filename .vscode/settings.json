@@ -1,7 +1,7 @@
 {
     "files.associations": {
-		"*.c.old": "c",
         "*.h": "c",
+        "*.c.old": "c",
         "array": "c",
         "string": "c",
         "string_view": "c",
@@ -12,6 +12,9 @@
         "span": "c",
         "utility": "c",
         "format": "c",
-        "thread": "c"
+        "thread": "c",
+        "deque": "c",
+        "list": "c",
+        "vector": "c"
     },
 }

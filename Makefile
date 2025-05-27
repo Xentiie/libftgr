@@ -6,7 +6,7 @@
 #    By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/04/15 17:26:47 by reclaire          #+#    #+#              #
-#    Updated: 2025/01/31 17:07:41 by reclaire         ###   ########.fr        #
+#    Updated: 2025/05/27 02:38:43 by reclaire         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -16,5 +16,5 @@ $(NAME): $(OBJS)
 	ar -rcs $(NAME) $(OBJS)
 
 test:	packages $(NAME)
-			$(CC) $(CFLAGS) $(INCLUDES) test/*.c -L./ $(LIBS_PATHS) -lftgr $(LIBS)
+			$(CC) $(CFLAGS) $(INCLUDES) test/*.c -L./ $(LIBS_PATHS) -lftGFX $(LIBS)
 

@@ -6,11 +6,11 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/09 16:46:04 by reclaire          #+#    #+#             */
-/*   Updated: 2025/04/22 18:55:20 by reclaire         ###   ########.fr       */
+/*   Updated: 2025/05/26 23:03:20 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libftgr_x11_int.h"
+#include "libftGFX_x11.h"
 
 #ifdef FT_OS_LINUX
 #include "libft/time.h"
@@ -20,10 +20,10 @@
 
 #include <unistd.h>
 
-static bool ftgr_init_shm(t_ftgr_ctx *ctx);
+static bool init_shm(struct s_ftGFX_ctx *ctx);
 // TODO: check return codes
 
-static int error_handler(Display *display, XErrorEvent *event)
+static S32 error_handler(Display *display, XErrorEvent *event)
 {
 	static const string x_requests_str[] = {
 		"XCreateWindow",
@@ -170,18 +170,18 @@ static int error_handler(Display *display, XErrorEvent *event)
 	};
 	(void)display;
 
-	ft_dprintf(ft_stderr, "X11 ERROR: ");
+	ft_fprintf(ft_fstderr, "X11 ERROR: ");
 	if (event->error_code >= (sizeof(x_errors_str) / sizeof(x_errors_str[0])))
-		ft_dprintf(ft_stderr, "code: %d(No error name available, minor code: %u) ", event->error_code, event->minor_code);
+		ft_fprintf(ft_fstderr, "code: %d(No error name available, minor code: %u) ", event->error_code, event->minor_code);
 	else
-		ft_dprintf(ft_stderr, "code: %s(%d, minor code: %u) ", x_errors_str[event->error_code], event->error_code, event->minor_code);
+		ft_fprintf(ft_fstderr, "code: %s(%d, minor code: %u) ", x_errors_str[event->error_code], event->error_code, event->minor_code);
 
 	if ((event->request_code - 1) >= (S64)(sizeof(x_requests_str) / sizeof(x_requests_str[0])))
-		ft_dprintf(ft_stderr, "req: %d(No request name available) ", event->request_code);
+		ft_fprintf(ft_fstderr, "req: %d(No request name available) ", event->request_code);
 	else
-		ft_dprintf(ft_stderr, "req: %s ", x_requests_str[event->request_code - 1]);
+		ft_fprintf(ft_fstderr, "req: %s ", x_requests_str[event->request_code - 1]);
 
-	ft_dprintf(ft_stderr,
+	ft_fprintf(ft_fstderr,
 			   "resoureid:%ld serial:%lu type:%d\n",
 			   event->resourceid,
 			   event->serial,
@@ -190,74 +190,20 @@ static int error_handler(Display *display, XErrorEvent *event)
 	return 0;
 }
 
-t_ftgr_ctx *ftgr_new_ctx()
+static bool init_shm(struct s_ftGFX_ctx *ctx)
 {
-	t_ftgr_ctx *ctx;
-	XVisualInfo template;
-	XVisualInfo *vi;
-	S32 dummy;
-
-	if (UNLIKELY((ctx = malloc(sizeof(t_ftgr_ctx))) == NULL))
-		FT_RET_ERR(NULL, FT_EOMEM);
-	ft_memset(ctx, 0, sizeof(t_ftgr_ctx));
-
-	if ((ctx->display = XOpenDisplay("")) == NULL)
-		goto exit_err;
-
-	XSetErrorHandler(error_handler);
-
-	ctx->screen = DefaultScreen(ctx->display);
-	ctx->root = DefaultRootWindow(ctx->display);
-	ctx->cmap = DefaultColormap(ctx->display, ctx->screen);
-	ctx->depth = DefaultDepth(ctx->display, ctx->screen);
-
-	ctx->visual = DefaultVisual(ctx->display, ctx->screen);
-	if (ctx->visual->class != TrueColor)
-	{
-		template = (XVisualInfo){.class = TrueColor, .depth = ctx->depth};
-
-		if ((vi = XGetVisualInfo(ctx->display, VisualDepthMask | VisualClassMask, &template, &dummy)) == NULL)
-		{
-			XCloseDisplay(ctx->display);
-			goto exit_err;
-		}
-
-		ctx->visual = vi->visual;
-		ctx->cmap = XCreateColormap(ctx->display, ctx->root, ctx->visual, AllocNone);
-	}
-
-	ctx->flush = TRUE;
-	ctx->windows = NULL;
-
-	ctx->del_win_atom = XInternAtom(ctx->display, "WM_DELETE_WINDOW", False);
-	ctx->protocols_atom = XInternAtom(ctx->display, "WM_PROTOCOLS", False);
-
-	ftgr_init_shm(ctx);
-	// ftgr_int_rgb_conversion(ctx);
-
-	ft_clk_get(&ctx->global_time);
-	ft_clk_get(&ctx->delta_time_clk);
-
-	ft_bzero(ctx->keys, sizeof(ctx->keys));
-	ft_bzero(ctx->mouse, sizeof(ctx->mouse));
-	return (ctx);
-
-exit_err:
-	free(ctx);
-	FT_RET_ERR(NULL, FT_ESYSCALL);
-}
-
-static bool ftgr_init_shm(t_ftgr_ctx *ctx)
-{
+	struct s_ftGFX_ctx_private *private;
 	S32 use_pshm;
 	S32 dummy;
 	char *dpy;
 	char hostname[33];
 
-	ctx->use_xshm = XShmQueryVersion(ctx->display, &dummy, &dummy, &use_pshm);
-	if (ctx->use_xshm && use_pshm)
+	private = (struct s_ftGFX_ctx_private *)ctx->private;
+
+	private->use_xshm = XShmQueryVersion(private->display, &dummy, &dummy, &use_pshm);
+	if (private->use_xshm && use_pshm)
 	{
-		ctx->pixmap_shm_format = XShmPixmapFormat(ctx->display);
+		private->pixmap_shm_format = XShmPixmapFormat(private->display);
 		return TRUE;
 	}
 
@@ -269,32 +215,100 @@ static bool ftgr_init_shm(t_ftgr_ctx *ctx)
 		&& *dpy != ':' && ft_strncmp(dpy, hostname, ft_strlen(hostname)) /* DISPLAY n'est pas notre hostname */
 		&& ft_strncmp(dpy, "localhost", 10))							 /* DISPLAY n'est pas localhost */
 	{																	 /* -> pas de xshm */
-		ctx->pixmap_shm_format = -1;
-		ctx->use_xshm = FALSE;
+		private->pixmap_shm_format = -1;
+		private->use_xshm = FALSE;
 	}
 
-	if (!ctx->use_xshm)
+	if (!private->use_xshm)
 		ft_fprintf(ft_fstderr, "warning: not using shared memory images\n");
+	return TRUE;
+
 exit_err:
-	ctx->pixmap_shm_format = -1;
-	ctx->use_xshm = FALSE;
+	private->pixmap_shm_format = -1;
+	private->use_xshm = FALSE;
 	return FALSE;
 }
 
-void ftgr_destroy(t_ftgr_ctx *ctx)
+struct s_ftGFX_ctx *ftGFX_create_ctx()
 {
-	t_list *win = ctx->windows;
-	while (win)
+	struct s_ftGFX_ctx_private *private;
+	struct s_ftGFX_ctx *ctx;
+	XVisualInfo template;
+	XVisualInfo *vi;
+	S32 dummy;
+
+	if (UNLIKELY((ctx = malloc(sizeof(struct s_ftGFX_ctx) + sizeof(struct s_ftGFX_ctx_private))) == NULL))
+		FT_RET_ERR(NULL, FT_EOMEM);
+	private = (struct s_ftGFX_ctx_private *)ctx->private;
+
+	if ((private->display = XOpenDisplay("")) == NULL)
+		goto exit_einvop;
+
+	XSetErrorHandler(error_handler);
+
+	private->screen = DefaultScreen(private->display);
+	private->root = DefaultRootWindow(private->display);
+	private->cmap = DefaultColormap(private->display, private->screen);
+	private->depth = DefaultDepth(private->display, private->screen);
+	private->visual = DefaultVisual(private->display, private->screen);
+	if (private->visual->class != TrueColor)
 	{
-		t_list *nxt = win->next;
-		ftgr_free_window(FTGR_WINDOW(win));
-		free(win);
-		win = nxt;
+		template = (XVisualInfo){.class = TrueColor, .depth = private->depth};
+
+		if ((vi = XGetVisualInfo(private->display, VisualDepthMask | VisualClassMask, &template, &dummy)) == NULL)
+		{
+			XCloseDisplay(private->display);
+			goto exit_einvop;
+		}
+
+		private->visual = vi->visual;
+		private->cmap = XCreateColormap(private->display, private->root, private->visual, AllocNone);
 	}
 
-	XFreeColormap(ctx->display, ctx->cmap);
-	XDestroyWindow(ctx->display, ctx->root);
-	XCloseDisplay(ctx->display);
+	private->del_win_atom = XInternAtom(private->display, "WM_DELETE_WINDOW", False);
+	private->protocols_atom = XInternAtom(private->display, "WM_PROTOCOLS", False);
+
+	private->flush = TRUE;
+	ctx->windows = NULL;
+
+	init_shm(ctx);
+
+	ft_clk_get(&ctx->global_time);
+	ft_clk_get(&ctx->delta_time_clk);
+	ctx->delta_time = 0;
+
+	ft_bzero(ctx->keys, sizeof(ctx->keys));
+	ft_bzero(ctx->mouse, sizeof(ctx->mouse));
+	ctx->keys_char[0] = '\0';
+
+	ctx->should_close = FALSE;
+
+	return ctx;
+
+exit_einvop:
+	free(ctx);
+	FT_RET_ERR(NULL, FT_EINVOP);
+}
+
+void ftGFX_destroy_ctx(struct s_ftGFX_ctx *ctx)
+{
+	struct s_ftGFX_ctx_private *private;
+	struct s_ftGFX_window *win;
+	struct s_ftGFX_window *next;
+
+	private = (struct s_ftGFX_ctx_private *)ctx->private;
+
+	win = ctx->windows;
+	while (win)
+	{
+		next = win->next;
+		ftGFX_destroy_window(win);
+		win = next;
+	}
+
+	XFreeColormap(private->display, private->cmap);
+	XDestroyWindow(private->display, private->root);
+	XCloseDisplay(private->display);
 	free(ctx);
 }
 

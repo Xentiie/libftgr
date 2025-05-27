@@ -6,90 +6,133 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 08:07:44 by reclaire          #+#    #+#             */
-/*   Updated: 2025/02/01 13:13:37 by reclaire         ###   ########.fr       */
+/*   Updated: 2025/05/26 23:05:16 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libftgr_x11_int.h"
+#include "libftGFX_x11.h"
 #ifdef FT_OS_LINUX
 
-void ftgr_mouse_move(t_ftgr_ctx *ctx, t_ftgr_win *win, t_iv2 pos)
+bool ftgfxx11_init_blank_cursor(struct s_ftGFX_window *win)
 {
-	t_ftgr_win_int *win_int = FTGR_WINDOW_INT(win);
+	struct s_ftGFX_ctx_private *private;
+	struct s_ftGFX_window_private *win_private;
 
-	XWarpPointer(ctx->display, None, win_int->window, 0, 0, 0, 0, pos.x, pos.y);
-}
-
-void ftgr_mouse_hide(t_ftgr_ctx *ctx, t_ftgr_win *win)
-{
-	t_ftgr_win_int *win_int = FTGR_WINDOW_INT(win);
-
-	static char data[1] = {0};
-	Pixmap blank = XCreateBitmapFromData(ctx->display, win_int->window, data, 1, 1);
-
+	static char blank_pixmap_data[1] = {0};
 	XColor dummy;
-	Cursor cursor = XCreatePixmapCursor(ctx->display, blank, blank, &dummy, &dummy, 0, 0);
 
-	XDefineCursor(ctx->display, win_int->window, cursor);
-	XFreePixmap(ctx->display, blank);
-	XFreeCursor(ctx->display, cursor);
+	private = (struct s_ftGFX_ctx_private *)win->ctx->private;
+	win_private = (struct s_ftGFX_window_private *)win->private;
+
+	dummy = (XColor){0};
+	if ((win_private->blank_cursor.pixmap = XCreateBitmapFromData(private->display,
+																  win_private->window,
+																  blank_pixmap_data,
+																  1, 1)) == None)
+		FT_RET_ERR(FALSE, FT_EINVOP);
+
+	if ((win_private->blank_cursor.cursor = XCreatePixmapCursor(private->display,
+																win_private->blank_cursor.pixmap,
+																win_private->blank_cursor.pixmap,
+																&dummy, &dummy, 0, 0)) == None)
+	{
+		XFreePixmap(private->display, win_private->blank_cursor.pixmap);
+		FT_RET_ERR(FALSE, FT_EINVOP);
+	}
+
+	win_private->blank_cursor.has_blank_cursor = TRUE;
+
+	FT_RET_OK(TRUE);
 }
 
-void ftgr_mouse_show(t_ftgr_ctx *ctx, t_ftgr_win *win)
+void ftgfxx11_destroy_blank_cursor(struct s_ftGFX_window *win)
 {
-	t_ftgr_win_int *win_int = FTGR_WINDOW_INT(win);
+	struct s_ftGFX_ctx_private *private;
+	struct s_ftGFX_window_private *win_private;
 
-	XUndefineCursor(ctx->display, win_int->window);
+	private = (struct s_ftGFX_ctx_private *)win->ctx->private;
+	win_private = (struct s_ftGFX_window_private *)win->private;
+
+	if (win_private->blank_cursor.has_blank_cursor)
+	{
+		XFreePixmap(private->display, win_private->blank_cursor.pixmap);
+		XFreeCursor(private->display, win_private->blank_cursor.cursor);
+	}
 }
 
-t_iv2 ftgr_mouse_get_pos(t_ftgr_ctx *ctx, t_ftgr_win *win)
+t_iv2 ftGFX_mouse_get_pos(struct s_ftGFX_ctx *ctx, struct s_ftGFX_window *win)
 {
-	Window root_return;
-	Window child_return;
-	int root_x_return;
-	int root_y_return;
-	unsigned mask_return;
+	struct s_ftGFX_ctx_private *private;
+	struct s_ftGFX_window_private *win_private;
 
 	t_iv2 out;
+	Window dummy_root;
+	Window dummy_child;
+	S32 dummy_root_x;
+	S32 dummy_root_y;
+	U32 dummy_mask;
+
+	private = (struct s_ftGFX_ctx_private *)ctx->private;
 
 	if (win)
 	{
-		t_ftgr_win_int *win_int = FTGR_WINDOW_INT(win);
+		win_private = (struct s_ftGFX_window_private *)win->private;
 
-		XQueryPointer(ctx->display, win_int->window,
-					  &root_return, &child_return, &root_x_return, &root_y_return,
-					  &out.x, &out.y, &mask_return);
+		XQueryPointer(private->display, win_private->window,
+					  &dummy_root, &dummy_child, &dummy_root_x, &dummy_root_y,
+					  &out.x, &out.y, &dummy_mask);
 	}
 	else
 	{
-		XQueryPointer(ctx->display, ctx->root,
-					  &root_return, &child_return, &root_x_return, &root_y_return,
-					  &out.x, &out.y, &mask_return);
+		XQueryPointer(private->display, private->root,
+					  &dummy_root, &dummy_child, &dummy_root_x, &dummy_root_y,
+					  &out.x, &out.y, &dummy_mask);
 	}
 	return out;
 }
 
-bool ftgr_mouse_pressed(t_ftgr_ctx *ctx, S32 button)
+void ftGFX_mouse_set_pos(struct s_ftGFX_ctx *ctx, struct s_ftGFX_window *win, t_iv2 pos)
 {
-	if (button < 0 || button >= 3)
-		return FALSE;
+	struct s_ftGFX_ctx_private *private;
+	struct s_ftGFX_window_private *win_private;
 
-	return !!(ctx->mouse[button]);
+	private = (struct s_ftGFX_ctx_private *)ctx->private;
+
+	if (win)
+	{
+		win_private = (struct s_ftGFX_window_private *)win->private;
+		XWarpPointer(private->display, None, win_private->window, 0, 0, 0, 0, pos.x, pos.y);
+	}
+	else
+		XWarpPointer(private->display, None, None, 0, 0, 0, 0, pos.x, pos.y);
 }
 
-bool ftgr_mouse_down(t_ftgr_ctx *ctx, S32 button)
+void ftGFX_mouse_hide(struct s_ftGFX_window *win)
 {
-	if (button < 0 || button >= 3)
-		return FALSE;
-	
-	return ctx->mouse[button] == _FTGR_MOUSE_DOWN;	
+	struct s_ftGFX_ctx_private *private;
+	struct s_ftGFX_window_private *win_private;
+
+	private = (struct s_ftGFX_ctx_private *)win->ctx->private;
+	win_private = (struct s_ftGFX_window_private *)win->private;
+
+	if (!win_private->blank_cursor.has_blank_cursor)
+	{
+		if (!ftgfxx11_init_blank_cursor(win))
+			return;
+	}
+
+	XDefineCursor(private->display, win_private->window, win_private->blank_cursor.cursor);
 }
 
-bool ftgr_mouse_released(t_ftgr_ctx *ctx, S32 button)
+void ftGFX_mouse_show(struct s_ftGFX_window *win)
 {
-	(void)ctx;
-	(void)button;
-	return FALSE; //TODO: 
+	struct s_ftGFX_ctx_private *private;
+	struct s_ftGFX_window_private *win_private;
+
+	private = (struct s_ftGFX_ctx_private *)win->ctx->private;
+	win_private = (struct s_ftGFX_window_private *)win->private;
+
+	XUndefineCursor(private->display, win_private->window);
 }
 
 #endif
