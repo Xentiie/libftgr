@@ -674,7 +674,7 @@ help()
 configure() {
 	debug=true
 	optimisations=
-	colors_fmt_mlx=true
+	colors_fmt_mlx=false
 
 	nextarg=""
 

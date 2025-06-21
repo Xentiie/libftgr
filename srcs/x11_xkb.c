@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 08:47:06 by reclaire          #+#    #+#             */
-/*   Updated: 2025/05/26 22:30:09 by reclaire         ###   ########.fr       */
+/*   Updated: 2025/06/09 00:34:43 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 #include "libftGFX_x11.h"
 
-#ifdef FT_OS_LINUX
+#if FT_OS_LINUX
 
 static const struct codepair {
   U16 keysym;

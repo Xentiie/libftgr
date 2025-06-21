@@ -14,7 +14,7 @@
 
 #include "libft/bits/static_array_len.h"
 
-#ifdef FT_OS_LINUX
+#if FT_OS_LINUX
 
 MAYBE_UNUSED
 static string get_event_name(S32 event)
@@ -178,17 +178,17 @@ repoll:
 	switch (ev.type)
 	{
 	case KeyPress:
-		event->type = FTGFX_KEY_DOWN_EVENT;
+		event->type = FTGFX_KEY_PRESS_EVENT;
 		fill_key_event(&ev, event);
 		if (event->key.unicode < statarray_len(ctx->keys))
-			ctx->keys[event->key.unicode] = FTGFX_KEY_DOWN;
+			ctx->keys[event->key.unicode] = FTGFX_KEY_PRESSED;
 		break;
 
 	case KeyRelease:
-		event->type = FTGFX_KEY_UP_EVENT;
+		event->type = FTGFX_KEY_RELEASE_EVENT;
 		fill_key_event(&ev, event);
 		if (event->key.unicode < statarray_len(ctx->keys))
-			ctx->keys[event->key.unicode] = FTGFX_KEY_UP;
+			ctx->keys[event->key.unicode] = FTGFX_KEY_RELEASED;
 		break;
 
 	case ButtonPress:

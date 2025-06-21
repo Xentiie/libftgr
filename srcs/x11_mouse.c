@@ -6,12 +6,12 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 08:07:44 by reclaire          #+#    #+#             */
-/*   Updated: 2025/05/26 23:05:16 by reclaire         ###   ########.fr       */
+/*   Updated: 2025/06/09 00:34:43 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libftGFX_x11.h"
-#ifdef FT_OS_LINUX
+#if FT_OS_LINUX
 
 bool ftgfxx11_init_blank_cursor(struct s_ftGFX_window *win)
 {

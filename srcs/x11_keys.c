@@ -6,12 +6,12 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 08:26:57 by reclaire          #+#    #+#             */
-/*   Updated: 2025/05/27 04:07:11 by reclaire         ###   ########.fr       */
+/*   Updated: 2025/06/09 00:34:43 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libftGFX_x11.h"
-#ifdef FT_OS_LINUX
+#if FT_OS_LINUX
 
 #include "libft/limits.h"
 

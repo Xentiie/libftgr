@@ -6,13 +6,13 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/22 23:38:56 by reclaire          #+#    #+#             */
-/*   Updated: 2025/05/26 22:08:22 by reclaire         ###   ########.fr       */
+/*   Updated: 2025/06/09 00:34:43 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libftGFX_x11.h"
 
-#ifdef FT_OS_LINUX
+#if FT_OS_LINUX
 
 U8 ftgfxx11_x11_to_ftgfx_mouse_button(U32 x11_mouse_button)
 {

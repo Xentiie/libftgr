@@ -6,13 +6,13 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/09 16:46:04 by reclaire          #+#    #+#             */
-/*   Updated: 2025/05/26 23:03:20 by reclaire         ###   ########.fr       */
+/*   Updated: 2025/06/09 00:34:43 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libftGFX_x11.h"
 
-#ifdef FT_OS_LINUX
+#if FT_OS_LINUX
 #include "libft/time.h"
 #include "libft/io.h"
 
@@ -253,10 +253,14 @@ struct s_ftGFX_ctx *ftGFX_create_ctx()
 	private->visual = DefaultVisual(private->display, private->screen);
 	if (private->visual->class != TrueColor)
 	{
-		template = (XVisualInfo){.class = TrueColor, .depth = private->depth};
+		template = (XVisualInfo){
+			.class = TrueColor,
+			.depth = private->depth,
+		};
 
-		if ((vi = XGetVisualInfo(private->display, VisualDepthMask | VisualClassMask, &template, &dummy)) == NULL)
+		if ((vi = XGetVisualInfo(private->display, VisualDepthMask | VisualClassMask | VisualRedMaskMask | VisualGreenMaskMask | VisualBlueMaskMask, &template, &dummy)) == NULL)
 		{
+			ft_printf("no visuals found :(\n");
 			XCloseDisplay(private->display);
 			goto exit_einvop;
 		}

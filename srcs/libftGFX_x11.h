@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/26 17:53:40 by reclaire          #+#    #+#             */
-/*   Updated: 2025/05/26 21:55:11 by reclaire         ###   ########.fr       */
+/*   Updated: 2025/06/11 20:55:14 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 
 #include "libft/std.h"
 
-#ifdef FT_OS_LINUX
+#if FT_OS_LINUX
 
 #include "libft/maths.h"
 #include "libft/lists.h"
@@ -75,7 +75,7 @@ struct s_ftGFX_ctx_private
 
 struct s_framebuffer
 {
-	Pixmap pixmap;
+	Pixmap xpixmap;
 	XImage *ximage;
 	S32 format;
 	bool shm;
@@ -87,9 +87,8 @@ struct s_ftGFX_window_private
 {
 	Window window;
 	GC gc;
-	U8 front;
-	U8 back;
-	struct s_framebuffer buffers[2];
+
+	struct s_framebuffer framebuffer;
 
 	/* Blank cursor cache for ftGFX_mouse_hide */
 	struct

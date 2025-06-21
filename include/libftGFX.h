@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/13 01:58:46 by reclaire          #+#    #+#             */
-/*   Updated: 2025/05/27 14:32:05 by reclaire         ###   ########.fr       */
+/*   Updated: 2025/06/04 04:03:08 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,10 +121,10 @@ enum e_ftGFX_event
 	/* Mouse leave event. Use `event->mouse`. */
 	FTGFX_MOUSE_LEAVE_EVENT,
 
-	/* Key down (press) event. Use `event->key`. */
-	FTGFX_KEY_DOWN_EVENT,
-	/* Key up (release) event. Use `event->key`. */
-	FTGFX_KEY_UP_EVENT,
+	/* Key press event. Use `event->key`. */
+	FTGFX_KEY_PRESS_EVENT,
+	/* Key release event. Use `event->key`. */
+	FTGFX_KEY_RELEASE_EVENT,
 
 	/* Window damage event. Use `event->damage`. */
 	FTGFX_WINDOW_DAMAGE_EVENT,
@@ -227,8 +227,6 @@ void ftGFX_set_win_name_infos(struct s_ftGFX_window *win, string infos);
 void ftGFX_move_window(struct s_ftGFX_window *win, t_iv2 pos);
 /* Draws the current window surface to the screen */
 void ftGFX_blt_screen(struct s_ftGFX_window *win);
-/* Swaps the front and back buffer of the window, copying the previous back buffer to the window */
-void ftGFX_swap_buffers(struct s_ftGFX_window *win);
 
 /*
 Retrieves the current mouse position. If `win != NULL`, the position is returned relative to the window.

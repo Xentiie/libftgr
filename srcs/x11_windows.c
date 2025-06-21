@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/16 22:36:34 by reclaire          #+#    #+#             */
-/*   Updated: 2025/05/27 03:44:32 by reclaire         ###   ########.fr       */
+/*   Updated: 2025/06/11 20:55:18 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 #include "libft/std.h"
 #include "libft/limits.h"
 
-#ifdef FT_OS_LINUX
+#if FT_OS_LINUX
 
 static bool init_buffer(struct s_ftGFX_ctx *ctx, struct s_framebuffer *buffer, t_iv2 size)
 {
@@ -28,10 +28,10 @@ static bool init_buffer(struct s_ftGFX_ctx *ctx, struct s_framebuffer *buffer, t
 	{ /* Init everything to 0 to be able to jump to exit_* labels. */
 		buffer->img.data = NULL;
 		buffer->ximage = NULL;
-		buffer->pixmap = None;
+		buffer->xpixmap = None;
 	}
 
-	{ /* FT image creation. */
+	{ /* Libft image. */
 		if (!ft_init_image(&buffer->img, size))
 			goto _exit_err; /* ft_errno set by ft_init_image */
 
@@ -44,7 +44,7 @@ static bool init_buffer(struct s_ftGFX_ctx *ctx, struct s_framebuffer *buffer, t
 									   (char *)buffer->img.data, size.x, size.y, 32, 0)) == NULL)
 		goto exit_invop;
 
-	if ((buffer->pixmap = XCreatePixmap(private->display, private->root, size.x, size.y, private->depth)) == 0)
+	if ((buffer->xpixmap = XCreatePixmap(private->display, private->root, size.x, size.y, private->depth)) == 0)
 		goto exit_invop;
 
 	buffer->format = ZPixmap;
@@ -61,8 +61,8 @@ _exit_err:
 		ft_destroy_image(&buffer->img);
 	if (buffer->ximage != NULL)
 		XDestroyImage(buffer->ximage);
-	if (buffer->pixmap != None)
-		XFreePixmap(private->display, buffer->pixmap);
+	if (buffer->xpixmap != None)
+		XFreePixmap(private->display, buffer->xpixmap);
 	return FALSE;
 }
 
@@ -89,14 +89,10 @@ struct s_ftGFX_window *ftGFX_create_window(struct s_ftGFX_ctx *ctx, t_iv2 size, 
 	if ((win->name = ft_strdup(title)) == NULL)
 		goto exit_omem;
 
-	{ /* Init front/back framebuffers */
-		if (!init_buffer(ctx, &win_private->buffers[0], win->size) ||
-			!init_buffer(ctx, &win_private->buffers[1], win->size))
+	{ /* Init framebuffer */
+		if (!init_buffer(ctx, &win_private->framebuffer, win->size))
 			goto _exit_err; /* ft_errno already set by init_buffer */
-
-		win_private->front = 0;
-		win_private->back = 1;
-		win->surface = &(win_private->buffers[win_private->back].img);
+		win->surface = &win_private->framebuffer.img;
 	}
 
 	{ /* Window creation */
@@ -107,16 +103,7 @@ struct s_ftGFX_window *ftGFX_create_window(struct s_ftGFX_ctx *ctx, t_iv2 size, 
 			.background_pixel = 0,
 			.border_pixel = -1,
 			.colormap = private->cmap,
-			.event_mask = 0
-				| KeyPressMask
-				| KeyReleaseMask
-				| ButtonPressMask
-				| ButtonReleaseMask
-				| EnterWindowMask
-				| LeaveWindowMask
-				| PointerMotionMask
-				| ButtonMotionMask
-				| ExposureMask,
+			.event_mask = 0 | KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask | EnterWindowMask | LeaveWindowMask | PointerMotionMask | ButtonMotionMask | ExposureMask,
 		};
 		win_valuemask = CWEventMask | CWBackPixel | CWBorderPixel | CWColormap;
 
@@ -226,8 +213,7 @@ void ftGFX_destroy_window(struct s_ftGFX_window *win)
 	ftgfxx11_destroy_blank_cursor(win);
 	XFreeGC(private->display, win_private->gc);
 	XDestroyWindow(private->display, win_private->window);
-	XDestroyImage(win_private->buffers[0].ximage);
-	XDestroyImage(win_private->buffers[1].ximage);
+	XDestroyImage(win_private->framebuffer.ximage);
 	free(win);
 }
 
@@ -288,44 +274,34 @@ void ftGFX_blt_screen(struct s_ftGFX_window *win)
 {
 	struct s_ftGFX_ctx_private *private;
 	struct s_ftGFX_window_private *win_private;
-	struct s_framebuffer fb;
-	GC gc;
 
 	private = (struct s_ftGFX_ctx_private *)win->ctx->private;
 	win_private = (struct s_ftGFX_window_private *)win->private;
 
-	gc = win_private->gc;
-	XSetClipOrigin(private->display, gc, 0, 0);
+	XSetClipOrigin(private->display, win_private->gc, 0, 0);
 
-	fb = win_private->buffers[win_private->back];
-
-	if (fb.shm)
+	if (win_private->framebuffer.shm)
 	{
 		ft_printf("%s:%d TODO\n", __FILE__, __LINE__);
 	}
 	else
 	{
-		XPutImage(private->display, fb.pixmap, win_private->gc, fb.ximage, 0, 0, 0, 0,
+		XPutImage(private->display,
+				  win_private->framebuffer.xpixmap,
+				  win_private->gc,
+				  win_private->framebuffer.ximage, 0, 0, 0, 0,
 				  win->size.x, win->size.y);
 	}
 
-	XCopyArea(private->display, fb.pixmap, win_private->window, gc,
-			  0, 0, win->size.x, win->size.y, 0, 0);
+	XCopyArea(private->display,
+			  win_private->framebuffer.xpixmap,
+			  win_private->window,
+			  win_private->gc,
+			  0, 0,
+			  win->size.x, win->size.y,
+			  0, 0);
 	if (private->flush)
 		XFlush(private->display);
-}
-
-void ftGFX_swap_buffers(struct s_ftGFX_window *win)
-{
-	struct s_ftGFX_window_private *win_private;
-
-	win_private = (struct s_ftGFX_window_private *)win->private;
-
-	ftGFX_blt_screen(win);
-
-	win_private->front = !win_private->front;
-	win_private->back = !win_private->back;
-	win->surface = &win_private->buffers[win_private->back].img;
 }
 
 #endif
