@@ -6,17 +6,21 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/09 16:46:04 by reclaire          #+#    #+#             */
-/*   Updated: 2025/06/09 00:34:43 by reclaire         ###   ########.fr       */
+/*   Updated: 2025/07/10 11:13:27 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libftGFX_x11.h"
+#include "libft/libft.h"
 
 #if FT_OS_LINUX
+
+#include "libftGFX_x11.h"
+
 #include "libft/time.h"
 #include "libft/io.h"
 
 #include <X11/Xproto.h>
+#include <X11/Xcursor/Xcursor.h>
 
 #include <unistd.h>
 
@@ -281,11 +285,35 @@ struct s_ftGFX_ctx *ftGFX_create_ctx()
 	ft_clk_get(&ctx->delta_time_clk);
 	ctx->delta_time = 0;
 
-	ft_bzero(ctx->keys, sizeof(ctx->keys));
-	ft_bzero(ctx->mouse, sizeof(ctx->mouse));
-	ctx->keys_char[0] = '\0';
+	{ /* Init cursors */
 
-	ctx->should_close = FALSE;
+		{ /* Blank cursor */
+			static char blank_pixmap_data[1] = {0};
+			XColor cursor_col;
+			Pixmap pixmap;
+
+			cursor_col = (XColor){0};
+			if ((pixmap = XCreateBitmapFromData(private->display, DefaultRootWindow(private->display), blank_pixmap_data, 1, 1)) == None)
+				goto exit_einvop;
+
+			private->cursors[FTGFX_CURSOR_BLANK] = XCreatePixmapCursor(private->display, pixmap, pixmap,
+																	   &cursor_col, &cursor_col, 0, 0);
+
+			XFreePixmap(private->display, pixmap);
+			if (private->cursors[FTGFX_CURSOR_BLANK] == None)
+				goto exit_einvop;
+		}
+		for (U8 i = FTGFX_CURSOR_BLANK + 1; i < _FTGFX_CURSOR_MAX; i++)
+		{
+			if ((private->cursors[i] = XcursorLibraryLoadCursor(private->display, ftgfxx11_cursor_name(i))) == None)
+			{
+				ft_fprintf(ft_fstderr, "couldn't init cursor %s\n", ftgfxx11_cursor_name(i));
+				goto exit_einvop;
+			}
+		}
+	}
+
+	ctx->active_window = NULL;
 
 	return ctx;
 
@@ -309,6 +337,9 @@ void ftGFX_destroy_ctx(struct s_ftGFX_ctx *ctx)
 		ftGFX_destroy_window(win);
 		win = next;
 	}
+
+	for (U8 i = 0; i < _FTGFX_CURSOR_MAX; i++)
+		XFreeCursor(private->display, private->cursors[i]);
 
 	XFreeColormap(private->display, private->cmap);
 	XDestroyWindow(private->display, private->root);

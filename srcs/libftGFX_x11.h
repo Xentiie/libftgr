@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/26 17:53:40 by reclaire          #+#    #+#             */
-/*   Updated: 2025/06/11 20:55:14 by reclaire         ###   ########.fr       */
+/*   Updated: 2025/07/08 02:53:36 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,6 +69,9 @@ struct s_ftGFX_ctx_private
 	bool use_xshm;
 
 	S32 pixmap_shm_format;
+
+	/* All the cursors supported by libftGFX */
+	Cursor cursors[_FTGFX_CURSOR_MAX];
 };
 
 #define FTGR_WINDOW_PRIVATE(win) ((t_ftGFX_win_private *)((win)->private))
@@ -90,13 +93,12 @@ struct s_ftGFX_window_private
 
 	struct s_framebuffer framebuffer;
 
-	/* Blank cursor cache for ftGFX_mouse_hide */
-	struct
-	{
-		bool has_blank_cursor;
-		Pixmap pixmap;
-		Cursor cursor;
-	} blank_cursor;
+	t_iv2 last_mouse_pos;
+
+	/* TRUE if the cursor is hidden */
+	bool cursor_hidden;
+	/* The index in `cursors` that is currently active. This is used to restore the correct when it is un-hidden. */
+	U8 cursor_current;
 };
 
 /*
@@ -108,14 +110,24 @@ Returns `((U8)-1)` and sets ft_errno.
 */
 U8 ftgfxx11_x11_to_ftgfx_mouse_button(U32 x11_mouse_button);
 
-/* Initializes the blank cursor for the specified window. */
-bool ftgfxx11_init_blank_cursor(struct s_ftGFX_window *win);
-/* Destroys the blank cursor for the specified window. */
-void ftgfxx11_destroy_blank_cursor(struct s_ftGFX_window *win);
+/*
+Converts a X11 keycode to a ftGFX key.
+### On error
+Returns `FTGFX_KEY_UNKNOWN` and sets ft_errno.
+### ft_errno
+- FT_ERANGE if no ftGFX key maps to the specified X11 keycode.
+*/
+enum e_ftGFX_key ftgfxx11_x11_to_ftgfx_key(struct s_ftGFX_ctx *ctx, U32 keycode);
+
+/* Converts X11 key modifiers to ftGFX key modifiers. */
+U32 ftgfxx11_x11_to_ftgfx_key_modifiers(U32 x11_mods);
 
 U32 ftgfxx11_keysym_to_unicode(U32 keysym);
 
-void ftgfxx11_keys_reset(struct s_ftGFX_ctx *ctx);
+void ftgfxx11_window_reset(struct s_ftGFX_window *window);
+
+/* Returns the cursor file name of `cursor`, to use with `Xcursor` */
+const_string ftgfxx11_cursor_name(enum e_ftGFX_cursor cursor);
 
 #endif
 #endif

@@ -1,0 +1,73 @@
+#!/usr/bin/awk -f
+# Copyright: 2022 David Hart
+# Licence:   wxWindows licence
+#
+# This version avoids gawk-specific features (like |&) by using temporary files.
+
+BEGIN {
+	suppression = 0
+	tmpfile = "/tmp/suppression_tmp"
+	md5tmp = "/tmp/suppression_md5"
+}
+
+# Start of a suppression
+/^{/ {
+	suppression = 1
+	i = 0
+	next
+}
+
+# End of a suppression
+/^}/ {
+	if (suppression) {
+		suppression = 0
+		ProcessInput()
+		delete supparray
+	}
+	next
+}
+
+# Inside a suppression: collect the lines
+{
+	if (suppression) {
+		supparray[++i] = $0
+	}
+}
+
+function ProcessInput() {
+	# Write current suppression to temp file
+	cmd = ">" tmpfile
+	for (n = 1; n <= i; ++n) {
+		cmd = cmd " && echo \"" escape(supparray[n]) "\" >> " tmpfile
+	}
+	system(cmd)
+
+	# Generate MD5 hash of the suppression file
+	system("md5sum " tmpfile " > " md5tmp)
+
+	# Read the MD5 hash
+	while ((getline result < md5tmp) > 0) {
+		split(result, parts, " ")
+		chksum = parts[1]
+		resultstring = "prefix" chksum
+		if (!(resultstring in chksum_array)) {
+			chksum_array[resultstring] = 0
+			OutputSuppression()
+		}
+	}
+	close(md5tmp)
+}
+
+function OutputSuppression() {
+	print "{"
+	for (n = 1; n <= i; ++n) {
+		print supparray[n]
+	}
+	print "}"
+}
+
+# Escape special characters for safe echo
+function escape(str,	escaped) {
+	gsub(/"/, "\\\"", str)
+	return str
+}

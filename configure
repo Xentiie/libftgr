@@ -673,7 +673,7 @@ help()
 
 configure() {
 	debug=true
-	optimisations=
+	optimisations=-O3
 	colors_fmt_mlx=false
 
 	nextarg=""
@@ -705,7 +705,6 @@ configure() {
 
 	cf_add_cflag "-Wall"
 	cf_add_cflag "-Wextra"
-	cf_add_cflag "-Wno-unknown-pragmas"
 
 	if [[ "$debug" == "true" ]]; then
 		cf_add_cflag "-DDEBUG"
@@ -722,6 +721,7 @@ configure() {
 	if [[ "$TARGET_OS" == "linux" ]]; then
 		cf_add_lib "libX11"
 		cf_add_lib "libXext"
+		cf_add_lib "libXcursor"
 	elif [[ "$TARGET_OS" == "windows" ]]; then
 		cf_add_lib "libgdi32"
 #		cf_add_lib "libopengl32"

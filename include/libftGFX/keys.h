@@ -1,0 +1,122 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   keys.h                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/07 00:38:45 by reclaire          #+#    #+#             */
+/*   Updated: 2025/07/08 15:43:48 by reclaire         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#if !defined(LIBFTGFX_KEYS_H)
+#define LIBFTGFX_KEYS_H
+
+enum e_ftGFX_key
+{
+	FTGFX_KEY_UNKNOWN = -1,
+
+	FTGFX_KEY_SPACE = 32,
+
+	FTGFX_KEY_A = 65,
+	FTGFX_KEY_B,
+	FTGFX_KEY_C,
+	FTGFX_KEY_D,
+	FTGFX_KEY_E,
+	FTGFX_KEY_F,
+	FTGFX_KEY_G,
+	FTGFX_KEY_H,
+	FTGFX_KEY_I,
+	FTGFX_KEY_J,
+	FTGFX_KEY_K,
+	FTGFX_KEY_L,
+	FTGFX_KEY_M,
+	FTGFX_KEY_N,
+	FTGFX_KEY_O,
+	FTGFX_KEY_P,
+	FTGFX_KEY_Q,
+	FTGFX_KEY_R,
+	FTGFX_KEY_S,
+	FTGFX_KEY_T,
+	FTGFX_KEY_U,
+	FTGFX_KEY_V,
+	FTGFX_KEY_W,
+	FTGFX_KEY_X,
+	FTGFX_KEY_Y,
+	FTGFX_KEY_Z,
+
+	FTGFX_KEY_SPECIAL = 256,
+	FTGFX_KEY_ESC,
+	FTGFX_KEY_F1,
+	FTGFX_KEY_F2,
+	FTGFX_KEY_F3,
+	FTGFX_KEY_F4,
+	FTGFX_KEY_F5,
+	FTGFX_KEY_F6,
+	FTGFX_KEY_F7,
+	FTGFX_KEY_F8,
+	FTGFX_KEY_F9,
+	FTGFX_KEY_F10,
+	FTGFX_KEY_F11,
+	FTGFX_KEY_F12,
+	FTGFX_KEY_F13,
+	FTGFX_KEY_F14,
+	FTGFX_KEY_F15,
+	FTGFX_KEY_F16,
+	FTGFX_KEY_F17,
+	FTGFX_KEY_F18,
+	FTGFX_KEY_F19,
+	FTGFX_KEY_F20,
+	FTGFX_KEY_F21,
+	FTGFX_KEY_F22,
+	FTGFX_KEY_F23,
+	FTGFX_KEY_F24,
+	FTGFX_KEY_F25,
+	FTGFX_KEY_UP,
+	FTGFX_KEY_DOWN,
+	FTGFX_KEY_LEFT,
+	FTGFX_KEY_RIGHT,
+	FTGFX_KEY_LSHIFT,
+	FTGFX_KEY_RSHIFT,
+	FTGFX_KEY_LCTRL,
+	FTGFX_KEY_RCTRL,
+	FTGFX_KEY_LALT,
+	FTGFX_KEY_RALT,
+	FTGFX_KEY_TAB,
+	FTGFX_KEY_ENTER,
+	FTGFX_KEY_BACKSPACE,
+	FTGFX_KEY_INSERT,
+	FTGFX_KEY_DEL,
+	FTGFX_KEY_PAGEUP,
+	FTGFX_KEY_PAGEDOWN,
+	FTGFX_KEY_HOME,
+	FTGFX_KEY_END,
+	FTGFX_KEY_KP_0,
+	FTGFX_KEY_KP_1,
+	FTGFX_KEY_KP_2,
+	FTGFX_KEY_KP_3,
+	FTGFX_KEY_KP_4,
+	FTGFX_KEY_KP_5,
+	FTGFX_KEY_KP_6,
+	FTGFX_KEY_KP_7,
+	FTGFX_KEY_KP_8,
+	FTGFX_KEY_KP_9,
+	FTGFX_KEY_KP_DIVIDE,
+	FTGFX_KEY_KP_MULTIPLY,
+	FTGFX_KEY_KP_SUBTRACT,
+	FTGFX_KEY_KP_ADD,
+	FTGFX_KEY_KP_DECIMAL,
+	FTGFX_KEY_KP_EQUAL,
+	FTGFX_KEY_KP_ENTER,
+	FTGFX_KEY_KP_NUM_LOCK,
+	FTGFX_KEY_CAPS_LOCK,
+	FTGFX_KEY_SCROLL_LOCK,
+	FTGFX_KEY_PAUSE,
+	FTGFX_KEY_LSUPER,
+	FTGFX_KEY_RSUPER,
+	FTGFX_KEY_MENU,
+	_FTGFX_KEY_MAX,
+};
+
+#endif

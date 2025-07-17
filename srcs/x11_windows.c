@@ -6,7 +6,7 @@
 /*   By: reclaire <reclaire@student.42mulhouse.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/16 22:36:34 by reclaire          #+#    #+#             */
-/*   Updated: 2025/06/11 20:55:18 by reclaire         ###   ########.fr       */
+/*   Updated: 2025/07/08 03:09:02 by reclaire         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,28 @@
 #include "libft/limits.h"
 
 #if FT_OS_LINUX
+
+void ftgfxx11_window_reset(struct s_ftGFX_window *window)
+{
+	for (U16 i = 0; i < sizeof(window->keys) / sizeof(window->keys[0]); i++)
+	{
+		if (window->keys[i] == FTGFX_KEY_STATE_PRESSED)
+			window->keys[i] = FTGFX_KEY_STATE_DOWN;
+		else if (window->keys[i] == FTGFX_KEY_STATE_RELEASED)
+			window->keys[i] = FTGFX_KEY_STATE_UP;
+	}
+
+	for (U8 i = 0; i < sizeof(window->mouse) / sizeof(window->mouse[0]); i++)
+	{
+		if (window->mouse[i] == FTGFX_MOUSE_STATE_PRESSED)
+			window->mouse[i] = FTGFX_MOUSE_STATE_DOWN;
+		else if (window->mouse[i] == FTGFX_MOUSE_STATE_RELEASED)
+			window->mouse[i] = FTGFX_MOUSE_STATE_UP;
+	}
+
+	window->mouse_delta = ivec2_zero;
+	window->damage = ivec4_zero;
+}
 
 static bool init_buffer(struct s_ftGFX_ctx *ctx, struct s_framebuffer *buffer, t_iv2 size)
 {
@@ -159,7 +181,17 @@ struct s_ftGFX_window *ftGFX_create_window(struct s_ftGFX_ctx *ctx, t_iv2 size, 
 	win->next = ctx->windows;
 	ctx->windows = win;
 
-	win_private->blank_cursor.has_blank_cursor = FALSE;
+	win->should_close = FALSE;
+
+	ft_bzero(win->keys, sizeof(win->keys));
+	ft_bzero(win->mouse, sizeof(win->mouse));
+	win->mouse_delta = ivec2_zero;
+	win_private->last_mouse_pos = ftGFX_mouse_get_pos(ctx, win);
+
+	win_private->cursor_hidden = FALSE;
+	win_private->cursor_current = FTGFX_CURSOR_DEFAULT;
+
+	win->damage = ivec4_zero;
 
 	return win;
 
@@ -210,7 +242,6 @@ void ftGFX_destroy_window(struct s_ftGFX_window *win)
 	}
 
 	free(win->name);
-	ftgfxx11_destroy_blank_cursor(win);
 	XFreeGC(private->display, win_private->gc);
 	XDestroyWindow(private->display, win_private->window);
 	XDestroyImage(win_private->framebuffer.ximage);
@@ -243,7 +274,7 @@ void ftGFX_set_win_name_infos(struct s_ftGFX_window *win, string infos)
 
 	win_private = (struct s_ftGFX_window_private *)win->private;
 
-	LIMIT_FREQ(1);
+	LIMIT_FREQ(0.15);
 	char buffer[256];
 	snprintf(buffer, sizeof(buffer), "%s - %s", win->name, infos);
 	XStoreName(((struct s_ftGFX_ctx_private *)win->ctx->private)->display, win_private->window, buffer);
